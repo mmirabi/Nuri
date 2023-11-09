@@ -147,13 +147,14 @@
                 @if (is_plugin_active('ecommerce'))
                     <div class="search-style-2">
                         <form action="{{ route('public.products') }}" class="form--quick-search" data-ajax-url="{{ route('public.ajax.search-products') }}" method="GET">
-                            <div class="form-group--icon position-relative">
+                            {{-- Mehdi Mirabi categories box hidden in search box --}}
+                            {{-- <div class="form-group--icon position-relative">
                                 <div class="product-cat-label">{{ __('All Categories') }}</div>
                                 <select class="product-category-select" name="categories[]" aria-label="Select category">
                                     <option value="">{{ __('All Categories') }}</option>
                                     {!! ProductCategoryHelper::renderProductCategoriesSelect() !!}
                                 </select>
-                            </div>
+                            </div> --}}
                             <input type="text" class="input-search-product" name="q" placeholder="{{ __('Search for items...') }}" value="{{ BaseHelper::stringify(request()->input('q')) }}" autocomplete="off">
                             <div class="panel--search-result"></div>
                         </form>
