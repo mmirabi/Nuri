@@ -8,7 +8,7 @@
                 </a>
             </div>
         </div>
-        <div class="product-action-1">
+        {{-- <div class="product-action-1">
             <a aria-label="{{ __('Quick View') }}" href="#" class="action-btn hover-up js-quick-view-button" data-url="{{ route('public.ajax.quick-view', $product->id) }}">
                 <i class="fi-rs-eye"></i>
             </a>
@@ -22,7 +22,7 @@
                     <i class="fi-rs-shuffle"></i>
                 </a>
             @endif
-        </div>
+        </div> --}}
         <div class="product-badges product-badges-position product-badges-mrg">
             @if ($product->isOutOfStock())
                 <span class="bg-dark" style="font-size: 11px;">{{ __('Out Of Stock') }}</span>

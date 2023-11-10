@@ -81,6 +81,16 @@
                             href="#">
                             <i class="fi-rs-shopping-cart mr-5"></i> <span class="d-inline-block">{{ __('Add') }}</span>
                         </a>
+                        @if (EcommerceHelper::isWishlistEnabled())
+                            <a aria-label="{{ __('Add To Wishlist') }}" href="#" class="action-btn wishlist-button" data-url="{{ route('public.wishlist.add', $product->id) }}">
+                                <i class="fi-rs-heart"></i>
+                            </a>
+                        @endif
+                        @if (EcommerceHelper::isCompareEnabled())
+                            <a aria-label="{{ __('Add To Compare') }}" href="#" class="action-btn compare-button" data-url="{{ route('public.compare.add', $product->id) }}">
+                                <i class="fi-rs-shuffle"></i>
+                            </a>
+                        @endif
                     </div>
                 @endif
             </div>

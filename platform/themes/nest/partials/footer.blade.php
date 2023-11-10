@@ -27,7 +27,7 @@
                 <div class="col-xl-4 col-lg-6 col-md-6 text-end d-none d-md-block">
                     @if (theme_option('social_links'))
                         <div class="mobile-social-icon">
-                            <p class="font-heading h6">{{ __('Follow Us') }}</p>
+                            <p class="font-heading h6" style="margin-left: 20px">{{ __('Follow Us') }}</p>
                             @foreach(json_decode(theme_option('social_links'), true) as $socialLink)
                                 @if (count($socialLink) == 3)
                                     <a href="{{ $socialLink[2]['value'] }}"
@@ -38,7 +38,8 @@
                             @endforeach
                         </div>
                     @endif
-                    <p class="font-sm">{{ __('Up to 15% discount on your first subscribe') }}</p>
+                    {{-- mehdi mirabi hidden discount text down social media links in footer --}}
+                    {{-- <p class="font-sm">{{ __('Up to 15% discount on your first subscribe') }}</p> --}}
                 </div>
             </div>
         </div>
