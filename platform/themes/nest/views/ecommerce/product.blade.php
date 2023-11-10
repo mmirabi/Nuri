@@ -172,8 +172,12 @@
         <div class="tab-style3">
             <ul class="nav nav-tabs text-uppercase">
                 <li class="nav-item">
-                    <a class="nav-link active" id="Description-tab" data-bs-toggle="tab" href="#Description">{{ __('Description') }}</a>
+                    <a class="nav-link active" id="InfoPro-tab" data-bs-toggle="tab" href="#InfoPro">{{ __('مشخصات فنی') }}</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="Description-tab" data-bs-toggle="tab" href="#Description">{{ __('Description') }}</a>
+                </li>
+                
                 @if (EcommerceHelper::isReviewEnabled())
                     <li class="nav-item">
                         <a class="nav-link" id="Reviews-tab" data-bs-toggle="tab" href="#Reviews">{{ __('Reviews') }} ({{ $product->reviews_count }})</a>
@@ -195,9 +199,16 @@
                 @endif
             </ul>
             <div class="tab-content shop_info_tab entry-main-content">
-                <div class="tab-pane fade show active" id="Description">
+                <div class="tab-pane fade show" id="Description">
                     <div class="ck-content">
                         {!! BaseHelper::clean($product->content) !!}
+                    </div>
+                    {!! apply_filters(BASE_FILTER_PUBLIC_COMMENT_AREA, null, $product) !!}
+                </div>
+                {{-- mehdi mirabi add new tab in product page "Professional information"--}}
+                <div class="tab-pane fade show active" id="InfoPro">
+                    <div class="ck-content">
+                        {!! BaseHelper::clean($product->InfoPro) !!}
                     </div>
                     {!! apply_filters(BASE_FILTER_PUBLIC_COMMENT_AREA, null, $product) !!}
                 </div>
