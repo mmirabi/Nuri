@@ -1,0 +1,8 @@
+{
+    "id": "botble/nest",
+    "name": "nuri",
+    "namespace": "Theme\\Nest\\",
+    "description": "Nuri - Online Computer Laravel eCommerce",
+    "author": "Mehdi Mirabi",
+    "required_plugins": []
+}
