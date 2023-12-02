@@ -8,14 +8,13 @@ use Botble\Ecommerce\Models\Shipment;
 
 class ShipmentInfoForm extends FormAbstract
 {
-    protected $template = 'core/base::forms.form-content-only';
-
     public function buildForm(): void
     {
         $this
             ->setupModel(new Shipment())
             ->setValidatorClass(ShipmentRequest::class)
             ->withCustomFields()
+            ->contentOnly()
             ->add('shipping_company_name', 'text', [
                 'label' => trans('plugins/ecommerce::shipping.shipping_company_name'),
                 'attr' => [
@@ -44,13 +43,13 @@ class ShipmentInfoForm extends FormAbstract
                     'placeholder' => trans('plugins/ecommerce::shipping.add_note'),
                 ],
             ])
-            ->add('submit', 'button', [
+            ->add('submitter', 'button', [
                 'label' => '<i class="fa fa-check-circle me-2"></i>' . trans('core/base::forms.save'),
                 'attr' => [
                     'class' => 'btn btn-success',
                     'value' => 'save',
                     'type' => 'submit',
-                    'name' => 'submit',
+                    'name' => 'submitter',
                 ],
             ]);
     }

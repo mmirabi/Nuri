@@ -54,6 +54,19 @@ class AdsForm extends FormAbstract
                 'label' => trans('plugins/ads::ads.open_in_new_tab'),
                 'default_value' => true,
             ])
+            ->add('image', 'mediaImage')
+            ->add('tablet_image', 'mediaImage', [
+                'label' => __('Tablet Image'),
+                'help_block' => [
+                    'text' => __('For devices with width from 768px to 1200px, if empty, will use the image from the desktop.'),
+                ],
+            ])
+            ->add('mobile_image', 'mediaImage', [
+                'label' => __('Mobile Image'),
+                'help_block' => [
+                    'text' => __('For devices with width less than 768px, if empty, will use the image from the tablet.'),
+                ],
+            ])
             ->add('status', 'customSelect', [
                 'label' => trans('core/base::tables.status'),
                 'required' => true,
@@ -76,7 +89,6 @@ class AdsForm extends FormAbstract
                 'label' => trans('plugins/ads::ads.expired_at'),
                 'default_value' => BaseHelper::formatDate(Carbon::now()->addMonth()),
             ])
-            ->add('image', 'mediaImage')
             ->setBreakFieldPoint('status');
     }
 
