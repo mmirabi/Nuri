@@ -3,7 +3,8 @@
 namespace Botble\Ecommerce\Http\Controllers\Fronts;
 
 use Botble\Base\Facades\BaseHelper;
-use Botble\Base\Http\Responses\BaseHttpResponse;
+use Botble\Base\Http\Controllers\BaseController;
+use Botble\Ecommerce\Enums\DiscountTypeEnum;
 use Botble\Ecommerce\Enums\OrderStatusEnum;
 use Botble\Ecommerce\Enums\ShippingCodStatusEnum;
 use Botble\Ecommerce\Enums\ShippingMethodEnum;
@@ -17,6 +18,7 @@ use Botble\Ecommerce\Http\Requests\CheckoutRequest;
 use Botble\Ecommerce\Http\Requests\SaveCheckoutInformationRequest;
 use Botble\Ecommerce\Models\Address;
 use Botble\Ecommerce\Models\Customer;
+use Botble\Ecommerce\Models\Discount as DiscountModel;
 use Botble\Ecommerce\Models\Order;
 use Botble\Ecommerce\Models\OrderHistory;
 use Botble\Ecommerce\Models\OrderProduct;
@@ -32,14 +34,16 @@ use Botble\Optimize\Facades\OptimizerHelper;
 use Botble\Payment\Enums\PaymentStatusEnum;
 use Botble\Payment\Supports\PaymentHelper;
 use Botble\Theme\Facades\Theme;
+use Carbon\Carbon;
 use Illuminate\Auth\Events\Registered;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
-class PublicCheckoutController
+class PublicCheckoutController extends BaseController
 {
     public function __construct()
     {
@@ -49,7 +53,6 @@ class PublicCheckoutController
     public function getCheckout(
         string $token,
         Request $request,
-        BaseHttpResponse $response,
         HandleShippingFeeService $shippingFeeService,
         HandleApplyCouponService $applyCouponService,
         HandleRemoveCouponService $removeCouponService,
@@ -61,14 +64,18 @@ class PublicCheckoutController
         }
 
         if (! EcommerceHelper::isEnabledGuestCheckout() && ! auth('customer')->check()) {
-            return $response->setNextUrl(route('customer.login'));
+            return $this
+                ->httpResponse()
+                ->setNextUrl(route('customer.login'));
         }
 
         if ($token !== session('tracked_start_checkout')) {
             $order = Order::query()->where(['token' => $token, 'is_finished' => false])->first();
 
             if (! $order) {
-                return $response->setNextUrl(route('public.index'));
+                return $this
+                    ->httpResponse()
+                    ->setNextUrl(route('public.index'));
             }
         }
 
@@ -84,12 +91,15 @@ class PublicCheckoutController
 
         $products = Cart::instance('cart')->products();
         if (! $products->count()) {
-            return $response->setNextUrl(route('public.cart'));
+            return $this
+                ->httpResponse()
+                ->setNextUrl(route('public.cart'));
         }
 
         foreach ($products as $product) {
             if ($product->isOutOfStock()) {
-                return $response
+                return $this
+                    ->httpResponse()
                     ->setError()
                     ->setNextUrl(route('public.cart'))
                     ->setMessage(
@@ -101,7 +111,8 @@ class PublicCheckoutController
         if (EcommerceHelper::isEnabledSupportDigitalProducts() && ! EcommerceHelper::canCheckoutForDigitalProducts(
             $products
         )) {
-            return $response
+            return $this
+                ->httpResponse()
                 ->setError()
                 ->setNextUrl(route('customer.login'))
                 ->setMessage(__('Your shopping cart has digital product(s), so you need to sign in to continue!'));
@@ -271,6 +282,19 @@ class PublicCheckoutController
             $data = array_merge($data, compact('addresses', 'isAvailableAddress', 'sessionAddressId'));
         }
 
+        $discounts = DiscountModel::query()
+            ->where('type', DiscountTypeEnum::COUPON)
+            ->where('start_date', '<=', Carbon::now())
+            ->where('display_at_checkout', true)
+            ->where(
+                fn (Builder $query) => $query
+                    ->whereNull('quantity')
+                    ->orWhereColumn('quantity', '>', 'total_used')
+            )
+            ->get();
+
+        $data = [...$data, 'discounts' => $discounts];
+
         $checkoutView = Theme::getThemeNamespace('views.ecommerce.orders.checkout');
 
         if (view()->exists($checkoutView)) {
@@ -287,7 +311,7 @@ class PublicCheckoutController
         bool $finished = false
     ): array {
         if ($request->has('billing_address_same_as_shipping_address')) {
-            $sessionData['billing_address_same_as_shipping_address'] = $request->input(
+            $sessionData['billing_address_same_as_shipping_address'] = $request->boolean(
                 'billing_address_same_as_shipping_address'
             );
         }
@@ -403,7 +427,10 @@ class PublicCheckoutController
 
         $sessionData = array_merge($sessionData, $addressData);
 
+        Cart::instance('cart')->refresh();
+
         $products = Cart::instance('cart')->products();
+
         if (is_plugin_active('marketplace')) {
             $sessionData = apply_filters(
                 HANDLE_PROCESS_ORDER_DATA_ECOMMERCE,
@@ -461,15 +488,7 @@ class PublicCheckoutController
         $sessionData = OrderHelper::checkAndCreateOrderAddress($addressData, $sessionData);
 
         if (! isset($sessionData['created_order_product'])) {
-            $weight = 0;
-            foreach (Cart::instance('cart')->content() as $cartItem) {
-                $product = Product::query()->find($cartItem->id);
-                if ($product && $product->weight) {
-                    $weight += $product->weight * $cartItem->qty;
-                }
-            }
-
-            $weight = EcommerceHelper::validateOrderWeight($weight);
+            $weight = Cart::instance('cart')->weight();
 
             OrderProduct::query()->where(['order_id' => $sessionData['created_order_id']])->delete();
 
@@ -511,7 +530,6 @@ class PublicCheckoutController
     public function postSaveInformation(
         string $token,
         SaveCheckoutInformationRequest $request,
-        BaseHttpResponse $response,
         HandleApplyCouponService $applyCouponService,
         HandleRemoveCouponService $removeCouponService
     ) {
@@ -523,7 +541,9 @@ class PublicCheckoutController
             $order = Order::query()->where(['token' => $token, 'is_finished' => false])->first();
 
             if (! $order) {
-                return $response->setNextUrl(route('public.index'));
+                return $this
+                    ->httpResponse()
+                    ->setNextUrl(route('public.index'));
             }
         }
 
@@ -553,13 +573,14 @@ class PublicCheckoutController
 
         $sessionData = $this->processOrderData($token, $sessionData, $request);
 
-        return $response->setData($sessionData);
+        return $this
+            ->httpResponse()
+            ->setData($sessionData);
     }
 
     public function postCheckout(
         string $token,
         CheckoutRequest $request,
-        BaseHttpResponse $response,
         HandleShippingFeeService $shippingFeeService,
         HandleApplyCouponService $applyCouponService,
         HandleRemoveCouponService $removeCouponService,
@@ -570,11 +591,14 @@ class PublicCheckoutController
         }
 
         if (! EcommerceHelper::isEnabledGuestCheckout() && ! auth('customer')->check()) {
-            return $response->setNextUrl(route('customer.login'));
+            return $this
+                ->httpResponse()
+                ->setNextUrl(route('customer.login'));
         }
 
-        if (! Cart::instance('cart')->count()) {
-            return $response
+        if (Cart::instance('cart')->isEmpty()) {
+            return $this
+                ->httpResponse()
                 ->setError()
                 ->setMessage(__('No products in cart'));
         }
@@ -585,14 +609,16 @@ class PublicCheckoutController
             EcommerceHelper::isEnabledSupportDigitalProducts() &&
             ! EcommerceHelper::canCheckoutForDigitalProducts($products)
         ) {
-            return $response
+            return $this
+                ->httpResponse()
                 ->setError()
                 ->setNextUrl(route('customer.login'))
                 ->setMessage(__('Your shopping cart has digital product(s), so you need to sign in to continue!'));
         }
 
         if (EcommerceHelper::getMinimumOrderAmount() > Cart::instance('cart')->rawSubTotal()) {
-            return $response
+            return $this
+                ->httpResponse()
                 ->setError()
                 ->setMessage(
                     __('Minimum order amount is :amount, you need to buy more :more to place an order!', [
@@ -611,7 +637,8 @@ class PublicCheckoutController
 
         foreach ($products as $product) {
             if ($product->isOutOfStock()) {
-                return $response
+                return $this
+                    ->httpResponse()
                     ->setError()
                     ->setMessage(
                         __('Product :product is out of stock!', ['product' => $product->original_product->name])
@@ -633,7 +660,7 @@ class PublicCheckoutController
                 $request,
                 $token,
                 $sessionData,
-                $response
+                $this->httpResponse()
             );
         }
 
@@ -805,7 +832,8 @@ class PublicCheckoutController
         $paymentData = apply_filters(FILTER_ECOMMERCE_PROCESS_PAYMENT, $paymentData, $request);
 
         if ($checkoutUrl = Arr::get($paymentData, 'checkoutUrl')) {
-            return $response
+            return $this
+                ->httpResponse()
                 ->setError($paymentData['error'])
                 ->setNextUrl($checkoutUrl)
                 ->setData(['checkoutUrl' => $checkoutUrl])
@@ -814,19 +842,21 @@ class PublicCheckoutController
         }
 
         if ($paymentData['error'] || ! $paymentData['charge_id']) {
-            return $response
+            return $this
+                ->httpResponse()
                 ->setError()
                 ->setNextUrl(PaymentHelper::getCancelURL($token))
                 ->withInput()
                 ->setMessage($paymentData['message'] ?: __('Checkout error!'));
         }
 
-        return $response
+        return $this
+            ->httpResponse()
             ->setNextUrl(PaymentHelper::getRedirectURL($token))
             ->setMessage(__('Checkout successfully!'));
     }
 
-    public function getCheckoutSuccess(string $token, BaseHttpResponse $response)
+    public function getCheckoutSuccess(string $token)
     {
         if (! EcommerceHelper::isCartEnabled()) {
             abort(404);
@@ -843,14 +873,15 @@ class PublicCheckoutController
         }
 
         if (is_plugin_active('payment') && (float)$order->amount && ! $order->payment_id) {
-            return $response
+            return $this
+                ->httpResponse()
                 ->setError()
                 ->setNextUrl(PaymentHelper::getCancelURL())
                 ->setMessage(__('Payment failed!'));
         }
 
         if (is_plugin_active('marketplace')) {
-            return apply_filters(PROCESS_GET_CHECKOUT_SUCCESS_IN_ORDER, $token, $response);
+            return apply_filters(PROCESS_GET_CHECKOUT_SUCCESS_IN_ORDER, $token, $this->httpResponse());
         }
 
         OrderHelper::clearSessions($token);
@@ -887,11 +918,8 @@ class PublicCheckoutController
         return view('plugins/ecommerce::orders.thank-you', compact('order', 'products'));
     }
 
-    public function postApplyCoupon(
-        ApplyCouponRequest $request,
-        HandleApplyCouponService $handleApplyCouponService,
-        BaseHttpResponse $response
-    ) {
+    public function postApplyCoupon(ApplyCouponRequest $request, HandleApplyCouponService $handleApplyCouponService)
+    {
         if (! EcommerceHelper::isCartEnabled()) {
             abort(404);
         }
@@ -906,7 +934,8 @@ class PublicCheckoutController
         }
 
         if ($result['error']) {
-            return $response
+            return $this
+                ->httpResponse()
                 ->setError()
                 ->withInput()
                 ->setMessage($result['message']);
@@ -914,15 +943,13 @@ class PublicCheckoutController
 
         $couponCode = $request->input('coupon_code');
 
-        return $response
+        return $this
+            ->httpResponse()
             ->setMessage(__('Applied coupon ":code" successfully!', ['code' => $couponCode]));
     }
 
-    public function postRemoveCoupon(
-        Request $request,
-        HandleRemoveCouponService $removeCouponService,
-        BaseHttpResponse $response
-    ) {
+    public function postRemoveCoupon(Request $request, HandleRemoveCouponService $removeCouponService)
+    {
         if (! EcommerceHelper::isCartEnabled()) {
             abort(404);
         }
@@ -939,24 +966,28 @@ class PublicCheckoutController
                 return $result;
             }
 
-            return $response
+            return $this
+                ->httpResponse()
                 ->setError()
                 ->setData($result)
                 ->setMessage($result['message']);
         }
 
-        return $response
+        return $this
+            ->httpResponse()
             ->setMessage(__('Removed coupon :code successfully!', ['code' => session('applied_coupon_code')]));
     }
 
-    public function getCheckoutRecover(string $token, Request $request, BaseHttpResponse $response)
+    public function getCheckoutRecover(string $token, Request $request)
     {
         if (! EcommerceHelper::isCartEnabled()) {
             abort(404);
         }
 
         if (! EcommerceHelper::isEnabledGuestCheckout() && ! auth('customer')->check()) {
-            return $response->setNextUrl(route('customer.login'));
+            return $this
+                ->httpResponse()
+                ->setNextUrl(route('customer.login'));
         }
 
         if (is_plugin_active('marketplace')) {
@@ -1007,7 +1038,9 @@ class PublicCheckoutController
 
         OrderHelper::setOrderSessionData($token, $sessionCheckoutData);
 
-        return $response->setNextUrl(route('public.checkout.information', $token))
+        return $this
+            ->httpResponse()
+            ->setNextUrl(route('public.checkout.information', $token))
             ->setMessage(__('You have recovered from previous orders!'));
     }
 

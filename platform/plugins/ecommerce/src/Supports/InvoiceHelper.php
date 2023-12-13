@@ -264,6 +264,16 @@ class InvoiceHelper
             'invoice_payment_info_filter' => apply_filters('invoice_payment_info_filter', null, $invoice),
         ];
 
+        $data['settings']['font_css'] = null;
+
+        if ($data['settings']['using_custom_font_for_invoice'] && $data['settings']['font_family']) {
+            $data['settings']['font_css'] = BaseHelper::googleFonts(
+                'https://fonts.googleapis.com/css2?family=' .
+                urlencode($data['settings']['font_family']) .
+                ':wght@400;600;700&display=swap'
+            );
+        }
+
         $order = $invoice->reference;
 
         if ($order) {

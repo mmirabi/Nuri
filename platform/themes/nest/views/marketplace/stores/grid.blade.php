@@ -23,10 +23,10 @@
     </div>
 </div>
 <div class="row flex-row-reverse">
-    <div class="col-lg-4-5 products-listing position-relative">
+    <div class="col-lg-9 products-listing position-relative">
         @include(Theme::getThemeNamespace('views.marketplace.stores.items'), compact('products'))
     </div>
-    <div class="col-lg-1-5 primary-sidebar sticky-sidebar">
+    <div class="col-lg-3 primary-sidebar sticky-sidebar">
         <div class="sidebar-widget widget-store-info mb-30 bg-3 border-0">
             <div class="vendor-logo mb-30">
                 <img src="{{ RvMedia::getImageUrl($store->logo, 'medium', false, RvMedia::getDefaultImage()) }}" alt="{{ $store->name }}" />

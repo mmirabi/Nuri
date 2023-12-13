@@ -25,7 +25,7 @@
                             @foreach($products as $product)
                                 <tr class="pt-30">
                                     <td class="image product-thumbnail pt-40 pl-30">
-                                        <img alt="{{ $product->name }}" src="{{ RvMedia::getImageUrl($product->image, 'thumb', false, RvMedia::getDefaultImage()) }}">
+                                        <img alt="{{ $product->name }}" src="{{ RvMedia::getImageUrl($product->image, 'product-thumb', false, RvMedia::getDefaultImage()) }}">
                                     </td>
                                     <td class="product-des product-name">
                                         <p class="mb-5 font-heading h6">

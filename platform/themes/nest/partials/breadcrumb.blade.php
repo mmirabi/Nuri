@@ -11,8 +11,8 @@
                         <div class="col-xl-3">
                             <h1 class="mb-15">{{ SeoHelper::getTitle() }}</h1>
                             <div class="breadcrumb">
-                                @foreach ($crumbs as $i => $crumb)
-                                    @if ($i != (count($crumbs) - 1))
+                                @foreach ($crumbs as $crumb)
+                                    @if (! $loop->last)
                                         <div class="breadcrumb-item d-inline-block">
                                             <a href="{{ $crumb['url'] }}" title="{{ $crumb['label'] }}">
                                                 {!! BaseHelper::clean($crumb['label']) !!}
@@ -37,8 +37,8 @@
         <div class="page-header breadcrumb-wrap">
             <div class="container">
                 <div class="breadcrumb">
-                    @foreach ($crumbs as $i => $crumb)
-                        @if ($i != (count($crumbs) - 1))
+                    @foreach ($crumbs as $crumb)
+                        @if (! $loop->last)
                             <div class="breadcrumb-item d-inline-block">
                                 <a href="{{ $crumb['url'] }}"title="{{ $crumb['label'] }}">
                                     {!! BaseHelper::clean($crumb['label']) !!}

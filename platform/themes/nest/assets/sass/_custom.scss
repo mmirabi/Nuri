@@ -2153,3 +2153,15 @@ input.qty-input[type=number] {
 .w-full {
     width: 100% !important;
 }
+
+.nav-link:focus, .nav-link:hover {
+    color: var(--color-brand-2);
+}
+
+@media only screen and (max-width: 992px) {
+    .banner-img {
+        .banner-text {
+            padding: 0 5px;
+        }
+    }
+}

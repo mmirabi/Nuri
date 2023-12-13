@@ -1,20 +1,17 @@
 @extends('plugins/ecommerce::orders.master')
+
 @section('title')
     {{ __('Order successfully at :site_title', ['site_title' => theme_option('site_title')]) }}
 @stop
-@section('content')
 
+@section('content')
     <div class="container">
         <div class="row">
             <div class="col-lg-7 col-md-6 col-12 left">
-
                 @include('plugins/ecommerce::orders.partials.logo')
 
                 <div class="thank-you">
-                    <i
-                        class="fa fa-check-circle"
-                        aria-hidden="true"
-                    ></i>
+                    <i class="fa fa-check-circle" aria-hidden="true"></i>
                     <div class="d-inline-block">
                         <h3 class="thank-you-sentence">
                             {{ __('Your order is successfully placed') }}
@@ -35,7 +32,6 @@
             </div>
             <!---------------------- start right column ------------------>
             <div class="col-lg-5 col-md-6 right">
-
                 @foreach ($orders as $order)
                     @include('plugins/ecommerce::orders.thank-you.order-info', ['isShowTotalInfo' => true])
 
@@ -46,7 +42,6 @@
 
                 @if (count($orders) > 1)
                     <hr>
-
                     <!-- total info -->
                     <div class="bg-light p-3">
                         <div class="row total-price">
@@ -54,14 +49,11 @@
                                 <p>{{ __('Sub amount') }}:</p>
                             </div>
                             <div class="col-6">
-                                <p class="text-end"> {{ format_price($orders->sum('sub_total')) }} </p>
+                                <p class="text-end">{{ format_price($orders->sum('sub_total')) }}</p>
                             </div>
                         </div>
 
-                        @if (
-                            $orders->filter(function ($order) {
-                                    return $order->shipment->id;
-                                })->count())
+                        @if ($orders->filter(fn ($order) => $order->shipment->id)->count())
                             <div class="row total-price">
                                 <div class="col-6">
                                     <p>{{ __('Shipping fee') }}:</p>
@@ -99,7 +91,8 @@
                                 <p>{{ __('Total amount') }}:</p>
                             </div>
                             <div class="col-6">
-                                <p class="total-text raw-total-text text-end"> {{ format_price($orders->sum('amount')) }}
+                                <p class="total-text raw-total-text text-end">
+                                    {{ format_price($orders->sum('amount')) }}
                                 </p>
                             </div>
                         </div>

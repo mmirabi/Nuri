@@ -43,6 +43,7 @@ return [
         'max_upload_filesize' => 'Max upload filesize (MB)',
         'max_upload_filesize_placeholder' => 'Default: 10',
         'max_product_images_upload_by_vendor' => 'Max number of images for each product',
+        'enable_vendor_registration' => 'Enable vendor registration',
     ],
     'theme_options' => [
         'name' => 'Marketplace',
@@ -52,6 +53,8 @@ return [
     'store_name' => 'Store name',
     'store_email' => 'Store email',
     'store_phone' => 'Store phone',
+    'store_address' => 'Store address',
+    'store_url' => 'Store URL',
     'product_name' => 'Product name',
     'product_url' => 'Product URL',
     'withdrawal_amount' => 'Withdrawal amount',

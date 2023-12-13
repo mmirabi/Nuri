@@ -4,7 +4,7 @@
 
         <div class="carousel-6-columns-cover arrow-center position-relative wow fadeIn animated">
             <div class="slider-arrow slider-arrow-3 carousel-6-columns-arrow" id="carousel-6-columns-3-arrows"></div>
-            <div class="carousel-slider-wrapper carousel-6-columns text-center" id="carousel-6-columns-3" data-items-xxl="{{ (int)$shortcode->scroll_items > 0 ? (int)$shortcode->scroll_items : 8 }}"slick_config="{{ json_encode([
+            <div class="carousel-slider-wrapper carousel-6-columns text-center" id="carousel-6-columns-3" data-items-xxl="{{ (int)$shortcode->scroll_items > 0 ? (int)$shortcode->scroll_items : 8 }}" data-slick="{{ json_encode([
                 'autoplay' => $shortcode->is_autoplay == 'yes',
                 'infinite' => $shortcode->infinite == 'yes' || $shortcode->is_infinite == 'yes',
                 'autoplaySpeed' => (int)(in_array($shortcode->autoplay_speed, theme_get_autoplay_speed_options()) ? $shortcode->autoplay_speed : 3000),

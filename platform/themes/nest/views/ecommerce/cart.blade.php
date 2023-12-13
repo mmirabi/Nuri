@@ -32,7 +32,7 @@
                                         <tr class="pt-30">
                                             <td class="image product-thumbnail pt-40">
                                                 <input type="hidden" name="items[{{ $key }}][rowId]" value="{{ $cartItem->rowId }}">
-                                                <img src="{{ RvMedia::getImageUrl($cartItem->options['image'], 'thumb', false, RvMedia::getDefaultImage()) }}" alt="{{ $product->original_product->name }}" />
+                                                <img src="{{ RvMedia::getImageUrl($cartItem->options->image, 'product-thumb', false, RvMedia::getDefaultImage()) }}" alt="{{ $product->original_product->name }}" />
                                             </td>
                                             <td class="product-des product-name">
                                                 <p class="mb-5 font-heading h6">

@@ -5,9 +5,8 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <title>{{ 'plugins/ecommerce::order.invoice_for_order'|trans }} {{ invoice.code }}</title>
 
-    {% if settings.using_custom_font_for_invoice and settings.custom_font_family %}
-        <link href="https://fonts.googleapis.com/css2?family={{ settings.custom_font_family | urlencode }}:wght@400;500;600;700;900&display=swap" rel="stylesheet">
-    {% endif %}
+    {{ settings.font_css }}
+
     <style>
         body {
             font-size: 15px;
@@ -200,7 +199,7 @@
             {% endif %}
 
             {% if company_tax_id %}
-                <p>{{ 'plugins/ecommerce::ecommerce.setting.tax_id'|trans }}: {{ company_tax_id }}</p>
+                <p>{{ 'plugins/ecommerce::ecommerce.tax_id'|trans }}: {{ company_tax_id }}</p>
             {% endif %}
         </td>
         <td>

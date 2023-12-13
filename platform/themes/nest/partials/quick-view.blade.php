@@ -16,7 +16,7 @@
             <!-- THUMBNAILS -->
             <div class="slider-nav-thumbnails">
                 @foreach ($productImages as $img)
-                    <div><img src="{{ RvMedia::getImageUrl($img, 'thumb') }}" alt="{{ $product->name }}"></div>
+                    <div><img src="{{ RvMedia::getImageUrl($img, 'product-thumb') }}" alt="{{ $product->name }}"></div>
                 @endforeach
             </div>
         </div>

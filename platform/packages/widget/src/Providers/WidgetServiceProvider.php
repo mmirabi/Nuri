@@ -7,6 +7,7 @@ use Botble\Base\Facades\DashboardMenu;
 use Botble\Base\Facades\Html;
 use Botble\Base\Supports\ServiceProvider;
 use Botble\Base\Traits\LoadAndPublishDataTrait;
+use Botble\Theme\Events\RenderingAdminBar;
 use Botble\Theme\Facades\AdminBar;
 use Botble\Theme\Facades\Theme;
 use Botble\Theme\Supports\ThemeSupport;
@@ -20,7 +21,6 @@ use Botble\Widget\WidgetGroupCollection;
 use Botble\Widget\Widgets\CoreSimpleMenu;
 use Botble\Widget\Widgets\Text;
 use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Routing\Events\RouteMatched;
 use Illuminate\Support\Facades\Auth;
 
 class WidgetServiceProvider extends ServiceProvider
@@ -41,7 +41,8 @@ class WidgetServiceProvider extends ServiceProvider
             return new WidgetGroupCollection($app);
         });
 
-        $this->setNamespace('packages/widget')
+        $this
+            ->setNamespace('packages/widget')
             ->loadHelpers();
     }
 
@@ -100,25 +101,24 @@ class WidgetServiceProvider extends ServiceProvider
             }, 16);
         });
 
-        $this->app['events']->listen(RouteMatched::class, function () {
-            DashboardMenu::registerItem([
-                'id' => 'cms-core-widget',
-                'priority' => 3,
-                'parent_id' => 'cms-core-appearance',
-                'name' => 'packages/widget::widget.name',
-                'icon' => null,
-                'url' => route('widgets.index'),
-                'permissions' => ['widgets.index'],
-            ]);
+        DashboardMenu::default()->beforeRetrieving(function () {
+            DashboardMenu::make()
+                ->registerItem([
+                    'id' => 'cms-core-widget',
+                    'priority' => 3,
+                    'parent_id' => 'cms-core-appearance',
+                    'name' => 'packages/widget::widget.name',
+                    'route' => 'widgets.index',
+                ]);
+        });
 
-            if (function_exists('admin_bar')) {
-                AdminBar::registerLink(
-                    trans('packages/widget::widget.name'),
-                    route('widgets.index'),
-                    'appearance',
-                    'widgets.index'
-                );
-            }
+        $this->app['events']->listen(RenderingAdminBar::class, function () {
+            AdminBar::registerLink(
+                trans('packages/widget::widget.name'),
+                route('widgets.index'),
+                'appearance',
+                'widgets.index'
+            );
         });
     }
 }

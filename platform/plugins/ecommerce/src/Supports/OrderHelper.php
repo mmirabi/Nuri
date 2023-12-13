@@ -301,8 +301,11 @@ class OrderHelper
         do_action(ACTION_AFTER_ORDER_STATUS_COMPLETED_ECOMMERCE, $order, $request);
 
         OrderHistory::query()->create([
-            'action' => 'update_status',
-            'description' => trans('plugins/ecommerce::shipping.order_confirmed_by'),
+            'action' => 'mark_order_as_completed',
+            'description' => trans('plugins/ecommerce::order.mark_as_completed.history', [
+                'admin' => Auth::check() ? Auth::user()->name : 'system',
+                'time' => Carbon::now(),
+            ]),
             'order_id' => $orderId,
             'user_id' => $userId,
         ]);
@@ -649,10 +652,10 @@ class OrderHelper
         return $sessionData;
     }
 
-    protected function storeOrderBillingAddress(array $data, array $sessionData = [])
+    protected function storeOrderBillingAddress(array $data, array $sessionData = []): void
     {
         if (! EcommerceHelperFacade::isBillingAddressEnabled()) {
-            return false;
+            return;
         }
 
         $orderId = Arr::get($data, 'order_id', Arr::get($data, 'created_order_id'));
@@ -662,11 +665,11 @@ class OrderHelper
                 'billing_address_same_as_shipping_address',
                 '1'
             );
-            if (! $billingAddressSameAsShippingAddress || ! Arr::get(
-                $sessionData,
-                'is_save_order_shipping_address',
-                true
-            )) {
+
+            if (
+                ! $billingAddressSameAsShippingAddress ||
+                ! Arr::get($sessionData, 'is_save_order_shipping_address', true)
+            ) {
                 $addressData = Arr::only(
                     $sessionData,
                     ['name', 'phone', 'email', 'country', 'state', 'city', 'address', 'zip_code']
@@ -681,18 +684,21 @@ class OrderHelper
                 $rules = EcommerceHelperFacade::getCustomerAddressValidationRules();
                 $validator = Validator::make($billingAddressData, $rules);
                 if ($validator->fails()) {
-                    return false;
+                    return;
                 }
 
                 $billingAddressData['order_id'] = $orderId;
                 $billingAddressData['type'] = OrderAddressTypeEnum::BILLING;
 
-                OrderAddress::query()
-                    ->where([
+                $orderBillingAddress = OrderAddress::query()
+                    ->firstOrNew([
                         'order_id' => $orderId,
                         'type' => OrderAddressTypeEnum::BILLING,
-                    ])
-                    ->update($billingAddressData);
+                    ]);
+
+                $orderBillingAddress->fill($billingAddressData);
+                $orderBillingAddress->save();
+
             } else {
                 OrderAddress::query()
                     ->where([

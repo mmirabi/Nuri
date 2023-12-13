@@ -106,7 +106,7 @@
 </div>
 
 @if (is_plugin_active('captcha'))
-    @if (Captcha::isEnabled())
+    @if (Captcha::reCaptchaEnabled())
         <div class="contact-form-row">
             <div class="contact-column-12">
                 <div class="contact-form-group">
@@ -116,7 +116,7 @@
         </div>
     @endif
 
-    @if (setting('enable_math_captcha_for_contact_form', 0))
+    @if (Captcha::mathCaptchaEnabled() && setting('enable_math_captcha_for_contact_form', 0))
         <div class="contact-form-group">
             <label
                 class="contact-label required"
@@ -130,7 +130,7 @@
 {!! apply_filters('after_contact_form', null) !!}
 
 <div class="contact-form-group">
-    <p>{!! BaseHelper::clean(__('The field with (<span style="color:#FF0000;">*</span>) is required.')) !!}</p>
+    <p>{!! BaseHelper::clean(__('The field with (:asterisk) is required.', ['asterisk' => '<span style="color:#FF0000;">*</span>'])) !!}</p>
 </div>
 
 <div class="contact-form-group">

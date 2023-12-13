@@ -66,7 +66,7 @@ class BlogService
                 if (function_exists('admin_bar')) {
                     AdminBar::registerLink(
                         trans('plugins/blog::posts.edit_this_post'),
-                        route('posts.edit', $post->id),
+                        route('posts.edit', $post->getKey()),
                         null,
                         'posts.edit'
                     );
@@ -75,8 +75,6 @@ class BlogService
                 if (function_exists('shortcode')) {
                     shortcode()->getCompiler()->setEditLink(route('posts.edit', $post->id), 'posts.edit');
                 }
-
-                Theme::breadcrumb()->add(__('Home'), route('public.index'));
 
                 $category = $post->categories->sortByDesc('id')->first();
                 if ($category) {
@@ -124,19 +122,16 @@ class BlogService
                 if (function_exists('admin_bar')) {
                     AdminBar::registerLink(
                         trans('plugins/blog::categories.edit_this_category'),
-                        route('categories.edit', $category->id),
+                        route('categories.edit', $category->getKey()),
                         null,
                         'categories.edit'
                     );
                 }
 
-                $allRelatedCategoryIds = array_merge([$category->id], $category->activeChildren->pluck('id')->all());
+                $allRelatedCategoryIds = array_merge([$category->getKey()], $category->activeChildren->pluck('id')->all());
 
                 $posts = app(PostInterface::class)
                     ->getByCategory($allRelatedCategoryIds, (int)theme_option('number_of_posts_in_a_category', 12));
-
-                Theme::breadcrumb()
-                    ->add(__('Home'), route('public.index'));
 
                 if ($category->parents->isNotEmpty()) {
                     foreach ($category->parents->reverse() as $parentCategory) {
@@ -176,17 +171,15 @@ class BlogService
                 if (function_exists('admin_bar')) {
                     AdminBar::registerLink(
                         trans('plugins/blog::tags.edit_this_tag'),
-                        route('tags.edit', $tag->id),
+                        route('tags.edit', $tag->getKey()),
                         null,
                         'tags.edit'
                     );
                 }
 
-                $posts = get_posts_by_tag($tag->id, (int)theme_option('number_of_posts_in_a_tag', 12));
+                $posts = get_posts_by_tag($tag->getKey(), (int)theme_option('number_of_posts_in_a_tag', 12));
 
-                Theme::breadcrumb()
-                    ->add(__('Home'), route('public.index'))
-                    ->add($tag->name, $tag->url);
+                Theme::breadcrumb()->add($tag->name, $tag->url);
 
                 do_action(BASE_ACTION_PUBLIC_RENDER_SINGLE, TAG_MODULE_SCREEN_NAME, $tag);
 

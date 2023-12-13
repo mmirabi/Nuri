@@ -22,7 +22,7 @@ if (! function_exists('get_product_by_id')) {
 if (! function_exists('get_products')) {
     function get_products(array $params = []): Collection|LengthAwarePaginator|Product|null
     {
-        $params = array_merge([
+        $params = [
             'condition' => [
                 'ec_products.is_variation' => 0,
             ],
@@ -41,7 +41,8 @@ if (! function_exists('get_products')) {
             'with' => ['slugable'],
             'withCount' => [],
             'withAvg' => [],
-        ], $params);
+            ...$params,
+        ];
 
         return app(ProductInterface::class)->getProducts($params);
     }

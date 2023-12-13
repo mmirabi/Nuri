@@ -144,7 +144,7 @@
         var sliderID = '#' + id
         var appendArrowsClassName = '#' + id + '-arrows'
 
-        $(sliderID).slick({
+        const slickOptions = Object.assign({
             dots: false,
             infinite: true,
             rtl: isRTL,
@@ -181,16 +181,18 @@
             prevArrow: '<span class="slider-btn slider-prev"><i class="fi-rs-arrow-small-left"></i></span>',
             nextArrow: '<span class="slider-btn slider-next"><i class="fi-rs-arrow-small-right"></i></span>',
             appendArrows: appendArrowsClassName,
-        })
+        }, $(sliderID).data('slick') || {})
+
+        $(sliderID).slick(slickOptions)
     })
 
     /* Carousel 10 columns */
     $('.carousel-10-columns').each(function() {
-        var id = $(this).attr('id')
-        var sliderID = '#' + id
-        var appendArrowsClassName = '#' + id + '-arrows'
+        let id = $(this).attr('id')
+        let sliderID = '#' + id
+        let appendArrowsClassName = '#' + id + '-arrows'
 
-        $(sliderID).slick({
+        const slickOptions = Object.assign({
             dots: false,
             infinite: true,
             rtl: isRTL,
@@ -227,16 +229,18 @@
             prevArrow: '<span class="slider-btn slider-prev"><i class="fi-rs-arrow-small-left"></i></span>',
             nextArrow: '<span class="slider-btn slider-next"><i class="fi-rs-arrow-small-right"></i></span>',
             appendArrows: appendArrowsClassName,
-        })
+        }, $(sliderID).data('slick') || {})
+
+        $(sliderID).slick(slickOptions)
     })
 
     /*Carousel 4 columns*/
     $('.carousel-4-columns').each(function() {
-        var id = $(this).attr('id')
-        var sliderID = '#' + id
-        var appendArrowsClassName = '#' + id + '-arrows'
+        let id = $(this).attr('id')
+        let sliderID = '#' + id
+        let appendArrowsClassName = '#' + id + '-arrows'
 
-        $(sliderID).slick({
+        const slickOptions = Object.assign({
             dots: false,
             infinite: true,
             rtl: isRTL,
@@ -273,7 +277,9 @@
             prevArrow: '<span class="slider-btn slider-prev"><i class="fi-rs-arrow-small-left"></i></span>',
             nextArrow: '<span class="slider-btn slider-next"><i class="fi-rs-arrow-small-right"></i></span>',
             appendArrows: appendArrowsClassName,
-        })
+        }, $(sliderID).data('slick') || {})
+
+        $(sliderID).slick(slickOptions)
     })
 
     $('.carousel-6-columns').each(function() {
@@ -326,18 +332,18 @@
             prevArrow: '<span class="slider-btn slider-prev"><i class="fi-rs-arrow-small-left"></i></span>',
             nextArrow: '<span class="slider-btn slider-next"><i class="fi-rs-arrow-small-right"></i></span>',
             appendArrows: appendArrowsClassName,
-        }, el.data('slick') || {})
+        }, $(sliderID).data('slick') || {})
 
         $(sliderID).slick(slickOptions)
     })
 
     /*Carousel 4 columns*/
     $('.carousel-3-columns').each(function() {
-        var id = $(this).attr('id')
-        var sliderID = '#' + id
-        var appendArrowsClassName = '#' + id + '-arrows'
+        let id = $(this).attr('id')
+        let sliderID = '#' + id
+        let appendArrowsClassName = '#' + id + '-arrows'
 
-        $(sliderID).slick({
+        const slickOptions = Object.assign({
             dots: false,
             infinite: true,
             rtl: isRTL,
@@ -367,7 +373,9 @@
             prevArrow: '<span class="slider-btn slider-prev"><i class="fi-rs-arrow-small-left"></i></span>',
             nextArrow: '<span class="slider-btn slider-next"><i class="fi-rs-arrow-small-right"></i></span>',
             appendArrows: appendArrowsClassName,
-        })
+        }, $(sliderID).data('slick') || {})
+
+        $(sliderID).slick(slickOptions)
     })
 
     /*Fix Bootstrap 5 tab & slick slider*/
@@ -385,7 +393,7 @@
     }
 
     $('[data-countdown]').each(function() {
-        var $this = $(this), finalDate = $(this).data('countdown')
+        let $this = $(this), finalDate = $(this).data('countdown')
         $this.countdown(finalDate, function(event) {
 
             $(this).html(
@@ -555,7 +563,7 @@
     /*----------------------------
         Category toggle function
     ------------------------------*/
-    var searchToggle = $('.categories-button-active')
+    let searchToggle = $('.categories-button-active')
     searchToggle.on('click', function(e) {
         e.preventDefault()
         if ($headerArea.find('.categories-button-active').hasClass('cant-close') && !header.hasClass('stick')) {
@@ -577,12 +585,12 @@
     /*-------------------------
         Testimonial active 2
     --------------------------*/
-    var $status = $('.pagingInfo')
-    var $slickElement = $('.testimonial-active-2')
+    let $status = $('.pagingInfo')
+    let $slickElement = $('.testimonial-active-2')
 
     $slickElement.on('init reInit afterChange', function(event, slick, currentSlide) {
         //currentSlide is undefined on init -- set it to 0 in this case (currentSlide is 0 based)
-        var i = (currentSlide ? currentSlide : 0) + 1
+        let i = (currentSlide ? currentSlide : 0) + 1
         $status.text('0' + i + ' ------ ' + '0' + slick.slideCount)
     })
 
@@ -602,12 +610,12 @@
         Sort by active
     -----------------------------------*/
     if ($('.sort-by-product-area').length) {
-        var $body = $('body'),
+        let $body = $('body'),
             $cartWrap = $('.sort-by-product-area'),
             $cartContent = $cartWrap.find('.sort-by-dropdown')
         $body.on('click', '.sort-by-product-area .sort-by-product-wrap', function(e) {
             e.preventDefault()
-            var $this = $(this)
+            let $this = $(this)
             if (!$this.parent().hasClass('show')) {
                 $this.siblings('.sort-by-dropdown').addClass('show').closest('.sort-by-product-area').addClass('show')
             } else {
@@ -616,7 +624,7 @@
         })
         /*Close When Click Outside*/
         $body.on('click', function(e) {
-            var $target = e.target
+            let $target = e.target
             if (!$($target).is('.sort-by-product-area') && !$($target).parents().is('.sort-by-product-area') && $cartWrap.hasClass('show')) {
                 $cartWrap.removeClass('show')
                 $cartContent.removeClass('show')
@@ -627,7 +635,7 @@
     /*-----------------------
         Shop filter active
     ------------------------- */
-    var shopFiltericon = $('.shop-filter-toggle')
+    let shopFiltericon = $('.shop-filter-toggle')
     shopFiltericon.on('click', function(e) {
         e.preventDefault()
         $('.shop-product-filter-header').slideToggle()
@@ -712,7 +720,7 @@
     if ($('.grid').length) {
         $('.grid').imagesLoaded(function() {
             // init Isotope
-            var $grid = $('.grid').isotope({
+            let $grid = $('.grid').isotope({
                 itemSelector: '.grid-item',
                 percentPosition: true,
                 layoutMode: 'masonry',
@@ -726,7 +734,7 @@
 
     /*====== SidebarSearch ======*/
     function sidebarSearch() {
-        var searchTrigger = $('.search-active'),
+        let searchTrigger = $('.search-active'),
             endTriggersearch = $('.search-close'),
             container = $('.main-search-active')
 
@@ -744,7 +752,7 @@
 
     /*====== Sidebar menu Active ======*/
     function mobileHeaderActive() {
-        var navbarTrigger = $('.burger-icon'),
+        let navbarTrigger = $('.burger-icon'),
             endTrigger = $('.mobile-menu-close'),
             container = $('.mobile-header-active'),
             wrapper4 = $('body')
@@ -773,7 +781,7 @@
     /*---------------------
          Mobile menu active
      ------------------------ */
-    var $offCanvasNav = $('.mobile-menu'),
+    let $offCanvasNav = $('.mobile-menu'),
         $offCanvasNavSubMenu = $offCanvasNav.find('.dropdown')
 
     /*Add Toggle Button With Off Canvas Sub Menu*/
@@ -784,7 +792,7 @@
 
     /*Category Sub Menu Toggle*/
     $offCanvasNav.on('click', 'li a, li .menu-expand', function(e) {
-        var $this = $(this)
+        let $this = $(this)
         if (($this.parent().attr('class').match(/\b(menu-item-has-children|has-children|has-sub-menu)\b/)) && ($this.attr('href') === '#' || $this.hasClass('menu-expand'))) {
             e.preventDefault()
             if ($this.siblings('ul:visible').length) {
@@ -827,7 +835,7 @@
         showItems: 1,
     })
 
-    var productDetails = function() {
+    let productDetails = function() {
         $('.product-image-slider').slick({
             slidesToShow: 1,
             slidesToScroll: 1,
@@ -858,7 +866,7 @@
 
         // On before slide change match active thumbnail to current slide
         $('.product-image-slider').on('beforeChange', function(event, slick, currentSlide, nextSlide) {
-            var mySlideNumber = nextSlide
+            let mySlideNumber = nextSlide
             $('.slider-nav-thumbnails .slick-slide').removeClass('slick-active')
             $('.slider-nav-thumbnails .slick-slide').eq(mySlideNumber).addClass('slick-active')
         })

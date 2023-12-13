@@ -10,6 +10,7 @@ use Botble\Ecommerce\Models\Customer;
 use Botble\Ecommerce\Models\Discount;
 use Botble\Ecommerce\Models\Order;
 use Botble\Ecommerce\Models\Product;
+use Botble\Ecommerce\Models\QueryBuilders\StoreQueryBuilder;
 use Botble\Ecommerce\Traits\LocationTrait;
 use Botble\Media\Facades\RvMedia;
 use Exception;
@@ -168,5 +169,10 @@ class Store extends BaseModel
         }
 
         return $data;
+    }
+
+    public function newEloquentBuilder($query): StoreQueryBuilder
+    {
+        return new StoreQueryBuilder($query);
     }
 }

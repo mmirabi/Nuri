@@ -8,12 +8,12 @@
         </div>
         <div class="carousel-10-columns-cover position-relative">
             <div class="carousel-slider-wrapper carousel-10-columns" id="carousel-10-columns" data-items-xxl="{{ (int)$shortcode->scroll_items > 0 ? (int)$shortcode->scroll_items : 10 }}" title="{{ $shortcode->title }}"
-                 slick_config="{{ json_encode([
-                'autoplay' => $shortcode->is_autoplay == 'yes',
-                'infinite' => $shortcode->infinite == 'yes' || $shortcode->is_infinite == 'yes',
-                'autoplaySpeed' => (int)(in_array($shortcode->autoplay_speed, theme_get_autoplay_speed_options()) ? $shortcode->autoplay_speed : 3000),
-                'speed' => 800,
-        ]) }}" data-items-xl="6" data-items-lg="4" data-items-md="3" data-items-sm="2">
+                 data-slick="{{ json_encode([
+                        'autoplay' => $shortcode->is_autoplay == 'yes',
+                        'infinite' => $shortcode->infinite == 'yes' || $shortcode->is_infinite == 'yes',
+                        'autoplaySpeed' => (int)(in_array($shortcode->autoplay_speed, theme_get_autoplay_speed_options()) ? $shortcode->autoplay_speed : 3000),
+                        'speed' => 800,
+                ]) }}" data-items-xl="6" data-items-lg="4" data-items-md="3" data-items-sm="2">
                @foreach($categories as $category)
                     <div class="card-2 wow animate__animated animate__fadeInUp"
                          data-wow-delay="{{ ($loop->index + 1) / 10 }}s"

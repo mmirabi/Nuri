@@ -3,7 +3,7 @@
     {{ __('Checkout') }}
 @stop
 @section('content')
-    @if (Cart::instance('cart')->count() > 0)
+    @if (Cart::instance('cart')->isNotEmpty())
         @php
             $rawTotal = Cart::instance('cart')->rawTotal();
             $orderAmount = max($rawTotal - $promotionDiscountAmount - $couponDiscountAmount, 0);
@@ -131,7 +131,7 @@
                     <hr>
 
                     <div class="mt-3 mb-5">
-                        @include('plugins/ecommerce::themes.discounts.partials.form')
+                        @include('plugins/ecommerce::themes.discounts.partials.form', compact('discounts'))
                     </div>
                 </div>
                 <div class="col-lg-7 col-md-6 left">
@@ -283,7 +283,7 @@
 
                         <div class="form-group mb-3 @if ($errors->has('description')) has-error @endif">
                             <label
-                                class="control-label mb-2"
+                                class="form-label mb-2"
                                 for="description"
                             >{{ __('Order notes') }}</label>
                             <br>
@@ -381,7 +381,7 @@
         src="{{ asset('vendor/core/core/js-validation/js/js-validation.js') }}"
     ></script>
     {!! JsValidator::formRequest(
-        \Botble\Ecommerce\Http\Requests\SaveCheckoutInformationRequest::class,
+        Botble\Ecommerce\Http\Requests\SaveCheckoutInformationRequest::class,
         '#checkout-form',
     ) !!}
 @endpush

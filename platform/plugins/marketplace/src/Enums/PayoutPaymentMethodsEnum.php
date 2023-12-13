@@ -2,10 +2,10 @@
 
 namespace Botble\Marketplace\Enums;
 
-use Botble\Base\Facades\Html;
 use Botble\Base\Supports\Enum;
 use Botble\Marketplace\Facades\MarketplaceHelper;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\HtmlString;
 use Illuminate\Validation\Rule;
 
@@ -23,17 +23,13 @@ class PayoutPaymentMethodsEnum extends Enum
 
     public function toHtml(): HtmlString|string
     {
-        return match ($this->value) {
-            self::BANK_TRANSFER => Html::tag(
-                'span',
-                self::BANK_TRANSFER()->label(),
-                ['class' => 'label-info status-label']
-            )
-                ->toHtml(),
-            self::PAYPAL => Html::tag('span', self::PAYPAL()->label(), ['class' => 'label-primary status-label'])
-                ->toHtml(),
-            default => parent::toHtml(),
+        $color = match ($this->value) {
+            self::BANK_TRANSFER => 'info',
+            self::PAYPAL => 'primary',
+            default => null,
         };
+
+        return Blade::render(sprintf('<x-core::badge label="%s" color="%s" />', $this->label(), $color));
     }
 
     public static function payoutMethodsEnabled(): array

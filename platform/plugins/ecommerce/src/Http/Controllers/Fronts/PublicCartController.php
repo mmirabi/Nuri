@@ -2,7 +2,7 @@
 
 namespace Botble\Ecommerce\Http\Controllers\Fronts;
 
-use Botble\Base\Http\Responses\BaseHttpResponse;
+use Botble\Base\Http\Controllers\BaseController;
 use Botble\Ecommerce\Facades\Cart;
 use Botble\Ecommerce\Facades\EcommerceHelper;
 use Botble\Ecommerce\Facades\OrderHelper;
@@ -14,10 +14,9 @@ use Botble\Ecommerce\Services\HandleApplyPromotionsService;
 use Botble\SeoHelper\Facades\SeoHelper;
 use Botble\Theme\Facades\Theme;
 use Exception;
-use Illuminate\Routing\Controller;
 use Illuminate\Support\Arr;
 
-class PublicCartController extends Controller
+class PublicCartController extends BaseController
 {
     public function __construct(
         protected HandleApplyPromotionsService $applyPromotionsService,
@@ -40,7 +39,7 @@ class PublicCartController extends Controller
         $products = collect();
         $crossSellProducts = collect();
 
-        if (Cart::instance('cart')->count() > 0) {
+        if (Cart::instance('cart')->isNotEmpty()) {
             [$products, $promotionDiscountAmount, $couponDiscountAmount] = $this->getCartData();
 
             $crossSellProducts = get_cart_cross_sale_products(
@@ -51,7 +50,7 @@ class PublicCartController extends Controller
 
         SeoHelper::setTitle(__('Shopping Cart'));
 
-        Theme::breadcrumb()->add(__('Home'), route('public.index'))->add(__('Shopping Cart'), route('public.cart'));
+        Theme::breadcrumb()->add(__('Shopping Cart'), route('public.cart'));
 
         return Theme::scope(
             'ecommerce.cart',
@@ -85,11 +84,13 @@ class PublicCartController extends Controller
         return [$products, $promotionDiscountAmount, $couponDiscountAmount];
     }
 
-    public function store(CartRequest $request, BaseHttpResponse $response)
+    public function store(CartRequest $request)
     {
         if (! EcommerceHelper::isCartEnabled()) {
             abort(404);
         }
+
+        $response = $this->httpResponse();
 
         $product = Product::query()->find($request->input('id'));
 
@@ -224,7 +225,7 @@ class PublicCartController extends Controller
             ]);
     }
 
-    public function update(UpdateCartRequest $request, BaseHttpResponse $response)
+    public function update(UpdateCartRequest $request)
     {
         if (! EcommerceHelper::isCartEnabled()) {
             abort(404);
@@ -233,7 +234,9 @@ class PublicCartController extends Controller
         if ($request->has('checkout')) {
             $token = OrderHelper::getOrderSessionToken();
 
-            return $response->setNextUrl(route('public.checkout.information', $token));
+            return $this
+                ->httpResponse()
+                ->setNextUrl(route('public.checkout.information', $token));
         }
 
         $data = $request->input('items', []);
@@ -267,7 +270,8 @@ class PublicCartController extends Controller
         }
 
         if ($outOfQuantity) {
-            return $response
+            return $this
+                ->httpResponse()
                 ->setError()
                 ->setData([
                     'count' => Cart::instance('cart')->count(),
@@ -277,7 +281,8 @@ class PublicCartController extends Controller
                 ->setMessage(__('One or all products are not enough quantity so cannot update!'));
         }
 
-        return $response
+        return $this
+            ->httpResponse()
             ->setData([
                 'count' => Cart::instance('cart')->count(),
                 'total_price' => format_price(Cart::instance('cart')->rawSubTotal()),
@@ -286,7 +291,7 @@ class PublicCartController extends Controller
             ->setMessage(__('Update cart successfully!'));
     }
 
-    public function destroy(string $id, BaseHttpResponse $response)
+    public function destroy(string $id)
     {
         if (! EcommerceHelper::isCartEnabled()) {
             abort(404);
@@ -295,10 +300,14 @@ class PublicCartController extends Controller
         try {
             Cart::instance('cart')->remove($id);
         } catch (Exception) {
-            return $response->setError()->setMessage(__('Cart item is not existed!'));
+            return $this
+                ->httpResponse()
+                ->setError()
+                ->setMessage(__('Cart item is not existed!'));
         }
 
-        return $response
+        return $this
+            ->httpResponse()
             ->setData([
                 'count' => Cart::instance('cart')->count(),
                 'total_price' => format_price(Cart::instance('cart')->rawSubTotal()),
@@ -307,7 +316,7 @@ class PublicCartController extends Controller
             ->setMessage(__('Removed item from cart successfully!'));
     }
 
-    public function empty(BaseHttpResponse $response)
+    public function empty()
     {
         if (! EcommerceHelper::isCartEnabled()) {
             abort(404);
@@ -315,7 +324,8 @@ class PublicCartController extends Controller
 
         Cart::instance('cart')->destroy();
 
-        return $response
+        return $this
+            ->httpResponse()
             ->setData(Cart::instance('cart')->content())
             ->setMessage(__('Empty cart successfully!'));
     }

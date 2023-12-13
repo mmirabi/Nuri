@@ -7,7 +7,7 @@
             <div class="slider-arrow slider-arrow-2 flex-right carousel-8-columns-arrow" id="carousel-8-columns-arrows"></div>
         </div>
         <div class="carousel-8-columns-cover position-relative">
-            <div class="carousel-slider-wrapper carousel-8-columns" id="carousel-8-columns" data-items-xxl="{{ (int)$shortcode->scroll_items > 0 ? (int)$shortcode->scroll_items : 8 }}" :title="'{!! BaseHelper::clean($shortcode->title) !!}'"slick_config="{{ json_encode([
+            <div class="carousel-slider-wrapper carousel-8-columns" id="carousel-8-columns" data-items-xxl="{{ (int)$shortcode->scroll_items > 0 ? (int)$shortcode->scroll_items : 8 }}" :title="'{!! BaseHelper::clean($shortcode->title) !!}'" data-slick="{{ json_encode([
                 'autoplay' => $shortcode->is_autoplay == 'yes',
                 'infinite' => $shortcode->infinite == 'yes' || $shortcode->is_infinite == 'yes',
                 'autoplaySpeed' => (int)(in_array($shortcode->autoplay_speed, theme_get_autoplay_speed_options()) ? $shortcode->autoplay_speed : 3000),

@@ -139,7 +139,7 @@
                                         <tr>
                                             <td class="text-center">{{ $key + 1 }}</td>
                                             <td class="text-center">
-                                                <img src="{{ RvMedia::getImageUrl($product ? $product->image : null, 'thumb', false, RvMedia::getDefaultImage()) }}" width="50" alt="{{ $orderProduct->product_name }}">
+                                                <img src="{{ RvMedia::getImageUrl($product ? $product->image : null, 'product-thumb', false, RvMedia::getDefaultImage()) }}" width="50" alt="{{ $orderProduct->product_name }}">
                                             </td>
                                             <td>
                                                 @if ($product)

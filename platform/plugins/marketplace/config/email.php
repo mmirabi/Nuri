@@ -18,6 +18,9 @@ return [
                 'customer_phone' => 'plugins/ecommerce::ecommerce.customer_phone',
                 'customer_address' => 'plugins/ecommerce::ecommerce.customer_address',
                 'store_name' => 'plugins/marketplace::marketplace.store_name',
+                'store_phone' => 'plugins/marketplace::marketplace.store_phone',
+                'store_address' => 'plugins/marketplace::marketplace.store_address',
+                'store_url' => 'plugins/marketplace::marketplace.store_url',
                 'store' => 'Store',
                 'order' => 'Order',
                 'shipment' => 'Shipment info',
@@ -37,7 +40,9 @@ return [
                 'customer_address' => 'plugins/ecommerce::ecommerce.customer_address',
                 'store_name' => 'plugins/marketplace::marketplace.store_name',
                 'store_phone' => 'plugins/marketplace::marketplace.store_phone',
-                'store_link' => 'plugins/marketplace::marketplace.store_link',
+                'store_address' => 'plugins/marketplace::marketplace.store_address',
+                'store_url' => 'plugins/marketplace::marketplace.store_url',
+                'store' => 'Store',
             ],
         ],
         'vendor-account-approved' => [
@@ -48,6 +53,10 @@ return [
             'enabled' => true,
             'variables' => [
                 'store_name' => 'plugins/marketplace::marketplace.store_name',
+                'store_phone' => 'plugins/marketplace::marketplace.store_phone',
+                'store_address' => 'plugins/marketplace::marketplace.store_address',
+                'store_url' => 'plugins/marketplace::marketplace.store_url',
+                'store' => 'Store',
             ],
         ],
         'pending-product-approval' => [
@@ -57,9 +66,13 @@ return [
             'can_off' => true,
             'enabled' => true,
             'variables' => [
-                'store_name' => 'plugins/marketplace::marketplace.store_name',
                 'product_name' => 'plugins/marketplace::marketplace.product_name',
                 'product_url' => 'plugins/marketplace::marketplace.product_url',
+                'store_name' => 'plugins/marketplace::marketplace.store_name',
+                'store_phone' => 'plugins/marketplace::marketplace.store_phone',
+                'store_address' => 'plugins/marketplace::marketplace.store_address',
+                'store_url' => 'plugins/marketplace::marketplace.store_url',
+                'store' => 'Store',
             ],
         ],
         'product-approved' => [
@@ -70,6 +83,10 @@ return [
             'enabled' => true,
             'variables' => [
                 'store_name' => 'plugins/marketplace::marketplace.store_name',
+                'store_phone' => 'plugins/marketplace::marketplace.store_phone',
+                'store_address' => 'plugins/marketplace::marketplace.store_address',
+                'store_url' => 'plugins/marketplace::marketplace.store_url',
+                'store' => 'Store',
             ],
         ],
         'withdrawal-approved' => [
@@ -79,8 +96,12 @@ return [
             'can_off' => true,
             'enabled' => true,
             'variables' => [
-                'store_name' => 'plugins/marketplace::marketplace.store_name',
                 'withdrawal_amount' => 'plugins/marketplace::marketplace.withdrawal_amount',
+                'store_name' => 'plugins/marketplace::marketplace.store_name',
+                'store_phone' => 'plugins/marketplace::marketplace.store_phone',
+                'store_address' => 'plugins/marketplace::marketplace.store_address',
+                'store_url' => 'plugins/marketplace::marketplace.store_url',
+                'store' => 'Store',
             ],
         ],
     ],

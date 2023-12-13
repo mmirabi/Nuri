@@ -12,7 +12,7 @@
                                 @foreach($products as $product)
                                     <td class="row_img">
                                         <a href="{{ $product->original_product->url }}">
-                                            <img src="{{ RvMedia::getImageUrl($product->image, 'thumb', false, RvMedia::getDefaultImage()) }}" alt="{{ $product->name }}">
+                                            <img src="{{ RvMedia::getImageUrl($product->image, 'product-thumb', false, RvMedia::getDefaultImage()) }}" alt="{{ $product->name }}">
                                         </a>
                                     </td>
                                 @endforeach

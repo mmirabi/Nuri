@@ -22,7 +22,7 @@
                                 <td>{{ get_order_code($order->id) }}</td>
                                 <td>{{ $order->created_at->format('Y/m/d h:m') }}</td>
                                 <td>{{ __(':price for :total item(s)', ['price' => $order->amount_format, 'total' => $order->products_count]) }}</td>
-                                <td>{{ $order->status->label() }}</td>
+                                <td>{!! $order->status->toHtml() !!}</td>
                                 <td>
                                     <a class="btn-small d-block" href="{{ route('customer.orders.view', $order->id) }}">{{ __('View') }}</a>
                                 </td>

@@ -22,12 +22,9 @@ class BaseStatusEnum extends Enum
     public function toHtml(): string|HtmlString
     {
         return match ($this->value) {
-            self::DRAFT => Html::tag('span', self::DRAFT()->label(), ['class' => 'label-info status-label'])
-                ->toHtml(),
-            self::PENDING => Html::tag('span', self::PENDING()->label(), ['class' => 'label-warning status-label'])
-                ->toHtml(),
-            self::PUBLISHED => Html::tag('span', self::PUBLISHED()->label(), ['class' => 'label-success status-label'])
-                ->toHtml(),
+            self::DRAFT => Html::tag('span', self::DRAFT()->label(), ['class' => 'badge bg-secondary text-secondary-fg']),
+            self::PENDING => Html::tag('span', self::PENDING()->label(), ['class' => 'badge bg-warning text-warning-fg']),
+            self::PUBLISHED => Html::tag('span', self::PUBLISHED()->label(), ['class' => 'badge bg-success text-success-fg']),
             default => parent::toHtml(),
         };
     }

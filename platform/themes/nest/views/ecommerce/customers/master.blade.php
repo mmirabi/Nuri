@@ -19,6 +19,12 @@
             'routes' => ['customer.orders.view']
         ],
         [
+            'key'   => 'customer.product-reviews',
+            'label' => __('Product Reviews'),
+            'icon'  => 'fi-rs-star',
+            'routes' => ['customer.product-reviews'],
+        ],
+        [
             'key'    => 'customer.downloads',
             'label'  => __('Downloads'),
             'icon'   => 'fi-rs-shopping-bag',
@@ -51,12 +57,16 @@
         ],
     ];
 
-    if (! EcommerceHelper::isEnabledSupportDigitalProducts()) {
+    if (!EcommerceHelper::isReviewEnabled()) {
         unset($menus[3]);
     }
 
-    if (! EcommerceHelper::isOrderReturnEnabled()) {
+    if (! EcommerceHelper::isEnabledSupportDigitalProducts()) {
         unset($menus[4]);
+    }
+
+    if (! EcommerceHelper::isOrderReturnEnabled()) {
+        unset($menus[5]);
     }
 @endphp
 <div class="page-content pt-50 pb-150">

@@ -210,6 +210,11 @@ return [
         'parent_flag' => 'plugins.ecommerce',
     ],
     [
+        'name' => 'Create',
+        'flag' => 'reviews.create',
+        'parent_flag' => 'reviews.index',
+    ],
+    [
         'name' => 'Delete',
         'flag' => 'reviews.destroy',
         'parent_flag' => 'reviews.index',
@@ -448,5 +453,85 @@ return [
         'name' => 'Invoice Template',
         'flag' => 'ecommerce.invoice-template.index',
         'parent_flag' => 'plugins.ecommerce',
+    ],
+    [
+        'name' => 'General Settings',
+        'flag' => 'ecommerce.settings.general',
+        'parent_flag' => 'ecommerce.settings',
+    ],
+    [
+        'name' => 'Currency Settings',
+        'flag' => 'ecommerce.settings.currencies',
+        'parent_flag' => 'ecommerce.settings',
+    ],
+    [
+        'name' => 'Product Settings',
+        'flag' => 'ecommerce.settings.products',
+        'parent_flag' => 'ecommerce.settings',
+    ],
+    [
+        'name' => 'Product Search Settings',
+        'flag' => 'ecommerce.settings.product-search',
+        'parent_flag' => 'ecommerce.settings',
+    ],
+    [
+        'name' => 'Digital Product Settings',
+        'flag' => 'ecommerce.settings.digital-products',
+        'parent_flag' => 'ecommerce.settings',
+    ],
+    [
+        'name' => 'Store Locators Settings',
+        'flag' => 'ecommerce.settings.store-locators',
+        'parent_flag' => 'ecommerce.settings',
+    ],
+    [
+        'name' => 'Invoice Settings',
+        'flag' => 'ecommerce.settings.invoices',
+        'parent_flag' => 'ecommerce.settings',
+    ],
+    [
+        'name' => 'Product Review Settings',
+        'flag' => 'ecommerce.settings.product-reviews',
+        'parent_flag' => 'ecommerce.settings',
+    ],
+    [
+        'name' => 'Customer Settings',
+        'flag' => 'ecommerce.settings.customers',
+        'parent_flag' => 'ecommerce.settings',
+    ],
+    [
+        'name' => 'Shopping Settings',
+        'flag' => 'ecommerce.settings.shopping',
+        'parent_flag' => 'ecommerce.settings',
+    ],
+    [
+        'name' => 'Tax Settings',
+        'flag' => 'ecommerce.settings.taxes',
+        'parent_flag' => 'ecommerce.settings',
+    ],
+    [
+        'name' => 'Shipping Settings',
+        'flag' => 'ecommerce.settings.shipping',
+        'parent_flag' => 'ecommerce.settings',
+    ],
+    [
+        'name' => 'Tracking Settings',
+        'flag' => 'ecommerce.settings.tracking',
+        'parent_flag' => 'ecommerce.settings',
+    ],
+    [
+        'name' => 'Standard and Format Settings',
+        'flag' => 'ecommerce.settings.standard-and-format',
+        'parent_flag' => 'ecommerce.settings',
+    ],
+    [
+        'name' => 'Checkout Settings',
+        'flag' => 'ecommerce.settings.checkout',
+        'parent_flag' => 'ecommerce.settings',
+    ],
+    [
+        'name' => 'Return Settings',
+        'flag' => 'ecommerce.settings.return',
+        'parent_flag' => 'ecommerce.settings',
     ],
 ];

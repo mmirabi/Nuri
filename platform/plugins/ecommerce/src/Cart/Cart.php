@@ -14,12 +14,15 @@ use Closure;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Events\NullDispatcher;
 use Illuminate\Session\SessionManager;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 
 class Cart
 {
+    protected static Dispatcher $dispatcher;
+
     public const DEFAULT_INSTANCE = 'default';
 
     protected string $instance;
@@ -28,8 +31,10 @@ class Cart
 
     protected float $weight = 0;
 
-    public function __construct(protected SessionManager $session, protected Dispatcher $events)
+    public function __construct(protected SessionManager $session, Dispatcher $events)
     {
+        static::$dispatcher = $events;
+
         $this->instance(self::DEFAULT_INSTANCE);
     }
 
@@ -75,11 +80,18 @@ class Cart
 
         $content->put($cartItem->rowId, $cartItem);
 
-        $this->events->dispatch('cart.added', $cartItem);
-
         $this->putToSession($content);
 
+        static::dispatchEvent('cart.added', $cartItem);
+
         return $cartItem;
+    }
+
+    public function addQuietly($id, $name = null, $qty = null, $price = null, array $options = [])
+    {
+        return static::withoutEvents(
+            fn () => $this->add($id, $name, $qty, $price, $options)
+        );
     }
 
     /**
@@ -142,9 +154,6 @@ class Cart
         foreach (Arr::get($options, 'optionCartValue', []) as $value) {
             if (is_array($value)) {
                 foreach ($value as $valueItem) {
-                    if (Arr::get($valueItem, 'option_type') == 'field') {
-                        continue;
-                    }
                     if ($valueItem['affect_type'] == 1) {
                         $valueItem['affect_price'] = ($basePrice * $valueItem['affect_price']) / 100;
                     }
@@ -154,9 +163,11 @@ class Cart
                 if (Arr::get($value, 'option_type') == 'field') {
                     continue;
                 }
+
                 if ($value['affect_type'] == 1) {
                     $value['affect_price'] = ($basePrice * $value['affect_price']) / 100;
                 }
+
                 $price += $value['affect_price'];
             }
         }
@@ -184,6 +195,7 @@ class Cart
     public function putToSession($content)
     {
         $this->setLastUpdatedAt();
+
         $this->session->put($this->instance, $content);
 
         return $this;
@@ -234,11 +246,16 @@ class Cart
 
         $cartItem->updated_at = Carbon::now();
 
-        $this->events->dispatch('cart.updated', $cartItem);
+        static::dispatchEvent('cart.updated', $cartItem);
 
         $this->putToSession($content);
 
         return $cartItem;
+    }
+
+    public function updateQuietly($rowId, $qty)
+    {
+        return static::withoutEvents(fn () => $this->update($rowId, $qty));
     }
 
     /**
@@ -272,9 +289,14 @@ class Cart
 
         $content->pull($cartItem->rowId);
 
-        $this->events->dispatch('cart.removed', $cartItem);
+        static::dispatchEvent('cart.removed', $cartItem);
 
         $this->putToSession($content);
+    }
+
+    public function removeQuietly($rowId)
+    {
+        return static::withoutEvents(fn () => $this->remove($rowId));
     }
 
     /**
@@ -295,6 +317,16 @@ class Cart
         $content = $this->getContent();
 
         return $content->sum('qty');
+    }
+
+    public function isNotEmpty(): bool
+    {
+        return $this->getContent()->isNotEmpty();
+    }
+
+    public function isEmpty(): bool
+    {
+        return $this->getContent()->isEmpty();
     }
 
     /**
@@ -462,7 +494,12 @@ class Cart
             'content' => serialize($content),
         ]);
 
-        $this->events->dispatch('cart.stored');
+        static::dispatchEvent('cart.stored');
+    }
+
+    public function storeQuietly($identifier)
+    {
+        return static::withoutEvents(fn () => $this->store($identifier));
     }
 
     protected function storedCartWithIdentifierExists(string $identifier): bool
@@ -541,7 +578,7 @@ class Cart
             $content->put($cartItem->rowId, $cartItem);
         }
 
-        $this->events->dispatch('cart.restored');
+        static::dispatchEvent('cart.restored');
 
         $this->putToSession($content);
 
@@ -549,6 +586,11 @@ class Cart
 
         $this->getConnection()->table($this->getTableName())
             ->where('identifier', $identifier)->delete();
+    }
+
+    public function restoreQuietly($identifier)
+    {
+        return static::withoutEvents(fn () => $this->restore($identifier));
     }
 
     /**
@@ -682,7 +724,7 @@ class Cart
 
         $productsInCart = new EloquentCollection();
 
-        if ($products->count()) {
+        if ($products->isNotEmpty()) {
             foreach ($cartContent as $cartItem) {
                 $product = $products->firstWhere('id', $cartItem->id);
                 if (! $product || $product->original_product->status != BaseStatusEnum::PUBLISHED) {
@@ -701,7 +743,7 @@ class Cart
         $this->products = $productsInCart;
         $this->weight = $weight;
 
-        if ($this->products->count() == 0) {
+        if ($this->products->isEmpty()) {
             $this->instance('cart')->destroy();
         }
 
@@ -722,13 +764,83 @@ class Cart
         return $this->session->get($this->instance);
     }
 
-    /**
-     * Get weight
-     *
-     * @return int|float
-     */
-    public function weight()
+    public function weight(): float
     {
         return EcommerceHelper::validateOrderWeight($this->weight);
+    }
+
+    public static function getEventDispatcher(): Dispatcher
+    {
+        return static::$dispatcher;
+    }
+
+    public static function setEventDispatcher(Dispatcher $dispatcher): void
+    {
+        static::$dispatcher = $dispatcher;
+    }
+
+    public static function withoutEvents(callable $callback)
+    {
+        $dispatcher = static::getEventDispatcher();
+
+        static::setEventDispatcher(new NullDispatcher($dispatcher));
+
+        try {
+            return $callback();
+        } finally {
+            if ($dispatcher) {
+                static::setEventDispatcher($dispatcher);
+            }
+        }
+    }
+
+    protected static function dispatchEvent(string $event, $parameters = []): void
+    {
+        if (isset(static::$dispatcher)) {
+            static::$dispatcher->dispatch($event, $parameters);
+        }
+    }
+
+    public function refresh(): void
+    {
+        $cart = $this->instance('cart');
+
+        if ($this->isEmpty()) {
+            return;
+        }
+
+        $ids = $cart->content()->pluck('id')->toArray();
+
+        $products = get_products([
+            'condition' => [
+                ['ec_products.id', 'IN', $ids],
+            ],
+        ]);
+
+        if ($products->isEmpty()) {
+            return;
+        }
+
+        foreach ($cart->content() as $rowId => $cartItem) {
+            $product = $products->firstWhere('id', $cartItem->id);
+            if (! $product || $product->original_product->status != BaseStatusEnum::PUBLISHED) {
+                $this->remove($cartItem->rowId);
+            } else {
+                $cart->removeQuietly($rowId);
+
+                $parentProduct = $product->original_product;
+
+                $options = $cartItem->options->toArray();
+                $options['image'] = $product->image ?: $parentProduct->image;
+
+                $cart->addQuietly(
+                    $cartItem->id,
+                    $cartItem->name,
+                    $cartItem->qty,
+                    $product->front_sale_price,
+                    $options
+                );
+            }
+        }
     }
 }

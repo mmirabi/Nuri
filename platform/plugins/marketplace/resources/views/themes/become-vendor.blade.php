@@ -1,4 +1,5 @@
-@extends(Theme::getThemeNamespace() . '::views.ecommerce.customers.master')
+@extends(EcommerceHelper::viewPath('customers.master'))
+
 @section('content')
     {!! Form::open([
         'route' => 'marketplace.vendor.become-vendor',

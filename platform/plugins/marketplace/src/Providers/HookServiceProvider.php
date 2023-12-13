@@ -2,6 +2,7 @@
 
 namespace Botble\Marketplace\Providers;
 
+use Botble\Base\Contracts\BaseModel;
 use Botble\Base\Enums\BaseStatusEnum;
 use Botble\Base\Facades\Assets;
 use Botble\Base\Facades\BaseHelper;
@@ -31,12 +32,14 @@ use Botble\Table\Abstracts\TableAbstract;
 use Botble\Table\CollectionDataTable;
 use Botble\Table\Columns\Column;
 use Botble\Table\EloquentDataTable;
+use Botble\Theme\Events\RenderingThemeOptionSettings;
 use Exception;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
@@ -54,29 +57,53 @@ class HookServiceProvider extends ServiceProvider
 
             add_action(BASE_ACTION_AFTER_UPDATE_CONTENT, [$this, 'saveAdditionalData'], 128, 3);
 
-            add_filter(BASE_FILTER_GET_LIST_DATA, [$this, 'addColumnToEcommerceTable'], 153, 2);
-            add_filter(BASE_FILTER_TABLE_HEADINGS, [$this, 'addHeadingToEcommerceTable'], 153, 2);
-            add_filter(BASE_FILTER_TABLE_QUERY, [$this, 'modifyQueryInCustomerTable'], 153);
+            TableAbstract::beforeRendering(function () {
+                add_filter(BASE_FILTER_GET_LIST_DATA, [$this, 'addColumnToEcommerceTable'], 153, 2);
+                add_filter(BASE_FILTER_TABLE_HEADINGS, [$this, 'addHeadingToEcommerceTable'], 153, 2);
+                add_filter(BASE_FILTER_TABLE_QUERY, [$this, 'modifyQueryInCustomerTable'], 153);
 
-            add_filter(BASE_FILTER_REGISTER_CONTENT_TABS, [$this, 'addBankInfoTab'], 55, 3);
-            add_filter(BASE_FILTER_REGISTER_CONTENT_TAB_INSIDE, [$this, 'addBankInfoContent'], 55, 3);
+                add_filter('base_filter_table_filters', function (array $filters, TableAbstract $table) {
+                    if ($table instanceof CustomerTable) {
+                        $filters['is_vendor'] = [
+                            'title' => trans('plugins/marketplace::store.forms.is_vendor'),
+                            'type' => 'select',
+                            'choices' => [1 => trans('core/base::base.yes'), 0 => trans('core/base::base.no')],
+                            'validate' => 'required|in:1,0',
+                        ];
+                    }
+
+                    if ($table instanceof ProductTable) {
+                        $filters['store_id'] = [
+                            'title' => trans('plugins/marketplace::store.forms.store'),
+                            'type' => 'select-search',
+                            'validate' => 'required|string',
+                            'callback' => fn () => Store::query()->pluck('name', 'id')->all(),
+                        ];
+                    }
+
+                    return $filters;
+                }, 120, 2);
+            });
 
             add_filter(BASE_FILTER_APPEND_MENU_NAME, [$this, 'getUnverifiedVendors'], 130, 2);
             add_filter(BASE_FILTER_MENU_ITEMS_COUNT, [$this, 'getMenuItemCount'], 121);
 
-            if (function_exists('theme_option')) {
+            $this->app['events']->listen(RenderingThemeOptionSettings::class, function () {
                 add_action(RENDERING_THEME_OPTIONS_PAGE, [$this, 'addThemeOptions'], 55);
-            }
+            });
 
             if (is_plugin_active('language') && is_plugin_active('language-advanced')) {
-                add_filter(BASE_FILTER_BEFORE_RENDER_FORM, function ($form, $data) {
-                    if (in_array('vendor', Route::current()->middleware()) &&
+                FormAbstract::beforeRendering(function (FormAbstract $form) {
+                    $model = $form->getModel();
+
+                    if (
+                        $model instanceof BaseModel &&
+                        in_array('vendor', Route::current()->middleware()) &&
                         auth('customer')->check() &&
                         auth('customer')->user()->is_vendor &&
                         Language::getCurrentAdminLocaleCode() != Language::getDefaultLocaleCode() &&
-                        $data &&
-                        $data->id &&
-                        LanguageAdvancedManager::isSupported($data)
+                        $model->getKey() &&
+                        LanguageAdvancedManager::isSupported($model)
                     ) {
                         $refLang = null;
 
@@ -86,68 +113,70 @@ class HookServiceProvider extends ServiceProvider
 
                         $form->setFormOption(
                             'url',
-                            route('marketplace.vendor.language-advanced.save', $data->id) . $refLang
+                            route('marketplace.vendor.language-advanced.save', $model->getKey()) . $refLang
                         );
                     }
-
-                    return $form;
-                }, 9999, 2);
+                }, 9999);
             }
 
-            add_action(BASE_ACTION_TOP_FORM_CONTENT_NOTIFICATION, [$this, 'createdByVendorNotification'], 45, 2);
-            add_action(BASE_ACTION_TOP_FORM_CONTENT_NOTIFICATION, [$this, 'withdrawalVendorNotification'], 47, 2);
+            FormAbstract::beforeRendering(function () {
+                add_action(BASE_ACTION_TOP_FORM_CONTENT_NOTIFICATION, [$this, 'createdByVendorNotification'], 45, 2);
+                add_action(BASE_ACTION_TOP_FORM_CONTENT_NOTIFICATION, [$this, 'withdrawalVendorNotification'], 47, 2);
+            });
 
             add_filter(ACTION_BEFORE_POST_ORDER_REFUND_ECOMMERCE, [$this, 'beforeOrderRefund'], 120, 3);
             add_filter(ACTION_AFTER_POST_ORDER_REFUNDED_ECOMMERCE, [$this, 'afterOrderRefunded'], 120, 3);
 
-            add_filter('ecommerce_customer_registration_form_validation_rules', function (array $rules): array {
-                return $rules + [
-                        'shop_name' => [
-                            'nullable',
-                            'required_if:is_vendor,1',
-                            'string',
-                            'min:2',
-                        ],
-                        'shop_phone' => [
-                            'nullable',
-                            'required_if:is_vendor,1',
-                        ] + explode('|', BaseHelper::getPhoneValidationRule()),
-                        'shop_url' => [
-                            'nullable',
-                            'required_if:is_vendor,1',
-                            'string',
-                            'min:2',
-                        ],
-                    ];
-            }, 45, 2);
+            if (MarketplaceHelper::isVendorRegistrationEnabled()) {
+                add_filter('ecommerce_customer_registration_form_validation_rules', function (array $rules): array {
+                    return $rules + [
+                            'shop_name' => [
+                                'nullable',
+                                'required_if:is_vendor,1',
+                                'string',
+                                'min:2',
+                            ],
+                            'shop_phone' => [
+                                    'nullable',
+                                    'required_if:is_vendor,1',
+                                ] + explode('|', BaseHelper::getPhoneValidationRule()),
+                            'shop_url' => [
+                                'nullable',
+                                'required_if:is_vendor,1',
+                                'string',
+                                'min:2',
+                            ],
+                        ];
+                }, 45, 2);
 
-            add_filter('ecommerce_customer_registration_form_validation_attributes', function (array $attributes): array {
-                return $attributes + [
-                        'shop_name' => __('Shop Name'),
-                        'shop_phone' => __('Shop Phone'),
-                        'shop_url' => __('Shop URL'),
-                    ];
-            }, 45);
+                add_filter('ecommerce_customer_registration_form_validation_attributes', function (array $attributes): array {
+                    return $attributes + [
+                            'shop_name' => __('Shop Name'),
+                            'shop_phone' => __('Shop Phone'),
+                            'shop_url' => __('Shop URL'),
+                        ];
+                }, 45);
 
-            add_filter('ecommerce_customer_registration_form_validation_messages', function (array $attributes): array {
-                return $attributes + [
-                        'shop_name.required_if' => __('Shop Name is required.'),
-                        'shop_phone.required_if' => __('Shop Phone is required.'),
-                        'shop_url.required_if' => __('Shop URL is required.'),
-                    ];
-            }, 45);
+                add_filter('ecommerce_customer_registration_form_validation_messages', function (array $attributes): array {
+                    return $attributes + [
+                            'shop_name.required_if' => __('Shop Name is required.'),
+                            'shop_phone.required_if' => __('Shop Phone is required.'),
+                            'shop_url.required_if' => __('Shop URL is required.'),
+                        ];
+                }, 45);
 
-            add_action('customer_register_validation', function ($request) {
-                if (is_plugin_active('marketplace') && $request->input('is_vendor') == 1) {
-                    $existing = SlugHelper::getSlug($request->input('shop_url'), SlugHelper::getPrefix(Store::class));
+                add_action('customer_register_validation', function ($request) {
+                    if (is_plugin_active('marketplace') && $request->input('is_vendor') == 1) {
+                        $existing = SlugHelper::getSlug($request->input('shop_url'), SlugHelper::getPrefix(Store::class));
 
-                    if ($existing) {
-                        throw ValidationException::withMessages([
-                            'shop_url' => __('Shop URL is existing. Please choose another one!'),
-                        ]);
+                        if ($existing) {
+                            throw ValidationException::withMessages([
+                                'shop_url' => __('Shop URL is existing. Please choose another one!'),
+                            ]);
+                        }
                     }
-                }
-            }, 45, 2);
+                }, 45, 2);
+            }
 
             add_filter('ecommerce_import_product_row_data', [$this, 'setStoreToRow'], 45);
 
@@ -183,28 +212,6 @@ class HookServiceProvider extends ServiceProvider
             add_filter('ecommerce_product_eager_loading_relations', function (array $with) {
                 return array_merge($with, ['store', 'store.slugable']);
             }, 120);
-
-            add_filter('base_filter_table_filters', function (array $filters, TableAbstract $table) {
-                if ($table instanceof CustomerTable) {
-                    $filters['is_vendor'] = [
-                        'title' => trans('plugins/marketplace::store.forms.is_vendor'),
-                        'type' => 'select',
-                        'choices' => [1 => trans('core/base::base.yes'), 0 => trans('core/base::base.no')],
-                        'validate' => 'required|in:1,0',
-                    ];
-                }
-
-                if ($table instanceof ProductTable) {
-                    $filters['store_id'] = [
-                        'title' => trans('plugins/marketplace::store.forms.store'),
-                        'type' => 'select-search',
-                        'validate' => 'required|string',
-                        'callback' => fn () => Store::query()->pluck('name', 'id')->all(),
-                    ];
-                }
-
-                return $filters;
-            }, 120, 2);
         });
     }
 
@@ -301,7 +308,7 @@ class HookServiceProvider extends ServiceProvider
                 'desc' => trans('plugins/marketplace::marketplace.theme_options.description'),
                 'id' => 'opt-text-subsection-marketplace',
                 'subsection' => true,
-                'icon' => 'fa fa-shopping-cart',
+                'icon' => 'ti ti-shopping-bag',
                 'fields' => [
                     [
                         'id' => 'logo_vendor_dashboard',
@@ -319,7 +326,7 @@ class HookServiceProvider extends ServiceProvider
             ]);
     }
 
-    public function registerAdditionalData(FormAbstract $form, Model|string|null $data): FormAbstract
+    public function registerAdditionalData(FormAbstract $form, array|Model|string|null $data): FormAbstract
     {
         if ($data instanceof Product && request()->segment(1) === BaseHelper::getAdminPrefix()) {
             $stores = Store::query()->pluck('name', 'id')->all();
@@ -566,35 +573,6 @@ class HookServiceProvider extends ServiceProvider
         };
     }
 
-    public function addBankInfoTab(?string $tabs, Model|string|null $data = null): ?string
-    {
-        if (is_plugin_active('language') && is_plugin_active('language-advanced') && Language::getCurrentAdminLocaleCode() != Language::getDefaultLocaleCode()) {
-            return $tabs;
-        }
-
-        if (! empty($data) && $data instanceof Store && $data->customer->is_vendor) {
-            return $tabs .
-                view('plugins/marketplace::customers.tax-info-tab')->render() .
-                view('plugins/marketplace::customers.payout-info-tab')->render();
-        }
-
-        return $tabs;
-    }
-
-    public function addBankInfoContent(?string $tabs, Model|string|null $data = null): ?string
-    {
-        if (! empty($data) && $data instanceof Store) {
-            $customer = $data->customer;
-            if ($customer->is_vendor) {
-                return $tabs .
-                    view('plugins/marketplace::customers.tax-form', ['model' => $customer])->render() .
-                    view('plugins/marketplace::customers.payout-form', ['model' => $customer])->render();
-            }
-        }
-
-        return $tabs;
-    }
-
     public function getUnverifiedVendors(string|int|null $number, string $menuId): int|string|null
     {
         switch ($menuId) {
@@ -607,51 +585,33 @@ class HookServiceProvider extends ServiceProvider
                     return $number;
                 }
 
-                $attributes = [
-                    'class' => 'badge badge-success menu-item-count unverified-vendors',
-                    'style' => 'display: none;',
-                ];
-
-                return Html::tag('span', '', $attributes)->toHtml();
+                return Blade::render('<x-core::navbar.badge-count class="unverified-vendors" />');
 
             case 'cms-plugins-withdrawal':
                 if (! Auth::user()->hasPermission('marketplace.withdrawal.index')) {
                     return $number;
                 }
 
-                $attributes = [
-                    'class' => 'badge badge-success menu-item-count pending-withdrawals',
-                    'style' => 'display: none;',
-                ];
-
-                return Html::tag('span', '', $attributes)->toHtml();
+                return Blade::render('<x-core::navbar.badge-count class="pending-withdrawals" />');
 
             case 'cms-plugins-marketplace':
-                if (! Auth::user()->hasAnyPermission([
-                    'marketplace.withdrawal.index',
-                    'marketplace.unverified-vendor.index',
-                ])) {
+                if (
+                    ! Auth::user()->hasAnyPermission([
+                        'marketplace.withdrawal.index',
+                        'marketplace.unverified-vendor.index',
+                    ])
+                ) {
                     return $number;
                 }
 
-                $attributes = [
-                    'class' => 'badge badge-success menu-item-count marketplace-notifications-count',
-                    'style' => 'display: none;',
-                ];
-
-                return Html::tag('span', '', $attributes)->toHtml();
+                return Blade::render('<x-core::navbar.badge-count class="marketplace-notifications-count" />');
 
             case 'cms-plugins-ecommerce.product':
                 if (! Auth::user()->hasPermission('products.index')) {
                     return $number;
                 }
 
-                $attributes = [
-                    'class' => 'badge badge-success menu-item-count pending-products',
-                    'style' => 'display: none;',
-                ];
-
-                return Html::tag('span', '', $attributes)->toHtml();
+                return Blade::render('<x-core::navbar.badge-count class="pending-products" />');
         }
 
         return $number;
@@ -764,8 +724,7 @@ class HookServiceProvider extends ServiceProvider
             return false;
         }
 
-        echo view('plugins/marketplace::withdrawals.store-info', ['store' => $data->customer->store])
-            ->render();
+        echo view('plugins/marketplace::withdrawals.store-info', ['store' => $data->customer->store])->render();
 
         return true;
     }

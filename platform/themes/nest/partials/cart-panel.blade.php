@@ -17,7 +17,7 @@
                 @if (!empty($product))
                     <li>
                         <div class="shopping-cart-img">
-                            <a href="{{ $product->original_product->url }}"><img alt="{{ $product->original_product->name }}" src="{{ RvMedia::getImageUrl($cartItem->options['image'], 'thumb', false, RvMedia::getDefaultImage()) }}"></a>
+                            <a href="{{ $product->original_product->url }}"><img alt="{{ $product->original_product->name }}" src="{{ RvMedia::getImageUrl(Arr::get($cartItem->options, 'image'), 'product-thumb', false, RvMedia::getDefaultImage()) }}"></a>
                         </div>
                         <div class="shopping-cart-title">
                             <h4><a href="{{ $product->original_product->url }}">{{ $product->original_product->name }}  @if ($product->isOutOfStock()) <span class="stock-status-label">({!! $product->stock_status_html !!})</span> @endif</a></h4>

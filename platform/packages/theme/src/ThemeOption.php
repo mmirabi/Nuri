@@ -8,10 +8,15 @@ use Botble\Language\Facades\Language;
 use Botble\Setting\Facades\Setting;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Traits\Conditionable;
+use Illuminate\Support\Traits\Tappable;
 use Throwable;
 
 class ThemeOption
 {
+    use Conditionable;
+    use Tappable;
+
     public array $fields = [];
 
     public array $sections = [];
@@ -433,10 +438,14 @@ class ThemeOption
     public function renderField(array $field): string|null
     {
         try {
-            $attributes = $field['attributes'];
+            $attributes = Arr::get($field, 'attributes');
 
-            if ($this->hasOption($attributes['name'])) {
-                $attributes['value'] = $this->getOption($attributes['name']);
+            $name = $attributes['name'] ?? $field['id'] ?? null;
+
+            $attributes['name'] = $name;
+
+            if ($this->hasOption($name)) {
+                $attributes['value'] = $this->getOption($name);
             }
 
             return call_user_func_array([Form::class, $field['type']], array_values($attributes));

@@ -47,9 +47,8 @@ register_sidebar([
 
 Menu::addMenuLocation('header-navigation', 'Header navigation');
 
-RvMedia::setUploadPathAndURLToPublic();
-
-RvMedia::addSize('medium', 800, 800)
+RvMedia::setUploadPathAndURLToPublic()
+    ->addSize('medium', 800, 800)
     ->addSize('product-thumb', 400, 400);
 
 if (is_plugin_active('ecommerce')) {
@@ -390,17 +389,6 @@ add_action([BASE_ACTION_AFTER_CREATE_CONTENT, BASE_ACTION_AFTER_UPDATE_CONTENT],
                     $socialLinks = collect($socialLinks)->only($socials)->filter();
                     MetaBox::saveMetaBoxData($object, 'social_links', $socialLinks);
                 }
-            }
-
-            if ($request->hasFile('cover_image_input')) {
-                $result = RvMedia::handleUpload($request->file('cover_image_input'), 0, 'stores');
-                if (! $result['error']) {
-                    MetaBox::saveMetaBoxData($object, 'cover_image', $result['data']->url);
-                }
-            } elseif ($request->input('cover_image')) {
-                MetaBox::saveMetaBoxData($object, 'cover_image', $request->input('cover_image'));
-            } elseif ($request->has('cover_image')) {
-                MetaBox::deleteMetaData($object, 'cover_image');
             }
 
             break;

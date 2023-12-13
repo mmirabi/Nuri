@@ -728,7 +728,7 @@
                 },
                 error: (response) => {
                     $(this).prop('disabled', false).removeClass('btn-disabled').removeClass('button-loading')
-                    handleError(res, $form)
+                    handleError(response, $form)
                 },
             })
         })
@@ -1494,6 +1494,21 @@
         const reviewList = function() {
             const $body = $('body')
 
+            let $galleries = $('.block--review .block__images')
+            if ($galleries.length) {
+                $galleries.map((index, value) => {
+                    if (jQuery().magnificPopup) {
+                        $(value).magnificPopup({
+                            delegate: 'a', // the selector for gallery item
+                            type: 'image',
+                            gallery: {
+                                enabled: true
+                            }
+                        });
+                    }
+                })
+            }
+
             let $reviewListWrapper = $body.find('.comment-list')
             const $loadingSpinner = $body.find('.loading-spinner')
 
@@ -1519,19 +1534,17 @@
                         $reviewListWrapper.html(response.data)
                         $('.product-reviews-container .product-reviews-header').html(response.message)
 
-                        let $galleries = $('.product-reviews-container .review-images')
+                        let $galleries = $('.product-reviews-container .block__images')
                         if ($galleries.length) {
                             $galleries.map((index, value) => {
-                                if (!$(value).data('lightGallery')) {
-                                    $(value).lightGallery({
-                                        selector: 'a',
-                                        thumbnail: true,
-                                        share: false,
-                                        fullScreen: false,
-                                        autoplay: false,
-                                        autoplayControls: false,
-                                        actualSize: false,
-                                    })
+                                if (jQuery().magnificPopup) {
+                                    $(value).magnificPopup({
+                                        delegate: 'a', // the selector for gallery item
+                                        type: 'image',
+                                        gallery: {
+                                            enabled: true
+                                        }
+                                    });
                                 }
                             })
                         }

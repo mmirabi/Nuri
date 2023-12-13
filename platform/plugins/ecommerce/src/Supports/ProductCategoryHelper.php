@@ -181,7 +181,7 @@ class ProductCategoryHelper
                 ->leftJoin('slugs_translations as st', function (JoinClause $join) {
                     $join
                         ->on('st.slugs_id', 'slugs.id')
-                        ->where('st.lang_code', Language::getCurrentLocale());
+                        ->where('st.lang_code', Language::getCurrentLocaleCode());
                 })
                 ->addSelect(DB::raw('IF(st.key IS NOT NULL, CONCAT(st.prefix, "/", st.key), CONCAT(slugs.prefix, "/", slugs.key)) as url'));
         }
@@ -206,7 +206,7 @@ class ProductCategoryHelper
                 ->leftJoin('ec_product_categories_translations as ct', function (JoinClause $join) {
                     $join
                         ->on('ec_product_categories_id', 'ec_product_categories.id')
-                        ->where('ct.lang_code', Language::getCurrentLocale());
+                        ->where('ct.lang_code', Language::getCurrentLocaleCode());
                 })
                 ->addSelect(DB::raw('IF(ct.name IS NOT NULL, ct.name, ec_product_categories.name) as name'));
         }
