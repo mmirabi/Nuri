@@ -1,7 +1,7 @@
 @font-face {
   font-family: 'Estedad';
   font-style: 'normal';
-  font-weight: '700';
+  font-weight: "700";
   src:     url('../fonts/Estedad/Estedad-FD[KSHD,wght].woff2') format('woff2'), /* Super Modern Browsers */
   src:     url('../fonts/Estedad/Estedad-Medium.ttf') format('truetype'), /* Safari, Android, iOS */
 }
@@ -125,4 +125,7 @@ background-color: var(--color-brand);
     visibility: hidden;
     white-space: nowrap;
     margin-left: 10px;
+}
+.header-style-1 .search-style-2 form{
+    max-width: 645px!important;
 }
