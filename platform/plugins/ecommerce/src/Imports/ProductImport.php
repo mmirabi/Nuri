@@ -235,7 +235,11 @@ class ProductImport implements
         $images = array_values(array_filter($images));
 
         foreach ($images as $key => $image) {
-            $images[$key] = str_replace(RvMedia::getUploadURL() . '/', '', trim(strtolower($image)));
+            $image = trim(strtolower($image));
+
+            if (! setting('media_use_original_name_for_file_path')) {
+                $images[$key] = str_replace(RvMedia::getUploadURL() . '/', '', $image);
+            }
 
             if (Str::startsWith($images[$key], ['http://', 'https://'])) {
                 $images[$key] = $this->uploadImageFromURL($images[$key]);

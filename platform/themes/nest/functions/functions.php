@@ -149,7 +149,6 @@ add_filter(BASE_FILTER_BEFORE_RENDER_FORM, function ($form, $data) {
             $form
                 ->addAfter('key', 'button_text', 'text', [
                     'label' => __('Button text'),
-                    'label_attr' => ['class' => 'control-label'],
                     'value' => $buttonText,
                     'attr' => [
                         'placeholder' => __('Ex: Shop now'),
@@ -157,7 +156,6 @@ add_filter(BASE_FILTER_BEFORE_RENDER_FORM, function ($form, $data) {
                 ])
                 ->addBefore('key', 'subtitle', 'textarea', [
                     'label' => __('Subtitle'),
-                    'label_attr' => ['class' => 'control-label'],
                     'value' => $subtitle,
                     'attr' => [
                         'placeholder' => __('Text to highlight'),
@@ -174,7 +172,6 @@ add_filter(BASE_FILTER_BEFORE_RENDER_FORM, function ($form, $data) {
             $form
                 ->addAfter('name', 'subtitle', 'text', [
                     'label' => __('Subtitle'),
-                    'label_attr' => ['class' => 'control-label'],
                     'value' => $subtitle,
                     'attr' => [
                         'placeholder' => __('Text to highlight'),
@@ -182,7 +179,6 @@ add_filter(BASE_FILTER_BEFORE_RENDER_FORM, function ($form, $data) {
                 ])
                 ->addAfter('end_date', 'image', 'mediaImage', [
                     'label' => __('Image'),
-                    'label_attr' => ['class' => 'control-label'],
                     'value' => $image,
                 ]);
 

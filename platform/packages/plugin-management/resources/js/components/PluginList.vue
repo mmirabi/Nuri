@@ -3,7 +3,7 @@ import { defineComponent } from 'vue'
 import PluginItem from './PluginItem.vue'
 import PluginDetails from './PluginDetails.vue'
 import Pagination from './Pagination.vue'
-import PluginPlaceholder from "./PluginPlaceholder.vue";
+import PluginPlaceholder from './PluginPlaceholder.vue'
 
 export default defineComponent({
     components: {
@@ -291,11 +291,7 @@ export default defineComponent({
             </div>
 
             <div class="mb-3 row row-cards position-relative">
-                <plugin-placeholder
-                    v-if="loading"
-                    v-for="(item) in this.lastPluginsCount"
-                    :key="item"
-                />
+                <plugin-placeholder v-if="loading" v-for="item in this.lastPluginsCount" :key="item" />
 
                 <plugin-item
                     v-for="(plugin, index) in plugins"

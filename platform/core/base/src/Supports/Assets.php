@@ -13,6 +13,8 @@ use Illuminate\Config\Repository;
  */
 class Assets extends BaseAssets
 {
+    protected bool $hasVueJs = false;
+
     public function __construct(Repository $config, HtmlBuilder $htmlBuilder)
     {
         parent::__construct($config, $htmlBuilder);
@@ -43,6 +45,7 @@ class Assets extends BaseAssets
 
         if (AdminHelper::isInAdmin(true) && BaseHelper::adminLanguageDirection() === 'rtl') {
             $this->config['resources']['styles']['core']['src']['local'] = '/vendor/core/core/base/css/core.rtl.css';
+            $this->config['resources']['styles']['select2']['src']['local'][1] = '/vendor/core/core/base/css/libraries/select2.rtl.css';
         }
 
         return parent::renderHeader($lastStyles);
@@ -59,6 +62,8 @@ class Assets extends BaseAssets
     {
         $this->addScripts(['vue', 'vue-app']);
 
+        $this->hasVueJs = true;
+
         return $this;
     }
 
@@ -66,7 +71,14 @@ class Assets extends BaseAssets
     {
         $this->removeScripts(['vue', 'vue-app']);
 
+        $this->hasVueJs = false;
+
         return $this;
+    }
+
+    public function hasVueJs(): bool
+    {
+        return $this->hasVueJs;
     }
 
     /**

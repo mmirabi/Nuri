@@ -34,6 +34,7 @@ use Botble\Ecommerce\Repositories\Interfaces\ProductInterface;
 use Botble\Ecommerce\Services\HandleFrontPages;
 use Botble\Ecommerce\Supports\InvoiceHelper;
 use Botble\Ecommerce\Supports\TwigExtension;
+use Botble\Faq\Models\Faq;
 use Botble\Media\Facades\RvMedia;
 use Botble\Menu\Events\RenderingMenuOptions;
 use Botble\Menu\Facades\Menu;
@@ -134,6 +135,7 @@ class HookServiceProvider extends ServiceProvider
                     ->setColor('#32c5d2')
                     ->setStatsTotal($items)
                     ->setRoute(route('orders.index'))
+                    ->setColumn('col-12 col-md-6 col-lg-3')
                     ->init($widgets, $widgetSettings);
             }, 2, 2);
 
@@ -152,6 +154,7 @@ class HookServiceProvider extends ServiceProvider
                     ->setColor('#1280f5')
                     ->setStatsTotal($items)
                     ->setRoute(route('products.index'))
+                    ->setColumn('col-12 col-md-6 col-lg-3')
                     ->init($widgets, $widgetSettings);
             }, 3, 2);
 
@@ -167,6 +170,7 @@ class HookServiceProvider extends ServiceProvider
                     ->setColor('#75b6f9')
                     ->setStatsTotal($items)
                     ->setRoute(route('customers.index'))
+                    ->setColumn('col-12 col-md-6 col-lg-3')
                     ->init($widgets, $widgetSettings);
             }, 4, 2);
 
@@ -182,6 +186,7 @@ class HookServiceProvider extends ServiceProvider
                     ->setColor('#074f9d')
                     ->setStatsTotal($items)
                     ->setRoute(route('reviews.index'))
+                    ->setColumn('col-12 col-md-6 col-lg-3')
                     ->init($widgets, $widgetSettings);
             }, 5, 2);
         });
@@ -312,18 +317,25 @@ class HookServiceProvider extends ServiceProvider
 
                     MetaBox::addMetaBox('faq_schema_config_wrapper', __('Product FAQs'), function () {
                         $value = [];
+                        $selectedFaqs = [];
 
                         $args = func_get_args();
                         if ($args[0] && $args[0]->id) {
                             $value = MetaBox::getMetaData($args[0], 'faq_schema_config', true);
+                            $selectedFaqs = MetaBox::getMetaData($args[0], 'faq_ids', true) ?: [];
                         }
 
                         $hasValue = ! empty($value);
 
                         $value = json_encode((array)$value);
 
-                        return view('plugins/faq::schema-config-box', compact('value', 'hasValue'))->render();
-                    }, get_class($object), $context);
+                        $faqs = Faq::query()->wherePublished()->pluck('question', 'id')->all();
+
+                        return view(
+                            'plugins/faq::schema-config-box',
+                            compact('value', 'hasValue', 'faqs', 'selectedFaqs')
+                        )->render();
+                    }, $object::class, $context);
 
                     return true;
                 }, 139, 2);
@@ -438,7 +450,11 @@ class HookServiceProvider extends ServiceProvider
         });
 
         add_action(BASE_ACTION_TOP_FORM_CONTENT_NOTIFICATION, function ($request, $data = null) {
-            if (! $data instanceof Product || Route::currentRouteName() != 'products.edit') {
+            if (
+                ! $data instanceof Product
+                || Route::currentRouteName() != 'products.edit'
+                || ! FlashSaleFacade::isEnabled()
+            ) {
                 return;
             }
 
@@ -571,6 +587,7 @@ class HookServiceProvider extends ServiceProvider
                         $products[] = [
                             'id' => $product->product_id,
                             'name' => $product->product_name,
+                            'image' => RvMedia::getImageUrl($product->product_image),
                             'price' => $this->convertOrderAmount($product->price),
                             'price_per_order' => $this->convertOrderAmount(
                                 ($product->price * $product->qty)
@@ -695,18 +712,17 @@ class HookServiceProvider extends ServiceProvider
 
         add_action(INVOICE_PAYMENT_CREATED, function (Invoice $invoice) {
             try {
-                $customer = $invoice->payment->customer;
                 $localDisk = Storage::disk('local');
                 $invoiceName = 'invoice-' . $invoice->code . '.pdf';
                 $localDisk->put($invoiceName, (new InvoiceHelper())->makeInvoicePDF($invoice)->output());
 
                 EmailHandler::setModule(ECOMMERCE_MODULE_SCREEN_NAME)
                     ->setVariableValues([
-                        'customer_name' => $customer->name,
+                        'customer_name' => $invoice->customer_name,
                         'invoice_code' => $invoice->code,
                         'invoice_link' => route('customer.invoices.show', $invoice->getKey()),
                     ])
-                    ->sendUsingTemplate('invoice-payment-created', $customer->email, [
+                    ->sendUsingTemplate('invoice-payment-created', $invoice->customer_email, [
                         'attachments' => [$localDisk->path($invoiceName)],
                     ]);
 
@@ -745,7 +761,6 @@ class HookServiceProvider extends ServiceProvider
         theme_option()
             ->setSection([
                 'title' => trans('plugins/ecommerce::ecommerce.theme_options.name'),
-                'desc' => trans('plugins/ecommerce::ecommerce.theme_options.description'),
                 'id' => 'opt-text-subsection-ecommerce',
                 'subsection' => true,
                 'icon' => 'ti ti-shopping-bag',
@@ -808,6 +823,34 @@ class HookServiceProvider extends ServiceProvider
                             'value' => null,
                             'attributes' => [
                                 'allow_thumb' => false,
+                            ],
+                        ],
+                    ],
+                    [
+                        'id' => 'login_background',
+                        'type' => 'mediaImage',
+                        'label' => trans('plugins/ecommerce::ecommerce.theme_options.login_background_image'),
+                        'attributes' => [
+                            'name' => 'login_background',
+                        ],
+                    ],
+                    [
+                        'id' => 'register_background',
+                        'type' => 'mediaImage',
+                        'label' => trans('plugins/ecommerce::ecommerce.theme_options.register_background_image'),
+                        'attributes' => [
+                            'name' => 'register_background',
+                        ],
+                    ],
+                    [
+                        'id' => 'ecommerce_term_and_privacy_policy_url',
+                        'type' => 'text',
+                        'label' => trans('plugins/ecommerce::ecommerce.theme_options.term_and_privacy_policy_url'),
+                        'attributes' => [
+                            'name' => 'ecommerce_term_and_privacy_policy_url',
+                            'value' => null,
+                            'options' => [
+                                'class' => 'form-control',
                             ],
                         ],
                     ],

@@ -4,6 +4,13 @@ namespace Botble\Base\Forms\FieldOptions;
 
 class MultiChecklistFieldOption extends SelectFieldOption
 {
+    public function placeholder(string $placeholder): static
+    {
+        $this->addAttribute('placeholder', $placeholder);
+
+        return $this;
+    }
+
     public function toArray(): array
     {
         $data = parent::toArray();

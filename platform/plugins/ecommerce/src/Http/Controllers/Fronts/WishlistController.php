@@ -51,56 +51,76 @@ class WishlistController extends BaseController
         return Theme::scope('ecommerce.wishlist', compact('products'), 'plugins/ecommerce::themes.wishlist')->render();
     }
 
-    public function store(int|string $productId)
+    public function store(int|string $productId, Request $request)
     {
         if (! EcommerceHelper::isWishlistEnabled()) {
             abort(404);
         }
 
+        if (! $productId) {
+            $productId = $request->input('product_id');
+        }
+
+        if (! $productId) {
+            return $this->httpResponse()->setError()->setMessage(__('This product is not available.'));
+        }
+
         $product = Product::query()->findOrFail($productId);
 
-        if ($product->is_variation) {
-            $product = $product->original_product;
-            $productId = $product->getKey();
-        }
-
-        $duplicates = Cart::instance('wishlist')->search(function ($cartItem) use ($productId) {
-            return $cartItem->id == $productId;
-        });
-
-        if (! $duplicates->isEmpty()) {
-            return $this
-                ->httpResponse()
-                ->setMessage(__(':product is already in your wishlist!', ['product' => $product->name]))
-                ->setError();
-        }
+        $messageAdded = __('Added product :product successfully!', ['product' => $product->name]);
+        $messageRemoved = __('Removed product :product from wishlist successfully!', ['product' => $product->name]);
 
         if (! auth('customer')->check()) {
-            Cart::instance('wishlist')->add($productId, $product->name, 1, $product->front_sale_price)
-                ->associate(Product::class);
+            $wishlistInstance = Cart::instance('wishlist');
+
+            $duplicates = $wishlistInstance->search(function ($cartItem) use ($productId) {
+                return $cartItem->id == $productId;
+            });
+
+            if ($duplicates->isNotEmpty()) {
+                $added = false;
+                $duplicates->each(function ($cartItem, $rowId) use ($wishlistInstance) {
+                    $wishlistInstance->remove($rowId);
+                });
+            } else {
+                $added = true;
+                $wishlistInstance
+                    ->add($productId, $product->name, 1, $product->front_sale_price)
+                    ->associate(Product::class);
+            }
 
             return $this
                 ->httpResponse()
-                ->setMessage(__('Added product :product successfully!', ['product' => $product->name]))
-                ->setData(['count' => Cart::instance('wishlist')->count()]);
+                ->setMessage($added ? $messageAdded : $messageRemoved)
+                ->setData([
+                    'count' => Cart::instance('wishlist')->count(),
+                    'added' => $added,
+                ]);
         }
+
+        $customer = auth('customer')->user();
 
         if (is_added_to_wishlist($productId)) {
-            return $this
-                ->httpResponse()
-                ->setMessage(__(':product is already in your wishlist!', ['product' => $product->name]))
-                ->setError();
+            $added = false;
+            Wishlist::query()->where([
+                'product_id' => $productId,
+                'customer_id' => $customer->getKey(),
+            ])->delete();
+        } else {
+            $added = true;
+            Wishlist::query()->create([
+                'product_id' => $productId,
+                'customer_id' => $customer->getKey(),
+            ]);
         }
-
-        Wishlist::query()->create([
-            'product_id' => $productId,
-            'customer_id' => auth('customer')->id(),
-        ]);
 
         return $this
             ->httpResponse()
-            ->setMessage(__('Added product :product successfully!', ['product' => $product->name]))
-            ->setData(['count' => auth('customer')->user()->wishlist()->count()]);
+            ->setMessage($added ? $messageAdded : $messageRemoved)
+            ->setData([
+                'count' => $customer->wishlist()->count(),
+                'added' => $added,
+            ]);
     }
 
     public function destroy(int|string $productId)

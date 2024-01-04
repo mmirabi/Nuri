@@ -3,18 +3,20 @@
 namespace Botble\Ecommerce\Http\Controllers\Fronts;
 
 use Botble\Base\Http\Controllers\BaseController;
+use Botble\Ecommerce\Enums\DiscountTypeEnum;
 use Botble\Ecommerce\Facades\Cart;
 use Botble\Ecommerce\Facades\EcommerceHelper;
 use Botble\Ecommerce\Facades\OrderHelper;
 use Botble\Ecommerce\Http\Requests\CartRequest;
 use Botble\Ecommerce\Http\Requests\UpdateCartRequest;
+use Botble\Ecommerce\Models\Discount;
 use Botble\Ecommerce\Models\Product;
 use Botble\Ecommerce\Services\HandleApplyCouponService;
 use Botble\Ecommerce\Services\HandleApplyPromotionsService;
 use Botble\SeoHelper\Facades\SeoHelper;
 use Botble\Theme\Facades\Theme;
-use Exception;
 use Illuminate\Support\Arr;
+use Throwable;
 
 class PublicCartController extends BaseController
 {
@@ -68,10 +70,18 @@ class PublicCartController extends BaseController
         $couponDiscountAmount = 0;
 
         if ($couponCode = session('auto_apply_coupon_code')) {
-            $couponData = $this->handleApplyCouponService->execute($couponCode);
+            $coupon = Discount::query()
+                ->where('code', $couponCode)
+                ->where('apply_via_url', true)
+                ->where('type', DiscountTypeEnum::COUPON)
+                ->exists();
 
-            if (! Arr::get($couponData, 'error')) {
-                $couponDiscountAmount = Arr::get($couponData, 'data.discount_amount');
+            if ($coupon) {
+                $couponData = $this->handleApplyCouponService->execute($couponCode);
+
+                if (! Arr::get($couponData, 'error')) {
+                    $couponDiscountAmount = Arr::get($couponData, 'data.discount_amount');
+                }
             }
         }
 
@@ -299,7 +309,7 @@ class PublicCartController extends BaseController
 
         try {
             Cart::instance('cart')->remove($id);
-        } catch (Exception) {
+        } catch (Throwable) {
             return $this
                 ->httpResponse()
                 ->setError()

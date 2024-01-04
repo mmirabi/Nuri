@@ -5,7 +5,6 @@ namespace Botble\Translation\Http\Controllers;
 use Botble\Base\Facades\Assets;
 use Botble\Base\Facades\BaseHelper;
 use Botble\Base\Supports\Language;
-use Botble\Language\Facades\Language as LanguageFacade;
 use Botble\Setting\Http\Controllers\SettingController;
 use Botble\Translation\Http\Requests\TranslationRequest;
 use Botble\Translation\Manager;
@@ -18,9 +17,6 @@ class TranslationController extends SettingController
 {
     public function __construct(protected Manager $manager)
     {
-        $this
-            ->breadcrumb()
-            ->add(trans('plugins/translation::translation.translations'), route('translations.locales'));
     }
 
     public function index(Request $request, TranslationTable $translationTable)
@@ -41,7 +37,7 @@ class TranslationController extends SettingController
             ];
         }
 
-        $currentLocale = is_plugin_active('language') ? LanguageFacade::getRefLang() : app()->getLocale();
+        $currentLocale = $request->has('ref_lang') ? $request->input('ref_lang') : app()->getLocale();
 
         $locale = Arr::first($locales, fn ($item) => $item['locale'] == $currentLocale);
 

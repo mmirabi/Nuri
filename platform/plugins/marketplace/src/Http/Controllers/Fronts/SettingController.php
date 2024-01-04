@@ -30,11 +30,11 @@ class SettingController extends BaseController
         $form = VendorStoreForm::createFromModel($store)
             ->renderForm();
 
-        $taxInformationForm = TaxInformationForm::createFromModel($store)
+        $taxInformationForm = TaxInformationForm::createFromModel($store->customer)
             ->setUrl(route('marketplace.vendor.settings.post.tax-info'))
             ->renderForm();
 
-        $payoutInformationForm = PayoutInformationForm::createFromModel($store)
+        $payoutInformationForm = PayoutInformationForm::createFromModel($store->customer)
             ->setUrl(route('marketplace.vendor.settings.post.payout'))
             ->renderForm();
 
@@ -48,37 +48,42 @@ class SettingController extends BaseController
     {
         $store = auth('customer')->user()->store;
 
-        $existing = SlugHelper::getSlug($request->input('slug'), SlugHelper::getPrefix(Store::class));
+        $storeForm = VendorStoreForm::createFromModel($store);
 
-        if ($existing && $existing->reference_id != $store->id) {
-            return $this->httpResponse()->setError()->setMessage(__('Shop URL is existing. Please choose another one!'));
-        }
+        $storeForm->saving(function (VendorStoreForm $form) use ($request) {
 
-        if ($request->hasFile('logo_input')) {
-            $result = RvMedia::handleUpload($request->file('logo_input'), 0, $store->upload_folder);
-            if (! $result['error']) {
-                $file = $result['data'];
-                $request->merge(['logo' => $file->url]);
+            $store = $form->getModel();
+
+            $existing = SlugHelper::getSlug($request->input('slug'), SlugHelper::getPrefix(Store::class));
+
+            if ($existing && $existing->reference_id != $store->id) {
+                return $this->httpResponse()->setError()->setMessage(__('Shop URL is existing. Please choose another one!'));
             }
-        }
 
-        if ($request->hasFile('cover_image_input')) {
-            $result = RvMedia::handleUpload($request->file('cover_image_input'), 0, 'stores');
-            if (! $result['error']) {
-                MetaBox::saveMetaBoxData($store, 'cover_image', $result['data']->url);
+            if ($request->hasFile('logo_input')) {
+                $result = RvMedia::handleUpload($request->file('logo_input'), 0, $store->upload_folder);
+                if (! $result['error']) {
+                    $file = $result['data'];
+                    $request->merge(['logo' => $file->url]);
+                }
             }
-        } elseif ($request->input('cover_image')) {
-            MetaBox::saveMetaBoxData($store, 'cover_image', $request->input('cover_image'));
-        } elseif ($request->has('cover_image')) {
-            MetaBox::deleteMetaData($store, 'cover_image');
-        }
 
-        $store->fill($request->input());
-        $store->save();
+            if ($request->hasFile('cover_image_input')) {
+                $result = RvMedia::handleUpload($request->file('cover_image_input'), 0, 'stores');
+                if (! $result['error']) {
+                    MetaBox::saveMetaBoxData($store, 'cover_image', $result['data']->url);
+                }
+            } elseif ($request->input('cover_image')) {
+                MetaBox::saveMetaBoxData($store, 'cover_image', $request->input('cover_image'));
+            } elseif ($request->has('cover_image')) {
+                MetaBox::deleteMetaData($store, 'cover_image');
+            }
 
-        $request->merge(['is_slug_editable' => 1]);
+            $store->fill($request->input());
+            $store->save();
 
-        event(new UpdatedContentEvent(STORE_MODULE_SCREEN_NAME, $request, $store));
+            $request->merge(['is_slug_editable' => 1]);
+        });
 
         return $this
             ->httpResponse()

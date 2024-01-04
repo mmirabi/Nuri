@@ -64,10 +64,9 @@ class PluginManagement {
 
             $httpClient
                 .makeWithoutErrorHandler()
+                .withButtonLoading(_self)
                 .post(route('plugins.check-requirement', { name: pluginName }))
-                .then(async ({ data }) => {
-                    await this.activateOrDeactivatePlugin(pluginName)
-                })
+                .then(() => this.activateOrDeactivatePlugin(pluginName))
                 .catch((e) => {
                     const { data, message } = e.response.data
 
@@ -83,9 +82,6 @@ class PluginManagement {
                     }
 
                     Botble.showError(message)
-                })
-                .finally(() => {
-                    Botble.hideButtonLoading(_self)
                 })
         })
 

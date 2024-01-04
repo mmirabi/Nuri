@@ -7,9 +7,17 @@ use Botble\Base\Enums\BaseStatusEnum;
 use Botble\Base\Facades\Assets;
 use Botble\Base\Facades\BaseHelper;
 use Botble\Base\Facades\Html;
+use Botble\Base\Forms\FieldOptions\RadioFieldOption;
+use Botble\Base\Forms\FieldOptions\SelectFieldOption;
+use Botble\Base\Forms\FieldOptions\TextFieldOption;
+use Botble\Base\Forms\Fields\HtmlField;
+use Botble\Base\Forms\Fields\RadioField;
+use Botble\Base\Forms\Fields\SelectField;
+use Botble\Base\Forms\Fields\TextField;
 use Botble\Base\Forms\FormAbstract;
 use Botble\Base\Http\Responses\BaseHttpResponse;
 use Botble\Ecommerce\Enums\CustomerStatusEnum;
+use Botble\Ecommerce\Forms\Fronts\Auth\RegisterForm;
 use Botble\Ecommerce\Models\Customer;
 use Botble\Ecommerce\Models\Discount;
 use Botble\Ecommerce\Models\Invoice;
@@ -33,6 +41,7 @@ use Botble\Table\CollectionDataTable;
 use Botble\Table\Columns\Column;
 use Botble\Table\EloquentDataTable;
 use Botble\Theme\Events\RenderingThemeOptionSettings;
+use Botble\Theme\Facades\Theme;
 use Exception;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
@@ -57,33 +66,31 @@ class HookServiceProvider extends ServiceProvider
 
             add_action(BASE_ACTION_AFTER_UPDATE_CONTENT, [$this, 'saveAdditionalData'], 128, 3);
 
-            TableAbstract::beforeRendering(function () {
-                add_filter(BASE_FILTER_GET_LIST_DATA, [$this, 'addColumnToEcommerceTable'], 153, 2);
-                add_filter(BASE_FILTER_TABLE_HEADINGS, [$this, 'addHeadingToEcommerceTable'], 153, 2);
-                add_filter(BASE_FILTER_TABLE_QUERY, [$this, 'modifyQueryInCustomerTable'], 153);
+            add_filter(BASE_FILTER_GET_LIST_DATA, [$this, 'addColumnToEcommerceTable'], 153, 2);
+            add_filter(BASE_FILTER_TABLE_HEADINGS, [$this, 'addHeadingToEcommerceTable'], 153, 2);
+            add_filter(BASE_FILTER_TABLE_QUERY, [$this, 'modifyQueryInCustomerTable'], 153);
 
-                add_filter('base_filter_table_filters', function (array $filters, TableAbstract $table) {
-                    if ($table instanceof CustomerTable) {
-                        $filters['is_vendor'] = [
-                            'title' => trans('plugins/marketplace::store.forms.is_vendor'),
-                            'type' => 'select',
-                            'choices' => [1 => trans('core/base::base.yes'), 0 => trans('core/base::base.no')],
-                            'validate' => 'required|in:1,0',
-                        ];
-                    }
+            add_filter('base_filter_table_filters', function (array $filters, TableAbstract $table) {
+                if ($table instanceof CustomerTable) {
+                    $filters['is_vendor'] = [
+                        'title' => trans('plugins/marketplace::store.forms.is_vendor'),
+                        'type' => 'select',
+                        'choices' => [1 => trans('core/base::base.yes'), 0 => trans('core/base::base.no')],
+                        'validate' => 'required|in:1,0',
+                    ];
+                }
 
-                    if ($table instanceof ProductTable) {
-                        $filters['store_id'] = [
-                            'title' => trans('plugins/marketplace::store.forms.store'),
-                            'type' => 'select-search',
-                            'validate' => 'required|string',
-                            'callback' => fn () => Store::query()->pluck('name', 'id')->all(),
-                        ];
-                    }
+                if ($table instanceof ProductTable) {
+                    $filters['store_id'] = [
+                        'title' => trans('plugins/marketplace::store.forms.store'),
+                        'type' => 'select-search',
+                        'validate' => 'required|string',
+                        'callback' => fn () => Store::query()->pluck('name', 'id')->all(),
+                    ];
+                }
 
-                    return $filters;
-                }, 120, 2);
-            });
+                return $filters;
+            }, 120, 2);
 
             add_filter(BASE_FILTER_APPEND_MENU_NAME, [$this, 'getUnverifiedVendors'], 130, 2);
             add_filter(BASE_FILTER_MENU_ITEMS_COUNT, [$this, 'getMenuItemCount'], 121);
@@ -213,6 +220,85 @@ class HookServiceProvider extends ServiceProvider
                 return array_merge($with, ['store', 'store.slugable']);
             }, 120);
         });
+
+        if (is_plugin_active('marketplace') && MarketplaceHelper::isVendorRegistrationEnabled()) {
+            RegisterForm::extend(function (RegisterForm $form) {
+                Theme::asset()
+                    ->container('footer')
+                    ->add('marketplace-register', 'vendor/core/plugins/marketplace/js/customer-register.js', ['jquery']);
+
+                $form
+                    ->addAfter(
+                        'password_confirmation',
+                        'is_vendor',
+                        RadioField::class,
+                        RadioFieldOption::make()
+                            ->label(__('Register as'))
+                            ->choices(['0' => __('I am a customer'), '1' => __('I am a vendor')])
+                            ->wrapperAttributes(['style' => 'margin-bottom: -1rem !important;'])
+                            ->toArray()
+                    )
+                    ->addAfter(
+                        'is_vendor',
+                        'openVendorWrapper',
+                        HtmlField::class,
+                        ['html' => sprintf('<div data-bb-toggle="vendor-info" style="%s">', old('is_vendor') ? '' : 'display: none;')]
+                    )
+                    ->addAfter(
+                        'openVendorWrapper',
+                        'shop_name',
+                        TextField::class,
+                        TextFieldOption::make()
+                            ->label(__('Shop Name'))
+                            ->placeholder(__('Ex: My Shop'))
+                            ->toArray()
+                    )
+                    ->addAfter(
+                        'shop_name',
+                        'open_shop_slug_wrapper',
+                        HtmlField::class,
+                        ['html' => '<div class="position-relative">']
+                    )
+                    ->addAfter(
+                        'open_shop_slug_wrapper',
+                        'shop_url',
+                        'url',
+                        TextFieldOption::make()
+                            ->label(__('Shop URL'))
+                            ->placeholder(__('Store URL'))
+                            ->attributes(['data-url' => route('public.ajax.check-store-url')])
+                            ->wrapperAttributes(['class' => 'position-relative'])
+                            ->toArray()
+                    )
+                    ->addAfter(
+                        'shop_url',
+                        'shop_slug',
+                        HtmlField::class,
+                        ['html' => Blade::render(<<<BLADE
+                            <div class="form-text mb-3" data-base-url="{{ route('public.store', '') }}" data-slug-value>
+                                {{ route('public.store', Str::limit((string) old('shop_url'))) }}
+                            </div>
+                            <span class="position-absolute top-0 end-0 shop-url-status text-danger"></span>
+                        BLADE)]
+                    )
+                    ->addAfter(
+                        'shop_slug',
+                        'close_shop_slug_wrapper',
+                        HtmlField::class,
+                        ['html' => '</div>']
+                    )
+                    ->addAfter(
+                        'shop_slug',
+                        'shop_phone',
+                        'tel',
+                        TextFieldOption::make()
+                            ->label(__('Phone Number'))
+                            ->placeholder(__('Ex: 0943243332'))
+                            ->toArray()
+                    )
+                    ->addAfter('shop_phone', 'closeVendorWrapper', HtmlField::class, ['html' => '</div>']);
+            });
+        }
     }
 
     public function beforeOrderRefund(BaseHttpResponse $response, Order $order, Request $request): BaseHttpResponse
@@ -305,7 +391,6 @@ class HookServiceProvider extends ServiceProvider
         theme_option()
             ->setSection([
                 'title' => trans('plugins/marketplace::marketplace.theme_options.name'),
-                'desc' => trans('plugins/marketplace::marketplace.theme_options.description'),
                 'id' => 'opt-text-subsection-marketplace',
                 'subsection' => true,
                 'icon' => 'ti ti-shopping-bag',
@@ -331,10 +416,21 @@ class HookServiceProvider extends ServiceProvider
         if ($data instanceof Product && request()->segment(1) === BaseHelper::getAdminPrefix()) {
             $stores = Store::query()->pluck('name', 'id')->all();
 
-            $form->addAfter('status', 'store_id', 'customSelect', [
-                'label' => trans('plugins/marketplace::store.forms.store'),
-                'choices' => [0 => trans('plugins/marketplace::store.forms.select_store')] + $stores,
-            ]);
+            $form
+                ->when($stores, function (FormAbstract $form) use ($stores) {
+                    $form
+                        ->addAfter(
+                            'status',
+                            'store_id',
+                            SelectField::class,
+                            SelectFieldOption::make()
+                                ->label(trans('plugins/marketplace::store.forms.store'))
+                                ->choices([0 => trans('plugins/marketplace::store.forms.select_store')] + $stores)
+                                ->searchable()
+                                ->emptyValue(trans('plugins/marketplace::store.forms.select_store'))
+                                ->toArray()
+                        );
+                });
         } elseif ($data instanceof Customer) {
             if ($data->is_vendor && $form->has('status')) {
                 $statusOptions = $form->getField('status')->getOptions();

@@ -24,10 +24,13 @@ class OrderReturnHelper
             'order_id' => $order->id,
             'store_id' => $order->store_id,
             'user_id' => $order->user_id,
-            'reason' => $data['reason'],
             'order_status' => $order->status,
             'return_status' => OrderReturnStatusEnum::PENDING,
         ];
+
+        if (! empty($data['reason'])) {
+            $orderReturnData = $data['reason'];
+        }
 
         try {
             DB::beginTransaction();
@@ -69,7 +72,7 @@ class OrderReturnHelper
                 $mailer = OrderHelperFacade::setEmailVariables($order);
 
                 $orderProducts = OrderProduct::query()
-                    ->where('order_id', $order->id)
+                    ->where('order_id', $order->getKey())
                     ->whereIn('product_id', $orderProductIds)
                     ->get();
 

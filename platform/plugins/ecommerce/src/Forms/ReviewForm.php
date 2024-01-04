@@ -22,14 +22,6 @@ class ReviewForm extends FormAbstract
             ->setupModel(new Review())
             ->setValidatorClass(ReviewRequest::class)
             ->add(
-                'created_at',
-                DatetimeField::class,
-                DatePickerFieldOption::make()
-                    ->label(trans('core/base::tables.created_at'))
-                    ->value(Carbon::now())
-                    ->toArray()
-            )
-            ->add(
                 'product_id',
                 SelectField::class,
                 SelectFieldOption::make()
@@ -66,6 +58,15 @@ class ReviewForm extends FormAbstract
             ->add('images[]', MediaImagesField::class, [
                 'label' => trans('plugins/ecommerce::review.images'),
                 'values' => $this->model->images,
-            ]);
+            ])
+            ->add(
+                'created_at',
+                DatetimeField::class,
+                DatePickerFieldOption::make()
+                    ->label(trans('core/base::tables.created_at'))
+                    ->value(Carbon::now())
+                    ->toArray()
+            )
+            ->setBreakFieldPoint('created_at');
     }
 }

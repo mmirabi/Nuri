@@ -1,5 +1,3 @@
-<meta name="robots" content="index,follow" />
-
 {!! SeoHelper::render() !!}
 
 @if ($favicon = theme_option('favicon'))
@@ -24,6 +22,7 @@
 }
 </script>
 
+{!! Theme::asset()->container('before_header')->styles() !!}
 {!! Theme::asset()->styles() !!}
 {!! Theme::asset()->container('after_header')->styles() !!}
 {!! Theme::asset()->container('header')->scripts() !!}

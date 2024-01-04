@@ -4,8 +4,10 @@ namespace Botble\Ecommerce\Forms;
 
 use Botble\Base\Facades\Assets;
 use Botble\Base\Facades\BaseHelper;
+use Botble\Base\Forms\FieldOptions\NameFieldOption;
 use Botble\Base\Forms\FieldOptions\StatusFieldOption;
 use Botble\Base\Forms\Fields\SelectField;
+use Botble\Base\Forms\Fields\TextField;
 use Botble\Base\Forms\FormAbstract;
 use Botble\Ecommerce\Http\Requests\FlashSaleRequest;
 use Botble\Ecommerce\Models\FlashSale;
@@ -22,14 +24,7 @@ class FlashSaleForm extends FormAbstract
         $this
             ->setupModel(new FlashSale())
             ->setValidatorClass(FlashSaleRequest::class)
-            ->add('name', 'text', [
-                'label' => trans('core/base::forms.name'),
-                'required' => true,
-                'attr' => [
-                    'placeholder' => trans('core/base::forms.name_placeholder'),
-                    'data-counter' => 250,
-                ],
-            ])
+            ->add('name', TextField::class, NameFieldOption::make()->toArray())
             ->add('status', SelectField::class, StatusFieldOption::make()->toArray())
             ->add('end_date', 'datePicker', [
                 'label' => __('End date'),

@@ -12,40 +12,48 @@
     />
 
     <div class="sample-filter-item-wrap hidden">
-        <div class="d-flex gap-2 filter-item form-filter">
-            <x-core::form.select
-                name="filter_columns[]"
-                :options="array_combine(array_keys($columns), array_column($columns, 'title'))"
-                class="filter-column-key"
-            />
+        <div class="row filter-item form-filter">
+            <div class="col-auto w-50 w-sm-auto">
+                <x-core::form.select
+                    name="filter_columns[]"
+                    :options="array_combine(array_keys($columns), array_column($columns, 'title'))"
+                    class="filter-column-key"
+                />
+            </div>
 
-            <x-core::form.select
-                name="filter_operators[]"
-                :options="[
-                    'like' => trans('core/table::table.contains'),
-                    '=' => trans('core/table::table.is_equal_to'),
-                    '>' => trans('core/table::table.greater_than'),
-                    '<' => trans('core/table::table.less_than'),
-                ]"
-                class="filter-operator filter-column-operator"
-            />
+            <div class="col-auto w-50 w-sm-auto">
+                <x-core::form.select
+                    name="filter_operators[]"
+                    :options="[
+                        'like' => trans('core/table::table.contains'),
+                        '=' => trans('core/table::table.is_equal_to'),
+                        '>' => trans('core/table::table.greater_than'),
+                        '<' => trans('core/table::table.less_than'),
+                    ]"
+                    class="filter-operator filter-column-operator"
+                />
+            </div>
 
-            <span class="filter-column-value-wrap">
-                <input
-                    class="form-control filter-column-value"
-                    type="text"
-                    placeholder="{{ trans('core/table::table.value') }}"
-                    name="filter_values[]"
-                >
-            </span>
+            <div class="col-auto w-100 w-sm-25">
+                <span class="filter-column-value-wrap">
+                    <input
+                        class="form-control filter-column-value"
+                        type="text"
+                        placeholder="{{ trans('core/table::table.value') }}"
+                        name="filter_values[]"
+                    >
+                </span>
+            </div>
 
-            <x-core::button
-                type="button"
-                class="btn-remove-filter-item mb-3 text-danger"
-                :tooltip="trans('core/table::table.delete')"
-                icon="ti ti-trash"
-                :icon-only="true"
-            />
+            <div class="col">
+                <x-core::button
+                    type="button"
+                    class="btn-remove-filter-item mb-3 text-danger"
+                    :tooltip="trans('core/table::table.delete')"
+                    icon="ti ti-trash"
+                    :icon-only="true"
+                />
+            </div>
         </div>
     </div>
 
@@ -68,7 +76,7 @@
                     'row filter-item form-filter',
                     'filter-item-default' => $loop->first,
                 ])>
-                    <div class="col-auto">
+                    <div class="col-auto w-50 w-sm-auto">
                         <x-core::form.select
                             name="filter_columns[]"
                             :options="['' => trans('core/table::table.select_field')] + array_combine(array_keys($columns), array_column($columns, 'title'))"
@@ -77,7 +85,7 @@
                         />
                     </div>
 
-                    <div class="col-auto">
+                    <div class="col-auto w-50 w-sm-auto">
                         <x-core::form.select
                             name="filter_operators[]"
                             :options="[
@@ -91,8 +99,8 @@
                         />
                     </div>
 
-                    <div class="col">
-                        <div class="filter-column-value-wrap">
+                    <div class="col-auto w-100 w-sm-25">
+                        <div class="filter-column-value-wrap mb-3">
                             <input
                                 class="form-control filter-column-value"
                                 type="text"

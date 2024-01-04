@@ -32,7 +32,7 @@
                         id="date_of_birth"
                         name="dob"
                         type="text"
-                        value="{{ auth('customer')->user()->dob }}"
+                        value="{{ auth('customer')->user()->dob ? auth('customer')->user()->dob->toDateString() : null }}"
                     >
                     {!! Form::error('dob', $errors) !!}
                 </div>
@@ -70,7 +70,7 @@
 
                 <div class="form-group">
                     <button
-                        class="btn btn-primary"
+                        class="{{ $buttonClass ?? 'btn btn-primary' }}"
                         type="submit"
                     >{{ __('Update') }}</button>
                 </div>

@@ -9,14 +9,14 @@
                             <p>{{ __('Tracking your order status') }}</p>
                         </div>
                         <form method="GET" action="{{ route('public.orders.tracking') }}">
-                            <div class="form-group">
+                            <div class="mb-3">
                                 <label for="txt-order-id">{{ __('Order ID') }}<sup>*</sup></label>
                                 <input class="form-control" name="order_id" id="txt-order-id" type="text" value="{{ old('order_id', request()->input('order_id')) }}" placeholder="{{ __('Order ID') }}">
                                 @if ($errors->has('order_id'))
                                     <span class="text-danger">{{ $errors->first('order_id') }}</span>
                                 @endif
                             </div>
-                            <div class="form-group">
+                            <div class="mb-3">
                                 <label for="txt-email">{{ __('Email Address') }}<sup>*</sup></label>
                                 <input class="form-control" name="email" id="txt-email" type="email" value="{{ old('email', request()->input('email', auth('customer')->check() ? auth('customer')->user()->email : '')) }}" placeholder="{{ __('Your Email') }}">
                                 @if ($errors->has('email'))

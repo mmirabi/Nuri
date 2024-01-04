@@ -19,26 +19,26 @@
                                 <form method="POST" action="{{ route('customer.register.post') }}">
                                     @csrf
                                     <div class="form__content">
-                                        <div class="form-group">
+                                        <div class="mb-3">
                                             <input class="form-control" name="name" id="txt-name" type="text" value="{{ old('name') }}" placeholder="{{ __('Your name') }}">
                                             @if ($errors->has('name'))
                                                 <span class="text-danger">{{ $errors->first('name') }}</span>
                                             @endif
                                         </div>
-                                        <div class="form-group">
+                                        <div class="mb-3">
                                             <input class="form-control" name="email" id="txt-email" type="email" value="{{ old('email') }}" placeholder="{{ __('Your email address') }}">
                                             @if ($errors->has('email'))
                                                 <span class="text-danger">{{ $errors->first('email') }}</span>
                                             @endif
                                         </div>
-                                        <div class="form-group">
+                                        <div class="mb-3">
                                             <input class="form-control" type="password" name="password" id="txt-password" placeholder="{{ __('Your password') }}">
                                             @if ($errors->has('password'))
                                                 <span class="text-danger">{{ $errors->first('password') }}</span>
                                             @endif
                                         </div>
 
-                                        <div class="form-group">
+                                        <div class="mb-3">
                                             <input class="form-control" type="password" name="password_confirmation" id="txt-password-confirmation" placeholder="{{ __('Password confirmation') }}">
                                             @if ($errors->has('password_confirmation'))
                                                 <span class="text-danger">{{ $errors->first('password_confirmation') }}</span>
@@ -47,7 +47,7 @@
 
                                         @if (is_plugin_active('marketplace') && apply_filters('marketplace_enabled_register_form', true))
                                             <div class="show-if-vendor" @if (old('is_vendor') == 0) style="display: none" @endif>
-                                                <div class="form-group">
+                                                <div class="mb-3">
                                                     <input class="form-control" name="shop_name" id="shop-name" type="text" value="{{ old('shop_name') }}" placeholder="{{ __('Shop Name') }}">
                                                     @if ($errors->has('shop_name'))
                                                         <span class="text-danger">{{ $errors->first('shop_name') }}</span>
@@ -61,7 +61,7 @@
                                                     @endif
                                                     <span class="d-inline-block"><small data-base-url="{{ route('public.store', '') }}">{{ route('public.store', (string)old('shop_url')) }}</small></span>
                                                 </div>
-                                                <div class="form-group">
+                                                <div class="mb-3">
                                                     <input class="form-control" name="shop_phone" id="shop-phone" type="text" value="{{ old('shop_phone') }}" placeholder="{{ __('Shop phone') }}">
                                                     @if ($errors->has('shop_phone'))
                                                         <span class="text-danger">{{ $errors->first('shop_phone') }}</span>
@@ -87,19 +87,19 @@
                                                 </p>
                                             </div>
                                         @endif
-                                        <div class="form-group">
+                                        <div class="mb-3">
                                             <p>{{ __('Your personal data will be used to support your experience throughout this website, to manage access to your account, and for other purposes described in our privacy policy.') }}</p>
                                         </div>
 
                                         @if (is_plugin_active('captcha'))
                                             @if(Captcha::isEnabled() && get_ecommerce_setting('enable_recaptcha_in_register_page', 0))
-                                                <div class="form-group">
+                                                <div class="mb-3">
                                                     {!! Captcha::display() !!}
                                                 </div>
                                             @endif
 
                                             @if (get_ecommerce_setting('enable_math_captcha_in_register_page', 0))
-                                                <div class="form-group">
+                                                <div class="mb-3">
                                                     <label class="form-label" for="math-group">{{ app('math-captcha')->label() }}</label>
                                                     {!! app('math-captcha')->input(['class' => 'form-control', 'id' => 'math-group', 'placeholder' => app('math-captcha')->getMathLabelOnly()]) !!}
                                                 </div>
@@ -116,7 +116,7 @@
                                             </div>
                                         </div>
 
-                                        <div class="form-group">
+                                        <div class="mb-3">
                                             <button type="submit" class="btn btn-fill-out btn-block hover-up">{{ __('Register') }}</button>
                                         </div>
 

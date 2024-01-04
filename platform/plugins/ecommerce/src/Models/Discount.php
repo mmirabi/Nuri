@@ -4,6 +4,7 @@ namespace Botble\Ecommerce\Models;
 
 use Botble\Base\Models\BaseModel;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
@@ -41,7 +42,7 @@ class Discount extends BaseModel
 
     protected static function booted(): void
     {
-        static::deleting(function (Discount $discount) {
+        static::deleted(function (Discount $discount) {
             $discount->productCollections()->detach();
             $discount->productCategories()->detach();
             $discount->customers()->detach();
@@ -52,11 +53,7 @@ class Discount extends BaseModel
 
     public function isExpired(): bool
     {
-        if ($this->end_date && strtotime($this->end_date) < strtotime(Carbon::now()->toDateTimeString())) {
-            return true;
-        }
-
-        return false;
+        return $this->end_date && strtotime($this->end_date) < strtotime(Carbon::now()->toDateTimeString());
     }
 
     public function productCollections(): BelongsToMany
@@ -104,5 +101,25 @@ class Discount extends BaseModel
     protected function leftQuantity(): Attribute
     {
         return Attribute::get(fn () => $this->quantity - $this->total_used);
+    }
+
+    public function scopeActive(Builder $query): void
+    {
+        $query
+            ->where('start_date', '<=', Carbon::now())
+            ->where(
+                fn (Builder $query) => $query
+                    ->whereNull('end_date')
+                    ->orWhere('end_date', '>=', Carbon::now()->toDateTimeString())
+            );
+    }
+
+    public function scopeAvailable(Builder $query): void
+    {
+        $query->where(
+            fn (Builder $query) => $query
+                ->whereNull('quantity')
+                ->orWhereColumn('quantity', '>', 'total_used')
+        );
     }
 }

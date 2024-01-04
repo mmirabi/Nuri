@@ -1,6 +1,9 @@
 import Toastify from './base/toast'
 
 class Botble {
+    static noticesTimeout = {}
+    static noticesTimeoutCount = 500
+
     constructor() {
         this.initGlobalModal()
         this.countCharacter()
@@ -8,6 +11,7 @@ class Botble {
         this.handleWayPoint()
         this.handleTurnOffDebugMode()
         Botble.initResources()
+        Botble.initGlobalResources()
         Botble.handleCounterUp()
         Botble.initMediaIntegrate()
 
@@ -29,40 +33,53 @@ class Botble {
     }
 
     static showNotice(messageType, message, messageHeader = '') {
+        let key = `notices_msg.${messageType}.${message}`
         let color = ''
+        let icon = ''
 
-        if (!messageHeader) {
+        if (Botble.noticesTimeout[key]) {
+            clearTimeout(Botble.noticesTimeout[key])
+        }
+
+        Botble.noticesTimeout[key] = setTimeout(() => {
+            if (!messageHeader) {
+                switch (messageType) {
+                    case 'error':
+                        messageHeader = BotbleVariables.languages.notices_msg.error
+                        break
+                    case 'success':
+                        messageHeader = BotbleVariables.languages.notices_msg.success
+                        break
+                }
+            }
+
             switch (messageType) {
                 case 'error':
-                    messageHeader = BotbleVariables.languages.notices_msg.error
+                    color = '#f44336'
+                    icon =
+                        '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M12 9v4" /><path d="M12 16v.01" /></svg>'
                     break
                 case 'success':
-                    messageHeader = BotbleVariables.languages.notices_msg.success
+                    color = '#4caf50'
+                    icon =
+                        '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l5 5l10 -10" /></svg>'
                     break
             }
-        }
 
-        switch (messageType) {
-            case 'error':
-                color = '#f44336'
-                break
-            case 'success':
-                color = '#4caf50'
-                break
-        }
-
-        Toastify({
-            text: message,
-            duration: 5000,
-            close: true,
-            gravity: 'bottom',
-            position: 'right',
-            stopOnFocus: true,
-            escapeMarkup: false,
-            style: {
-                background: color,
-            },
-        }).showToast()
+            Toastify({
+                text: message,
+                duration: 5000,
+                close: true,
+                gravity: 'bottom',
+                position: 'right',
+                stopOnFocus: true,
+                escapeMarkup: false,
+                icon: icon,
+                style: {
+                    background: color,
+                },
+            }).showToast()
+        }, Botble.noticesTimeoutCount)
     }
 
     static showError(message, messageHeader = '') {
@@ -231,9 +248,10 @@ class Botble {
                 {
                     container: '<span></span>',
                     classname: 'charcounter',
-                    format: `(%1 ${BotbleVariables.languages.system.character_remain})`,
+                    format: `(%1/%2)`,
                     pulse: true,
                     delay: 0,
+                    allowOverLimit: false,
                 },
                 settings
             )
@@ -241,21 +259,26 @@ class Botble {
 
             let count = (el, container) => {
                 el = $(el)
-                if (el.val().length > max) {
+                let current = el.val().length
+                let remaining = max - el.val().length
+                container.html(settings.format.replace(/%1/, current).replace(/%2/, max))
+
+                container.toggleClass('text-danger', el.val().length > max)
+
+                if (!settings.allowOverLimit && el.val().length > max) {
                     el.val(el.val().substring(0, max))
                     if (settings.pulse && !p) {
                         pulse(container, true)
                     }
                 }
+
                 if (settings.delay > 0) {
                     if (timeout) {
                         window.clearTimeout(timeout)
                     }
                     timeout = window.setTimeout(() => {
-                        container.html(settings.format.replace(/%1/, max - el.val().length))
+                        container.html(settings.format.replace(/%1/, remaining).replace(/%2/, max))
                     }, settings.delay)
-                } else {
-                    container.html(settings.format.replace(/%1/, max - el.val().length))
                 }
             }
 
@@ -265,35 +288,20 @@ class Botble {
                     p = null
                 }
 
-                el.animate(
-                    {
-                        opacity: 0.1,
-                    },
-                    100,
-                    () => {
-                        $(el).animate(
-                            {
-                                opacity: 1.0,
-                            },
-                            100
-                        )
-                    }
-                )
+                el.animate({ opacity: 0.1 }, 100, () => {
+                    $(el).animate({ opacity: 1.0 }, 100)
+                })
 
                 if (again) {
-                    p = window.setTimeout(() => {
-                        pulse(el)
-                    }, 200)
+                    p = window.setTimeout(() => pulse(el), 200)
                 }
             }
 
             return this.each((index, el) => {
                 let container
                 if (!settings.container.match(/^<.+>$/)) {
-                    // use existing element to hold counter message
                     container = $(settings.container)
                 } else {
-                    // append element to hold counter message (clean up old element first)
                     $(el)
                         .nextAll('.' + settings.classname)
                         .remove()
@@ -340,8 +348,11 @@ class Botble {
         }
 
         $(document).on('click', 'input[data-counter], textarea[data-counter]', (event) => {
-            $(event.currentTarget).charCounter($(event.currentTarget).data('counter'), {
+            const $this = $(event.currentTarget)
+
+            $(event.currentTarget).charCounter($this.data('counter'), {
                 container: '<small></small>',
+                allowOverLimit: $this.data('allow-over-limit') == '' ? true : false,
             })
         })
     }
@@ -652,6 +663,14 @@ class Botble {
             $('textarea.textarea-auto-height').textareaAutoSize()
         }
 
+        Botble.initCodeEditorComponent()
+        Botble.initColorPicker()
+        Botble.initTreeCategoriesSelect()
+
+        document.dispatchEvent(new CustomEvent('core-init-resources'))
+    }
+
+    static initGlobalResources() {
         $(document).on('submit', '.js-base-form', (event) => {
             $(event.currentTarget).find('button[type=submit]').addClass('disabled')
         })
@@ -677,13 +696,8 @@ class Botble {
 
         Botble.initFieldCollapse()
         Botble.initTreeCheckboxes()
-        Botble.initCodeEditorComponent()
-        Botble.initColorPicker()
         Botble.initClipboard()
-        Botble.initTreeCategoriesSelect()
         Botble.initDropdownCheckboxes()
-
-        document.dispatchEvent(new CustomEvent('core-init-resources'))
     }
 
     static numberFormat(number, decimals, dec_point, thousands_sep) {
@@ -810,20 +824,18 @@ class Botble {
                         <div class='image-picker-backdrop'></div>
                         <span class='image-picker-remove-button'>
                             <button data-bb-toggle='image-picker-remove' class='btn btn-sm btn-icon'>
-                                <i class='ti ti-x'></i>
+                                <span class="icon-tabler-wrapper icon-sm icon-left">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-x" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                  <path d="M18 6l-12 12" />
+                                  <path d="M6 6l12 12" />
+                                </svg>
                             </button>
                         </span>
                         <div data-bb-toggle='image-picker-edit' class='image-box-actions cursor-pointer'></div>
                     </div>
                 </div>
             </div>`
-
-            $('[data-type="rv-media-standard-alone-button"]').rvMedia({
-                multiple: false,
-                onSelectFiles: (files, $el) => {
-                    $($el.data('target')).val(files[0].url)
-                },
-            })
 
             $.each($(document).find('.btn_gallery'), function (index, item) {
                 $(item).rvMedia({
@@ -1037,7 +1049,6 @@ class Botble {
                 })
                 .then(({ data }) => {
                     form[0].reset()
-                    Botble.showSuccess(data.data.message)
                     modal.modal('hide')
 
                     const $imageBox = $(form.find('input[name="image-box-target"]').val())
@@ -1086,26 +1097,28 @@ class Botble {
             }
         })
 
-        $(document).on('click', '[data-bb-toggle="gallery-reset"]', (e) => {
-            e.preventDefault()
+        const $listImages = $('.list-images')
 
-            const $listImage = $('.list-images')
-            const $list = $('.list-gallery-media-images').find('.gallery-image-item-handler')
-            $list.remove()
+        if ($listImages.length) {
+            $(document).on('click', '[data-bb-toggle="gallery-reset"]', (e) => {
+                e.preventDefault()
 
-            $listImage.find('.default-placeholder-gallery-image').removeClass('hidden')
-            $listImage.find('.footer-action').hide()
-        })
+                $listImages.find('.list-gallery-media-images .gallery-image-item-handler').remove()
+                $listImages.find('.default-placeholder-gallery-image').removeClass('hidden')
+                $listImages.find('.footer-action').hide()
+            })
 
-        $('.list-gallery-media-images').each((index, item) => {
-            if (jQuery().sortable) {
-                let $current = $(item)
-                if ($current.data('ui-sortable')) {
-                    $current.sortable('destroy')
+            $listImages.find('.list-gallery-media-images').each((index, item) => {
+                if (jQuery().sortable) {
+                    let $current = $(item)
+                    if ($current.data('ui-sortable')) {
+                        $current.sortable('destroy')
+                    }
+
+                    $current.sortable()
                 }
-                $current.sortable()
-            }
-        })
+            })
+        }
     }
 
     static getViewPort() {
@@ -1190,36 +1203,34 @@ class Botble {
     }
 
     static initFieldCollapse() {
-        $(document)
-            .find('[data-bb-toggle="collapse"]')
-            .on('change', function (e) {
-                const target = $(this).data('bb-target')
+        $(document).on('change', '[data-bb-toggle="collapse"]', function (e) {
+            const target = $(this).data('bb-target')
 
-                let targetElement = null
+            let targetElement = null
 
-                if (e.currentTarget.type === 'checkbox') {
-                    targetElement = $(document).find(target)
-                    const isReverse = $(this).data('bb-reverse')
-                    const isChecked = $(this).prop('checked')
+            if (e.currentTarget.type === 'checkbox') {
+                targetElement = $(document).find(target)
+                const isReverse = $(this).data('bb-reverse')
+                const isChecked = $(this).prop('checked')
 
-                    if (isReverse) {
-                        isChecked ? targetElement.slideUp() : targetElement.slideDown()
-                    } else {
-                        isChecked ? targetElement.slideDown() : targetElement.slideUp()
-                    }
+                if (isReverse) {
+                    isChecked ? targetElement.slideUp() : targetElement.slideDown()
                 } else {
-                    targetElement = $(document).find(`${target}[data-bb-value="${$(this).val()}"]`)
-
-                    const targets = $(document).find(`${target}[data-bb-value]`)
-
-                    if (targetElement.length) {
-                        targets.not(targetElement).slideUp()
-                        targetElement.slideDown()
-                    } else {
-                        targets.slideUp()
-                    }
+                    isChecked ? targetElement.slideDown() : targetElement.slideUp()
                 }
-            })
+            } else {
+                targetElement = $(document).find(`${target}[data-bb-value="${$(this).val()}"]`)
+
+                const targets = $(document).find(`${target}[data-bb-value]`)
+
+                if (targetElement.length) {
+                    targets.not(targetElement).slideUp()
+                    targetElement.slideDown()
+                } else {
+                    targets.slideUp()
+                }
+            }
+        })
     }
 
     static initTreeCheckboxes() {
@@ -1455,7 +1466,9 @@ class Botble {
 
     static initDropdownCheckboxes() {
         const countCheckedDropdownCheckboxes = (e) => {
-            const $wrapper = e ? $(e.currentTarget).closest('[data-bb-toggle="dropdown-checkboxes"]') : $('[data-bb-toggle="dropdown-checkboxes"]')
+            const $wrapper = e
+                ? $(e.currentTarget).closest('[data-bb-toggle="dropdown-checkboxes"]')
+                : $('[data-bb-toggle="dropdown-checkboxes"]')
 
             if (Array.isArray($wrapper)) {
                 $wrapper.forEach((wrapper) => {
@@ -1465,23 +1478,23 @@ class Botble {
                 return
             }
 
-            const $checked = $wrapper.find('input[type="checkbox"]:checked')
-            const $text = $wrapper.find('> span')
+            const $checkedCheckboxes = $wrapper.find('input[type="checkbox"]:checked')
+            const $textElement = $wrapper.find('> span')
 
-            if ($checked.length) {
-                if ($checked.length > 3) {
-                    $text.text($checked.length + ' ' + $wrapper.data('selected-text'))
+            if ($checkedCheckboxes.length) {
+                if ($checkedCheckboxes.length > 3) {
+                    $textElement.text($checkedCheckboxes.length + ' ' + $wrapper.data('selected-text'))
                 } else {
                     const values = []
 
-                    $checked.each(function () {
+                    $checkedCheckboxes.each(function () {
                         values.push($(this).siblings('.form-check-label').text().trim())
                     })
 
-                    $text.text(values.join(', '))
+                    $textElement.text(values.join(', '))
                 }
             } else {
-                $text.text($wrapper.data('placeholder') || ' ')
+                $textElement.text($wrapper.data('placeholder') || ' ')
             }
         }
 
@@ -1489,18 +1502,72 @@ class Botble {
 
         $(document).on('click', '[data-bb-toggle="dropdown-checkboxes"] input[type="checkbox"]', (e) => {
             countCheckedDropdownCheckboxes(e)
+
+            const $wrapper = $(e.currentTarget).closest('[data-bb-toggle="dropdown-checkboxes"]')
+
+            const $selected = $wrapper.find('.multi-checklist-selected')
+
+            if ($(e.currentTarget).is(':checked')) {
+                const $input = `<input type="hidden" name="${$wrapper.data('name')}" value="${$(
+                    e.currentTarget
+                ).val()}">`
+                $selected.append($input)
+            } else {
+                const $input = $selected.find(`input[value="${$(e.currentTarget).val()}"]`)
+                $input.remove()
+            }
         })
 
-        $('[data-bb-toggle="dropdown-checkboxes"] > span').on('click', function (event) {
+        $(document).on('click', '[data-bb-toggle="dropdown-checkboxes"] > span', function (event) {
             event.stopPropagation()
 
             const $this = $(this)
             const $input = $this.siblings('input[type="text"]')
             const $dropdown = $this.siblings('.dropdown-menu')
+            const $wrapper = $this.closest('[data-bb-toggle="dropdown-checkboxes"]')
 
             $dropdown.addClass('show')
             $this.hide()
             $input.show().trigger('focus')
+
+            if ($wrapper.data('ajax-url')) {
+                const template = `<li>
+                    <label class="form-check">
+                        <input type="checkbox" id="__id__" class="form-check-input" value="__value__">
+                        <span class="form-check-label">
+                            __label__
+                        </span>
+                    </label>
+                </li>`
+
+                const name = $wrapper.data('name')
+
+                $httpClient
+                    .make()
+                    .withLoading($dropdown)
+                    .get($wrapper.data('ajax-url'))
+                    .then(({ data }) => {
+                        let html = ''
+
+                        Object.keys(data).map((item) => {
+                            html += template
+                                .replace(/__id__/g, `${name}-${item}`)
+                                .replace(/__value__/g, item)
+                                .replace(/__label__/g, data[item])
+                        })
+
+                        $dropdown.find('ul').html(html)
+
+                        const $selected = $wrapper.find('.multi-checklist-selected')
+                        const $inputs = $selected.find('input[type="hidden"]')
+
+                        $inputs.each(function () {
+                            const $input = $(this)
+                            const $checkbox = $dropdown.find(`input[value="${$input.val()}"]`)
+                            $checkbox.prop('checked', true)
+                        })
+                    })
+            }
         })
 
         $(document).on('click', function (event) {
@@ -1511,6 +1578,10 @@ class Botble {
                 $wrapper.find('> .dropdown-menu').removeClass('show')
                 $wrapper.find('> span').show()
                 $wrapper.find('> input[type="text"]').val('').hide()
+
+                if ($wrapper.data('ajax-url')) {
+                    $wrapper.find('> .dropdown-menu ul').html('<div class="py-5"></div>')
+                }
             }
         })
 

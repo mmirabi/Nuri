@@ -6,6 +6,7 @@ use Botble\Base\Events\CreatedContentEvent;
 use Botble\Base\Events\DeletedContentEvent;
 use Botble\Base\Facades\Assets;
 use Botble\Base\Http\Requests\SelectSearchAjaxRequest;
+use Botble\Base\Supports\Breadcrumb;
 use Botble\Ecommerce\Forms\ReviewForm;
 use Botble\Ecommerce\Http\Requests\ReviewRequest;
 use Botble\Ecommerce\Models\Customer;
@@ -20,12 +21,9 @@ use Illuminate\Http\Request;
 
 class ReviewController extends BaseController
 {
-    public function __construct()
+    protected function breadcrumb(): Breadcrumb
     {
-        parent::__construct();
-
-        $this
-            ->breadcrumb()
+        return parent::breadcrumb()
             ->add(trans('plugins/ecommerce::review.name'), route('reviews.index'));
     }
 
@@ -73,11 +71,14 @@ class ReviewController extends BaseController
             ->addStylesDirectly('vendor/core/plugins/ecommerce/css/review.css');
 
         $review = Review::query()
-            ->with(['user', 'product' => function (BelongsTo $query) {
-                $query
+            ->with([
+                'user',
+                'reply',
+                'reply.user',
+                'product' => fn (BelongsTo $query) => $query
                     ->withCount('reviews')
-                    ->withAvg('reviews', 'star');
-            }])
+                    ->withAvg('reviews', 'star'),
+            ])
             ->findOrFail($id);
 
         $this->pageTitle(trans('plugins/ecommerce::review.view', ['name' => $review->user->name]));

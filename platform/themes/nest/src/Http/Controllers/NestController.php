@@ -5,7 +5,6 @@ namespace Theme\Nest\Http\Controllers;
 use Botble\Base\Enums\BaseStatusEnum;
 use Botble\Base\Http\Responses\BaseHttpResponse;
 use Botble\Ecommerce\Facades\EcommerceHelper;
-use Botble\Ecommerce\Models\Product;
 use Botble\Ecommerce\Repositories\Interfaces\ProductCategoryInterface;
 use Botble\Ecommerce\Repositories\Interfaces\ProductInterface;
 use Botble\Ecommerce\Services\Products\GetProductService;
@@ -16,41 +15,6 @@ use Illuminate\Support\Arr;
 
 class NestController extends PublicController
 {
-    public function ajaxGetProductReviews(int|string $id, Request $request, BaseHttpResponse $response)
-    {
-        $product = Product::query()
-            ->wherePublished()
-            ->where([
-                'id' => $id,
-                'is_variation' => false,
-            ])
-            ->with(['variations'])
-            ->firstOrFail();
-
-        $star = $request->integer('star');
-        $perPage = $request->integer('per_page', 10) ?: 10;
-
-        $reviews = EcommerceHelper::getProductReviews($product, $star, $perPage);
-
-        if ($star) {
-            $message = __(':total review(s) ":star star" for ":product"', [
-                'total' => $reviews->total(),
-                'product' => $product->name,
-                'star' => $star,
-            ]);
-        } else {
-            $message = __(':total review(s) for ":product"', [
-                'total' => $reviews->total(),
-                'product' => $product->name,
-            ]);
-        }
-
-        return $response
-            ->setData(view(Theme::getThemeNamespace('views.ecommerce.includes.review-list'), compact('reviews'))->render())
-            ->setMessage($message)
-            ->toApiResponse();
-    }
-
     public function getQuickView(int|string $id, BaseHttpResponse $response)
     {
         $product = get_products([

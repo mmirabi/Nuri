@@ -15,8 +15,6 @@ class DashboardController extends BaseController
 {
     public function getDashboard(Request $request)
     {
-        $this->breadcrumb();
-
         $this->pageTitle(trans('core/dashboard::dashboard.title'));
 
         Assets::addScripts(['sortable', 'equal-height', 'counterup'])
@@ -32,7 +30,8 @@ class DashboardController extends BaseController
         $widgets = DashboardWidget::query()
             ->with([
                 'settings' => function (HasMany $query) use ($request) {
-                    $query->where('user_id', $request->user()->getKey())
+                    $query
+                        ->where('user_id', $request->user()->getKey())
                         ->select(['status', 'order', 'settings', 'widget_id'])
                         ->orderBy('order');
                 },

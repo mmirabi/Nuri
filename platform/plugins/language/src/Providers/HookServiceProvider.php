@@ -70,7 +70,10 @@ class HookServiceProvider extends ServiceProvider
                         '<x-core::form.helper-text>%s</x-core::form.helper-text>',
                         trans(
                             'plugins/language::language.setup_site_language',
-                            ['link' => Html::link(route('languages.index'), trans('plugins/language::language.name'))]
+                            [
+                                'link' => Html::link(route('languages.index'), trans('plugins/language::language.name')),
+                                'appearance_link' => Html::link(route('settings.admin-appearance'), trans('core/setting::setting.appearance.title')),
+                            ]
                         )
                     )),
             ]);
@@ -512,7 +515,11 @@ class HookServiceProvider extends ServiceProvider
 
     public function addLanguageSwitcherToTable(array $buttons, string $model): array
     {
-        if (in_array($model, Language::supportedModels())) {
+        if (
+            in_array($model, Language::supportedModels())
+            && ($countLanguage = count(Language::getActiveLanguage()))
+            && $countLanguage > 1
+        ) {
             $activeLanguages = Language::getActiveLanguage(['lang_code', 'lang_name', 'lang_flag']);
             $languageButtons = [];
             $currentLanguage = Language::getCurrentAdminLocaleCode();
@@ -563,10 +570,12 @@ class HookServiceProvider extends ServiceProvider
         $model = $query->getModel();
 
         if (
-            $model instanceof BaseModel &&
-            in_array($model::class, Language::supportedModels()) &&
-            ($languageCode = Language::getCurrentAdminLocaleCode()) &&
-            $languageCode !== 'all'
+            $model instanceof BaseModel
+            && in_array($model::class, Language::supportedModels())
+            && ($countLanguage = count(Language::getActiveLanguage()))
+            && $countLanguage > 1
+            && ($languageCode = Language::getCurrentAdminLocaleCode())
+            && $languageCode !== 'all'
         ) {
             Language::initModelRelations();
 

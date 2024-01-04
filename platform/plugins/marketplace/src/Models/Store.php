@@ -54,13 +54,11 @@ class Store extends BaseModel
 
     protected static function booted(): void
     {
-        self::deleting(function (Store $store) {
-            $store->products()->delete();
+        static::deleted(function (Store $store) {
+            $store->products()->each(fn (Product $product) => $product->delete());
             $store->discounts()->delete();
             $store->orders()->update(['store_id' => null]);
-        });
 
-        static::deleted(function (Store $store) {
             $folder = Storage::path($store->upload_folder);
             if (File::isDirectory($folder) && Str::endsWith($store->upload_folder, '/' . ($store->slug ?: $store->id))) {
                 File::deleteDirectory($folder);

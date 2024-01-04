@@ -42,7 +42,7 @@
                             @if (is_plugin_active('captcha'))
                                 @if (setting('enable_math_captcha_for_contact_form', 0))
                                     <div class="col-md-12 mb-20">
-                                        <div class="form-group">
+                                        <div class="mb-3">
                                             {!! app('math-captcha')->input(['id' => 'math-group', 'placeholder' => app('math-captcha')->label()]) !!}
                                         </div>
                                     </div>

@@ -34,9 +34,7 @@ use Botble\Optimize\Facades\OptimizerHelper;
 use Botble\Payment\Enums\PaymentStatusEnum;
 use Botble\Payment\Supports\PaymentHelper;
 use Botble\Theme\Facades\Theme;
-use Carbon\Carbon;
 use Illuminate\Auth\Events\Registered;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Hash;
@@ -284,13 +282,9 @@ class PublicCheckoutController extends BaseController
 
         $discounts = DiscountModel::query()
             ->where('type', DiscountTypeEnum::COUPON)
-            ->where('start_date', '<=', Carbon::now())
             ->where('display_at_checkout', true)
-            ->where(
-                fn (Builder $query) => $query
-                    ->whereNull('quantity')
-                    ->orWhereColumn('quantity', '>', 'total_used')
-            )
+            ->active()
+            ->available()
             ->get();
 
         $data = [...$data, 'discounts' => $discounts];
@@ -512,7 +506,7 @@ class PublicCheckoutController extends BaseController
                     'product_type' => $product?->product_type,
                 ];
 
-                if ($cartItem->options['options']) {
+                if (isset($cartItem->options['options'])) {
                     $data['product_options'] = $cartItem->options['options'];
                 }
 
@@ -801,7 +795,7 @@ class PublicCheckoutController extends BaseController
                 'product_type' => $product?->product_type,
             ];
 
-            if ($cartItem->options['options']) {
+            if (isset($cartItem->options['options'])) {
                 $data['product_options'] = $cartItem->options['options'];
             }
 

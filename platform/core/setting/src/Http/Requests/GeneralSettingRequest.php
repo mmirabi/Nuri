@@ -19,7 +19,7 @@ class GeneralSettingRequest extends Request
             'admin_email.*' => ['nullable', 'email'],
             'time_zone' => Rule::in(DateTimeZone::listIdentifiers()),
             'locale' => ['sometimes', Rule::in(array_keys(Language::getAvailableLocales()))],
-            'locale_direction' => ['required', 'in:ltr,rtl'],
+            'locale_direction' => ['sometimes', 'in:ltr,rtl'],
             'enable_send_error_reporting_via_email' => [$onOffRule],
             'redirect_404_to_homepage' => [$onOffRule],
         ];

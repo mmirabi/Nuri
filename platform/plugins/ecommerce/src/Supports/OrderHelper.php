@@ -19,6 +19,7 @@ use Botble\Ecommerce\Facades\Cart;
 use Botble\Ecommerce\Facades\Discount;
 use Botble\Ecommerce\Facades\EcommerceHelper;
 use Botble\Ecommerce\Facades\EcommerceHelper as EcommerceHelperFacade;
+use Botble\Ecommerce\Facades\FlashSale;
 use Botble\Ecommerce\Facades\InvoiceHelper as InvoiceHelperFacade;
 use Botble\Ecommerce\Http\Requests\CheckoutRequest;
 use Botble\Ecommerce\Models\Address;
@@ -139,32 +140,37 @@ class OrderHelper
             ]);
 
             if (
-                is_plugin_active('payment') &&
-                $order->amount &&
-                $order->payment &&
-                $order->payment->status == PaymentStatusEnum::COMPLETED
+                (
+                    is_plugin_active('payment')
+                    && $order->amount
+                    && $order->payment
+                    && $order->payment->status == PaymentStatusEnum::COMPLETED
+                )
+                || $order->amount == 0
             ) {
                 $this->sendEmailForDigitalProducts($order);
             }
         }
 
-        foreach ($orders as $order) {
-            foreach ($order->products as $orderProduct) {
-                $product = $orderProduct->product->original_product;
+        if (FlashSale::isEnabled()) {
+            foreach ($orders as $order) {
+                foreach ($order->products as $orderProduct) {
+                    $product = $orderProduct->product->original_product;
 
-                $flashSale = $product->latestFlashSales()->first();
-                if (! $flashSale) {
-                    continue;
+                    $flashSale = $product->latestFlashSales()->first();
+                    if (! $flashSale) {
+                        continue;
+                    }
+
+                    $flashSale->products()->detach([$product->id]);
+                    $flashSale->products()->attach([
+                        $product->id => [
+                            'price' => $flashSale->pivot->price,
+                            'quantity' => (int)$flashSale->pivot->quantity,
+                            'sold' => (int)$flashSale->pivot->sold + $orderProduct->qty,
+                        ],
+                    ]);
                 }
-
-                $flashSale->products()->detach([$product->id]);
-                $flashSale->products()->attach([
-                    $product->id => [
-                        'price' => $flashSale->pivot->price,
-                        'quantity' => (int)$flashSale->pivot->quantity,
-                        'sold' => (int)$flashSale->pivot->sold + $orderProduct->qty,
-                    ],
-                ]);
             }
         }
 
@@ -279,6 +285,7 @@ class OrderHelper
                 'payment_method' => is_plugin_active('payment') ? $order->payment->payment_channel->label() : '&mdash;',
                 'digital_product_list' => $view,
             ]);
+
             $mailer->sendUsingTemplate('download_digital_products', $order->user->email ?: $order->address->email);
 
             if ($digitalProductsCount === $order->products->count()) {

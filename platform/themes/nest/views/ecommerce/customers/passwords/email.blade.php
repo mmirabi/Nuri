@@ -15,7 +15,7 @@
                         <form class="form--auth form--login" method="POST" action="{{ route('customer.password.request') }}">
                             @csrf
                             <div class="form__content">
-                                <div class="form-group">
+                                <div class="mb-3">
                                     <label for="txt-email" class="required">{{ __('Email Address') }}</label>
                                     <input class="form-control" name="email" id="txt-email" type="email" value="{{ old('email') }}" placeholder="{{ __('Please enter your email address') }}">
                                     @if ($errors->has('email'))
@@ -23,7 +23,7 @@
                                     @endif
                                 </div>
                             </div>
-                            <div class="form-group">
+                            <div class="mb-3">
                                 <button type="submit" class="btn btn-fill-out btn-block hover-up">{{ __('Send Password Reset Link') }}</button>
                             </div>
 

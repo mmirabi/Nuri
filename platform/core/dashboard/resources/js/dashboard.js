@@ -130,24 +130,24 @@ $(() => {
 
     $(document)
         .on('submit', '[data-bb-toggle="widgets-management-modal"] form', function (event) {
-        event.preventDefault()
-        const form = $(event.currentTarget)
-        const modal = $(this).closest('.modal')
+            event.preventDefault()
+            const form = $(event.currentTarget)
+            const modal = $(this).closest('.modal')
 
-        $httpClient
-            .make()
-            .postForm(form.prop('action'), new FormData(form[0]))
-            .then(({ data }) => {
-                Botble.showSuccess(data.message)
+            $httpClient
+                .make()
+                .postForm(form.prop('action'), new FormData(form[0]))
+                .then(({ data }) => {
+                    Botble.showSuccess(data.message)
 
-                setTimeout(() => {
-                    window.location.reload()
-                }, 1000)
-            })
-            .finally(() => {
-                modal.modal('hide')
-            })
-    })
+                    setTimeout(() => {
+                        window.location.reload()
+                    }, 1000)
+                })
+                .finally(() => {
+                    modal.modal('hide')
+                })
+        })
         .on('change', '[data-bb-toggle="widgets-management-item"]', function (event) {
             const $this = $(event.currentTarget)
 

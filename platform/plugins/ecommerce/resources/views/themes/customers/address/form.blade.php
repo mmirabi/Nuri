@@ -38,7 +38,7 @@
     <div class="form-group mb-3 @if ($errors->has('country')) has-error @endif">
         <label class="form-label" for="country">{{ __('Country') }}:</label>
         <select
-            class="form-select default-select"
+            class="form-select form-control"
             id="country"
             name="country"
             data-type="country"
@@ -64,7 +64,7 @@
     <label class="form-label required" for="state">{{ __('State') }}:</label>
     @if (EcommerceHelper::loadCountriesStatesCitiesFromPluginLocation())
         <select
-            class="form-control"
+            class="form-select form-control"
             id="state"
             name="state"
             data-type="state"
@@ -104,7 +104,7 @@
         >
     @else
         <select
-            class="form-control"
+            class="form-select form-control"
             id="city"
             name="city"
             data-type="city"
@@ -168,7 +168,7 @@
 
 <div class="form-group mb-3">
     <button
-        class="btn btn-primary"
+        class="{{ $buttonClass ?? 'btn btn-primary' }}"
         type="submit"
     >{{ __('Update') }}</button>
 </div>

@@ -12,6 +12,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Str;
+use Throwable;
 
 class TranslationTable extends TableAbstract
 {
@@ -210,30 +211,40 @@ class TranslationTable extends TableAbstract
         $langPaths[] = lang_path('en');
 
         foreach ($langPaths as $langPath) {
-            foreach (File::allFiles($langPath) as $file) {
-                $group = str_replace(lang_path(), '', dirname($file));
+            if (! File::isWritable($langPath)) {
+                continue;
+            }
 
-                if ($group) {
-                    $group = str_replace('vendor' . DIRECTORY_SEPARATOR, '', $group);
+            try {
+                foreach (File::allFiles($langPath) as $file) {
+                    $group = str_replace(lang_path(), '', dirname($file));
+
+                    if ($group) {
+                        $group = str_replace('vendor' . DIRECTORY_SEPARATOR, '', $group);
+                    }
+
+                    $group = str_replace(DIRECTORY_SEPARATOR . 'en', '', $group);
+
+                    if (! $group) {
+                        $group = null;
+                    } else {
+                        $group = ltrim($group, DIRECTORY_SEPARATOR);
+                    }
+
+                    $fileName = File::name($file);
+
+                    if ($group) {
+                        $group .= DIRECTORY_SEPARATOR . $fileName;
+                    } else {
+                        $group = $fileName;
+                    }
+
+                    $groups[$group] = $group;
                 }
+            } catch (Throwable $exception) {
+                BaseHelper::logError($exception);
 
-                $group = str_replace(DIRECTORY_SEPARATOR . 'en', '', $group);
-
-                if (! $group) {
-                    $group = null;
-                } else {
-                    $group = ltrim($group, DIRECTORY_SEPARATOR);
-                }
-
-                $fileName = File::name($file);
-
-                if ($group) {
-                    $group .= DIRECTORY_SEPARATOR . $fileName;
-                } else {
-                    $group = $fileName;
-                }
-
-                $groups[$group] = $group;
+                continue;
             }
         }
 

@@ -27,14 +27,14 @@
                                         </div>
                                         <br>
                                     @endif
-                                    <div class="form-group">
-                                        <input name="email" required id="txt-email" type="email" value="{{ old('email') }}" placeholder="{{ __('Email') }}*">
+                                    <div class="mb-3">
+                                        <input name="email" class="form-control" required id="txt-email" type="email" value="{{ old('email') }}" placeholder="{{ __('Email') }}*">
                                         @if ($errors->has('email'))
                                             <span class="text-danger">{{ $errors->first('email') }}</span>
                                         @endif
                                     </div>
-                                    <div class="form-group">
-                                        <input type="password" required name="password" id="txt-password" placeholder="{{ __('Your password') }}*">
+                                    <div class="mb-3">
+                                        <input type="password" required class="form-control" name="password" id="txt-password" placeholder="{{ __('Your password') }}*">
                                         @if ($errors->has('password'))
                                             <span class="text-danger">{{ $errors->first('password') }}</span>
                                         @endif
@@ -48,7 +48,7 @@
                                         </div>
                                         <a class="text-muted" href="{{ route('customer.password.reset') }}">{{ __('Forgot password?') }}</a>
                                     </div>
-                                    <div class="form-group">
+                                    <div class="mb-3">
                                         <button type="submit" class="btn btn-heading btn-block hover-up">{{ __('Login') }}</button>
                                     </div>
                                     <div class="text-left">

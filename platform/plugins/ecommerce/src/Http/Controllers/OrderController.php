@@ -7,6 +7,7 @@ use Botble\Base\Events\UpdatedContentEvent;
 use Botble\Base\Facades\Assets;
 use Botble\Base\Facades\BaseHelper;
 use Botble\Base\Facades\EmailHandler;
+use Botble\Base\Supports\Breadcrumb;
 use Botble\Ecommerce\Cart\CartItem;
 use Botble\Ecommerce\Enums\OrderStatusEnum;
 use Botble\Ecommerce\Enums\ShippingCodStatusEnum;
@@ -63,10 +64,11 @@ class OrderController extends BaseController
         protected HandleApplyCouponService $handleApplyCouponService,
         protected HandleApplyPromotionsService $applyPromotionsService
     ) {
-        parent::__construct();
+    }
 
-        $this
-            ->breadcrumb()
+    protected function breadcrumb(): Breadcrumb
+    {
+        return parent::breadcrumb()
             ->add(trans('plugins/ecommerce::order.menu'), route('orders.index'));
     }
 
@@ -274,8 +276,10 @@ class OrderController extends BaseController
             Discount::getFacadeRoot()->afterOrderPlaced($couponCode, $customerId);
         }
 
-        if (! Arr::get($data, 'is_available_shipping')
-            && $paymentStatus === (is_plugin_active('payment') ? PaymentStatusEnum::COMPLETED : 'completed')) {
+        if (
+            ! Arr::get($data, 'is_available_shipping')
+            && $paymentStatus === (is_plugin_active('payment') ? PaymentStatusEnum::COMPLETED : 'completed')
+        ) {
             OrderHelper::setOrderCompleted($order->getKey(), $request, $userId);
         }
 

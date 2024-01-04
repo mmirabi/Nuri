@@ -3,16 +3,15 @@
 namespace Botble\Translation\Http\Controllers;
 
 use Botble\Base\Facades\Assets;
-use Botble\Base\Http\Controllers\BaseController;
 use Botble\Base\Supports\Language;
-use Botble\Language\Facades\Language as LanguageFacade;
+use Botble\Setting\Http\Controllers\SettingController;
 use Botble\Translation\Manager;
 use Botble\Translation\Tables\ThemeTranslationTable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\File;
 
-class ThemeTranslationController extends BaseController
+class ThemeTranslationController extends SettingController
 {
     public function index(Request $request, ThemeTranslationTable $translationTable)
     {
@@ -33,7 +32,7 @@ class ThemeTranslationController extends BaseController
             ];
         }
 
-        $currentLocale = is_plugin_active('language') ? LanguageFacade::getRefLang() : app()->getLocale();
+        $currentLocale = $request->has('ref_lang') ? $request->input('ref_lang') : app()->getLocale();
 
         $group = Arr::first($groups, fn ($item) => $item['locale'] == $currentLocale);
 

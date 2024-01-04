@@ -5,6 +5,7 @@ namespace Botble\Ecommerce\Http\Controllers;
 use Botble\Base\Events\CreatedContentEvent;
 use Botble\Base\Events\DeletedContentEvent;
 use Botble\Base\Events\UpdatedContentEvent;
+use Botble\Base\Supports\Breadcrumb;
 use Botble\Ecommerce\Forms\BrandForm;
 use Botble\Ecommerce\Http\Requests\BrandRequest;
 use Botble\Ecommerce\Models\Brand;
@@ -14,12 +15,9 @@ use Illuminate\Http\Request;
 
 class BrandController extends BaseController
 {
-    public function __construct()
+    protected function breadcrumb(): Breadcrumb
     {
-        parent::__construct();
-
-        $this
-            ->breadcrumb()
+        return parent::breadcrumb()
             ->add(trans('plugins/ecommerce::brands.menu'), route('brands.index'));
     }
 

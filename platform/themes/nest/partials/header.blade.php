@@ -14,6 +14,7 @@
             --font-text: {{ theme_option('font_text', 'Lato') }}, sans-serif;
             --font-heading: {{ theme_option('font_heading', 'Quicksand') }}, sans-serif;
             --color-brand: {{ theme_option('color_brand', '#3BB77E') }};
+            --primary-color: {{ theme_option('color_brand', '#3BB77E') }};
             --color-brand-rgb: {{ implode(',', BaseHelper::hexToRgb(theme_option('color_brand', '#3BB77E'))) }};
             --color-brand-dark: {{ theme_option('color_brand_dark', '#29A56C') }};
             --color-brand-2: {{ theme_option('color_brand_2', '#FDC040') }};

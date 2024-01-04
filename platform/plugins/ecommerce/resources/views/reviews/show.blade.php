@@ -2,8 +2,8 @@
 
 @section('content')
     <div class="row" id="review-section-wrapper">
-        <div class="col-md-7 mb-3 mb-md-0">
-            <x-core::card>
+        <div class="col-md-8 mb-3 mb-md-0">
+            <x-core::card class="mb-3">
                 <x-core::card.header>
                     <h4 class="card-title d-flex justify-content-between align-items-center w-100">
                         @include('plugins/ecommerce::reviews.partials.rating', [
@@ -44,13 +44,68 @@
                     </div>
                 </x-core::card.body>
 
-                <x-core::card.footer>
-                    {{ $review->user->name }}
-                    (<a href="mailto:{{ $review->user->email }}">{{ $review->user->email }}</a>)
+                <x-core::card.footer class="d-flex justify-content-between align-items-center w-100">
+                    <div>
+                        {{ $review->user->name }}
+                        (<a href="mailto:{{ $review->user->email }}">{{ $review->user->email }}</a>)
+                    </div>
+                    <div>
+                        {{ $review->created_at->diffForHumans() }}
+                    </div>
                 </x-core::card.footer>
             </x-core::card>
+
+            @if (auth()->user()->hasPermission('reviews.reply') || $review->reply)
+                <x-core::card>
+                    <x-core::card.header>
+                        <x-core::card.title>
+                            {{ trans('plugins/ecommerce::review.reply_to_review') }}
+                        </x-core::card.title>
+                    </x-core::card.header>
+                    <x-core::card.body>
+                        @if (auth()->user()->hasPermission('reviews.reply'))
+                            <x-core::form :url="$review->reply ? route('reviews.reply.update', [$review, $review->reply]) : route('reviews.reply', $review)" :method="$review->reply ? 'PUT' : 'POST'">
+                                <div class="mb-3">
+                                    <x-core::form.textarea
+                                        name="message"
+                                        :placeholder="trans('plugins/ecommerce::review.write_your_reply')"
+                                        :value="old('message', $review->reply ? $review->reply->message : '')"
+                                    />
+                                </div>
+
+                                <x-core::button
+                                    type="submit"
+                                    color="primary"
+                                    icon="ti ti-send"
+                                >
+                                    @if ($review->reply)
+                                        {{ trans('core/base::forms.update') }}
+                                    @else
+                                        {{ trans('plugins/ecommerce::review.reply') }}
+                                    @endif
+                                </x-core::button>
+                            </x-core::form>
+                        @else
+                            {{ $review->reply->message }}
+                        @endif
+                    </x-core::card.body>
+                    @if ($review->reply)
+                        <x-core::card.footer>
+                            <div class="d-flex justify-content-between align-items-center w-100">
+                                <div>
+                                    {{ $review->reply->user->name }}
+                                    (<a href="mailto:{{ $review->reply->user->email }}">{{ $review->reply->user->email }}</a>)
+                                </div>
+                                <div>
+                                    {{ $review->reply->created_at->diffForHumans() }}
+                                </div>
+                            </div>
+                        </x-core::card.footer>
+                    @endif
+                </x-core::card>
+            @endif
         </div>
-        <div class="col-md-5">
+        <div class="col-md-4">
             <x-core::card>
                 <x-core::card.header>
                     <h4 class="card-title">
@@ -67,11 +122,11 @@
                             style="width: 15%"
                         >
                         <div>
-                            <h5>
+                            <h4>
                                 <a href="{{ route('products.edit', $review->product) }}">
                                     {{ $review->product->name }}
                                 </a>
-                            </h5>
+                            </h4>
                             <div>
                                 @include('plugins/ecommerce::reviews.partials.rating', [
                                     'star' => $review->product->reviews_avg_star,

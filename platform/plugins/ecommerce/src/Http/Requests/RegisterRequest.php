@@ -2,8 +2,11 @@
 
 namespace Botble\Ecommerce\Http\Requests;
 
+use Botble\Base\Facades\BaseHelper;
 use Botble\Captcha\Facades\Captcha;
+use Botble\Ecommerce\Facades\EcommerceHelper;
 use Botble\Support\Http\Requests\Request;
+use Illuminate\Validation\Rule;
 
 class RegisterRequest extends Request
 {
@@ -12,6 +15,12 @@ class RegisterRequest extends Request
         $rules = [
             'name' => 'required|max:120|min:2',
             'email' => 'required|max:120|min:6|email|unique:ec_customers',
+            'phone' => [
+                'nullable',
+                Rule::requiredIf(EcommerceHelper::isLoginUsingPhone()),
+                ...explode('|', BaseHelper::getPhoneValidationRule()),
+                'unique:ec_customers',
+            ],
             'password' => 'required|min:6|confirmed',
             'agree_terms_and_policy' => 'sometimes|accepted:1',
         ];

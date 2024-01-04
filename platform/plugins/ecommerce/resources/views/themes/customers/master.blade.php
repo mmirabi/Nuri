@@ -23,7 +23,7 @@
                                                     alt="{{ auth('customer')->user()->name }}"
                                                 >
                                                 <div class="mt-overlay br2">
-                                                    <span><i class="fa fa-edit"></i></span>
+                                                    <span><x-core::icon name="ti ti-edit" /></span>
                                                 </div>
                                             </div>
                                         </div>
@@ -37,7 +37,7 @@
                         </form>
 
                         <div class="text-center">
-                            <div class="profile-usertitle-name">
+                            <div class="profile-customer-name">
                                 <strong>{{ auth('customer')->user()->name }}</strong>
                             </div>
                         </div>
@@ -48,86 +48,64 @@
                                     class="list-group-item"
                                     style="display:none"
                                 >
+                                    <x-core::icon name="ti ti-user" />
                                     <a
                                         class="collection-item @if (Route::currentRouteName() == 'customer.overview') active @endif"
                                         href="{{ route('customer.overview') }}"
                                     >{{ __('Overview') }}</a>
-                                    <i
-                                        class="fa fa-user-circle-o float-end"
-                                        aria-hidden="true"
-                                    ></i>
                                 </li>
                                 <li class="list-group-item">
+                                    <x-core::icon name="ti ti-credit-card" />
                                     <a
                                         class="collection-item @if (Route::currentRouteName() == 'customer.edit-account') active @endif"
                                         href="{{ route('customer.edit-account') }}"
                                     >{{ __('Profile') }}</a>
-                                    <i
-                                        class="fa fa-credit-card"
-                                        aria-hidden="true"
-                                    ></i>
                                 </li>
                                 <li class="list-group-item">
+                                    <x-core::icon name="ti ti-shopping-cart" />
                                     <a
                                         class="collection-item @if (Route::currentRouteName() == 'customer.orders') active @endif"
                                         href="{{ route('customer.orders') }}"
                                     >{{ __('Orders') }}</a>
-                                    <i
-                                        class="fa fa-shopping-cart"
-                                        aria-hidden="true"
-                                    ></i>
                                 </li>
                                 @if (EcommerceHelper::isReviewEnabled())
                                     <li class="list-group-item">
+                                        <x-core::icon name="ti ti-star" />
                                         <a
                                             class="collection-item @if (Route::currentRouteName() == 'customer.product-reviews') active @endif"
                                             href="{{ route('customer.product-reviews') }}"
                                         >{{ __('Product Reviews') }}</a>
-                                        <i class="fa fa-star"></i>
                                     </li>
                                 @endif
                                 @if (EcommerceHelper::isEnabledSupportDigitalProducts())
                                     <li class="list-group-item">
+                                        <x-core::icon name="ti ti-download" />
                                         <a
                                             class="collection-item @if (Route::currentRouteName() == 'customer.downloads') active @endif"
                                             href="{{ route('customer.downloads') }}"
                                         >{{ __('Downloads') }}</a>
-                                        <i
-                                            class="fa fa-download"
-                                            aria-hidden="true"
-                                        ></i>
                                     </li>
                                 @endif
                                 <li class="list-group-item">
+                                    <x-core::icon name="ti ti-book" />
                                     <a
                                         class="collection-item @if (Route::currentRouteName() == 'customer.address') active @endif"
                                         href="{{ route('customer.address') }}"
                                     >{{ __('Address books') }}</a>
-                                    <i
-                                        class="fa fa-book"
-                                        aria-hidden="true"
-                                    ></i>
                                 </li>
                                 <li class="list-group-item">
+                                    <x-core::icon name="ti ti-key" />
                                     <a
                                         class="collection-item @if (Route::currentRouteName() == 'customer.change-password') active @endif"
                                         href="{{ route('customer.change-password') }}"
                                     >{{ __('Change password') }}</a>
-                                    <i
-                                        class="fa fa-exclamation-circle"
-                                        aria-hidden="true"
-                                    ></i>
                                 </li>
                                 <li class="list-group-item">
+                                    <x-core::icon name="ti ti-logout" />
                                     <a
                                         class="collection-item"
                                         href="{{ route('customer.logout') }}"
                                     >{{ __('Logout') }}</a>
-                                    <i
-                                        class="fa fa-sign-out"
-                                        aria-hidden="true"
-                                    ></i>
-
                                 </li>
                             </ul>
                         </div>
@@ -224,12 +202,12 @@
                     </div>
                     <div class="modal-footer">
                         <button
-                            class="btn--custom btn--rounded btn--outline"
+                            class="btn btn-secondary"
                             data-bs-dismiss="modal"
                             type="button"
                         >{{ __('Close') }}</button>
                         <button
-                            class="btn--custom btn--rounded btn--outline avatar-save"
+                            class="btn btn-primary avatar-save"
                             type="submit"
                         >{{ __('Save') }}</button>
                     </div>

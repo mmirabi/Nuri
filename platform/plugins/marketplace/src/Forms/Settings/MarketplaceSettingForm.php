@@ -3,7 +3,6 @@
 namespace Botble\Marketplace\Forms\Settings;
 
 use Botble\Base\Facades\Assets;
-use Botble\Base\Forms\Fields\MultiCheckListField;
 use Botble\Marketplace\Facades\MarketplaceHelper;
 use Botble\Marketplace\Http\Requests\MarketPlaceSettingFormRequest;
 use Botble\Marketplace\Models\Store;
@@ -32,7 +31,6 @@ class MarketplaceSettingForm extends SettingForm
             ->setSectionTitle(trans('plugins/marketplace::marketplace.settings.title'))
             ->setSectionDescription(trans('plugins/marketplace::marketplace.settings.description'))
             ->setValidatorClass(MarketPlaceSettingFormRequest::class)
-            ->addCustomField('multiCheckList', MultiCheckListField::class)
             ->contentOnly()
             ->add('fee_per_order', 'number', [
                 'label' => trans('plugins/marketplace::marketplace.settings.default_commission_fee'),

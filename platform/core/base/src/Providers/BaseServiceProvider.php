@@ -277,10 +277,14 @@ class BaseServiceProvider extends ServiceProvider
 
             $setting = $this->app[SettingStore::class];
             $timezone = $setting->get('time_zone', $config->get('app.timezone'));
+            $locale = $setting->get('locale', $config->get('core.base.general.locale', $config->get('app.locale')));
 
             $config->set([
+                'app.locale' => $locale,
                 'app.timezone' => $timezone,
             ]);
+
+            $this->app->setLocale($locale);
 
             if (in_array($timezone, DateTimeZone::listIdentifiers())) {
                 date_default_timezone_set($timezone);

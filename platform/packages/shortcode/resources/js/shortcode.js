@@ -75,7 +75,7 @@ $(() => {
         $(this).closest('.modal').modal('hide')
     })
 
-    $('[data-bb-toggle="shortcode-list-modal"]').on('click', () => {
+    $(document).on('click', '[data-bb-toggle="shortcode-list-modal"]', () => {
         $shortcodeListModal.modal('show')
     })
 
@@ -114,7 +114,7 @@ $(() => {
         const { href, key, description = null, data = {}, update = false, previewImage = null } = params
         $('.shortcode-admin-config').html('')
 
-        let $addShortcodeButton = $('.shortcode-modal .add-shortcode-btn')
+        let $addShortcodeButton = $('.shortcode-modal button[data-bb-toggle="shortcode-add-single"]')
 
         $addShortcodeButton.text($addShortcodeButton.data(update ? 'update-text' : 'add-text'))
 

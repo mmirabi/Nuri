@@ -4,6 +4,7 @@ namespace Botble\Ecommerce\Models;
 
 use Botble\Base\Facades\MacroableModels;
 use Botble\Base\Models\BaseModel;
+use Botble\Base\Models\BaseQueryBuilder;
 use Botble\Base\Supports\Avatar;
 use Botble\Ecommerce\Enums\CustomerStatusEnum;
 use Botble\Ecommerce\Enums\DiscountTypeEnum;
@@ -51,6 +52,7 @@ class Customer extends BaseModel implements
         'phone',
         'dob',
         'status',
+        'private_notes',
     ];
 
     protected $hidden = [
@@ -80,12 +82,11 @@ class Customer extends BaseModel implements
 
     public function addresses(): HasMany
     {
-        $with = [];
-        if (is_plugin_active('location')) {
-            $with = ['locationCountry', 'locationState', 'locationCity'];
-        }
-
-        return $this->hasMany(Address::class, 'customer_id', 'id')->with($with);
+        return $this
+            ->hasMany(Address::class, 'customer_id', 'id')
+            ->when(is_plugin_active('location'), function (BaseQueryBuilder $query) {
+                return $query->with(['locationCountry', 'locationState', 'locationCity']);
+            });
     }
 
     public function payments(): HasMany
@@ -105,13 +106,13 @@ class Customer extends BaseModel implements
 
     protected static function booted(): void
     {
-        self::deleting(function (Customer $customer) {
+        self::deleted(function (Customer $customer) {
             $customer->discounts()->detach();
             $customer->usedCoupons()->detach();
             $customer->orders()->update(['user_id' => 0]);
             $customer->addresses()->delete();
             $customer->wishlist()->delete();
-            $customer->reviews()->delete();
+            $customer->reviews()->each(fn (Review $review) => $review->delete());
         });
 
         static::deleted(function (Customer $customer) {
@@ -184,7 +185,7 @@ class Customer extends BaseModel implements
         return Attribute::get(function () {
             $folder = $this->id ? 'customers/' . $this->id : 'customers';
 
-            return apply_filters('ec;ommerce_customer_upload_folder', $folder, $this);
+            return apply_filters('ecommerce_customer_upload_folder', $folder, $this);
         });
     }
 }

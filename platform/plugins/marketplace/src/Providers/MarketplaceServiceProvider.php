@@ -297,6 +297,7 @@ class MarketplaceServiceProvider extends ServiceProvider
             Revenue::query()->where('customer_id', $customer->getKey())->delete();
             Withdrawal::query()->where('customer_id', $customer->getKey())->delete();
             VendorInfo::query()->where('customer_id', $customer->getKey())->delete();
+            Store::query()->where('customer_id', $customer->getKey())->each(fn (Store $store) => $store->delete());
         });
 
         $this->app->booted(function () {

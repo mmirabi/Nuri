@@ -69,7 +69,7 @@
         unset($menus[5]);
     }
 @endphp
-<div class="page-content pt-50 pb-150">
+<div class="page-content pt-50 pb-150 customer-page">
     <div class="container">
         <div class="row">
             <div class="col-lg-10 m-auto">

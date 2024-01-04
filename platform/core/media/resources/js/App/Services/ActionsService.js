@@ -234,7 +234,9 @@ export class ActionsService {
             $renamePhysicalFile
                 .closest('.form-check')
                 .find('span')
-                .text(value.is_folder ? $renamePhysicalFile.data('folder-label') : $renamePhysicalFile.data('file-label'))
+                .text(
+                    value.is_folder ? $renamePhysicalFile.data('folder-label') : $renamePhysicalFile.data('file-label')
+                )
 
             $item.find('input[name="rename_physical_file"]').on('change', function () {
                 $item.data('rename_physical_file', $(this).is(':checked'))
@@ -422,15 +424,18 @@ export class ActionsService {
                             '<i class="icon __icon__ dropdown-item-icon"></i>',
                             '<span class="icon-tabler-wrapper dropdown-item-icon">__icon__</span>'
                         )
+                        .replace('__icon__', '<span class="icon-tabler-wrapper dropdown-item-icon">__icon__</span>')
                         .replace('__icon__', item.icon || '')
                         .replace(/__name__/gi, Helpers.trans(`actions_list.${key}.${item.action}`) || item.name)
 
                     if (item.icon) {
                         template = template.replace('media-icon', 'media-icon dropdown-item-icon')
                     }
+
                     if (!index && initializedItem) {
                         template = `<li role="separator" class="divider"></li>${template}`
                     }
+
                     $dropdownActions.append(template)
                 }
             })
@@ -444,6 +449,8 @@ export class ActionsService {
     static handleDownload(files) {
         const html = $('.media-download-popup')
         let downloadTimeout = null
+
+        html.show()
 
         $httpClient
             .make()

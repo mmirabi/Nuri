@@ -4,12 +4,15 @@ namespace Botble\Ecommerce\Supports;
 
 use Botble\Base\Enums\BaseStatusEnum;
 use Botble\Base\Facades\BaseHelper;
+use Botble\Base\Forms\FieldOptions\TextFieldOption;
 use Botble\Base\Models\BaseQueryBuilder;
 use Botble\Base\Supports\Helper;
 use Botble\Ecommerce\Enums\OrderStatusEnum;
 use Botble\Ecommerce\Enums\ProductTypeEnum;
 use Botble\Ecommerce\Facades\Cart;
 use Botble\Ecommerce\Facades\ProductCategoryHelper;
+use Botble\Ecommerce\Forms\Fronts\OrderTrackingForm;
+use Botble\Ecommerce\Http\Requests\Fronts\OrderTrackingRequest;
 use Botble\Ecommerce\Models\Brand;
 use Botble\Ecommerce\Models\Customer;
 use Botble\Ecommerce\Models\Product;
@@ -24,6 +27,7 @@ use Botble\Location\Models\State;
 use Botble\Location\Rules\CityRule;
 use Botble\Location\Rules\StateRule;
 use Botble\Payment\Enums\PaymentMethodEnum;
+use Botble\Support\Http\Requests\Request as BaseRequest;
 use Botble\Theme\Facades\Theme;
 use Carbon\Carbon;
 use Exception;
@@ -273,11 +277,20 @@ class EcommerceHelper
 
     public function getShowParams(): array
     {
-        return apply_filters('ecommerce_number_of_products_display_options', [
+        $showParams = apply_filters('ecommerce_number_of_products_display_options', [
             12 => 12,
             24 => 24,
             36 => 36,
         ]);
+
+        $numberProductsPerPages = (int)theme_option('number_of_products_per_page');
+
+        if ($numberProductsPerPages) {
+            $showParams[$numberProductsPerPages] = $numberProductsPerPages;
+            ksort($showParams);
+        }
+
+        return $showParams;
     }
 
     public function getMinimumOrderAmount(): float
@@ -746,6 +759,9 @@ class EcommerceHelper
                         'ec_products.quantity',
                         'ec_products.price',
                         'ec_products.sale_price',
+                        'ec_products.sale_type',
+                        'ec_products.start_date',
+                        'ec_products.end_date',
                         'ec_products.allow_checkout_when_out_of_stock',
                         'ec_products.with_storehouse_management',
                         'ec_products.stock_status',
@@ -870,6 +886,9 @@ class EcommerceHelper
             'q' => 'nullable|string|max:255',
             'max_price' => 'nullable|numeric',
             'min_price' => 'nullable|numeric',
+            'price_ranges' => 'sometimes|array',
+            'price_ranges.*.from' => 'required|numeric',
+            'price_ranges.*.to' => 'required|numeric',
             'attributes' => 'nullable|array',
             'categories' => 'nullable|array',
             'tags' => 'nullable|array',
@@ -1140,7 +1159,9 @@ class EcommerceHelper
         $maxFilterPrice = $this->getProductMaxPrice($categoryIds) * get_current_exchange_rate();
 
         if ($category) {
-            if ($category->activeChildren->isEmpty() && $category->parent_id) {
+            $categoriesRequest = request()->input('categories', []);
+
+            if (! $categoriesRequest && $category->activeChildren->isEmpty() && $category->parent_id) {
                 $category = $category->parent()->with(['activeChildren'])->first();
 
                 if ($category) {
@@ -1170,9 +1191,133 @@ class EcommerceHelper
         ];
     }
 
+    public function dataPriceRangesForFilter(): array
+    {
+        $priceRanges = request()->query('price_ranges', []);
+        $priceRanges = is_array($priceRanges) ? $priceRanges : [];
+
+        if (empty($priceRanges)) {
+            return [];
+        }
+
+        foreach ($priceRanges as $key => $value) {
+            if (
+                ! isset($value['from'])
+                || ! isset($value['to'])
+                || ! is_numeric($value['from'])
+                || ! is_numeric($value['to'])
+            ) {
+                unset($priceRanges[$key]);
+            }
+        }
+
+        return array_values($priceRanges);
+    }
+
+    public function isPriceRangesChecked(float $fromPrice, float $toPrice): bool
+    {
+        foreach ($this->dataPriceRangesForFilter() as $currentPriceRange) {
+            if ($currentPriceRange['from'] == $fromPrice && $currentPriceRange['to'] == $toPrice) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function dataPriceRanges(int $stepPrice = 1000, int $stepCount = 10): array
+    {
+        $configKey = 'plugins.ecommerce.general.display_big_money_in_million_billion';
+        $configValue = config($configKey);
+
+        if (! $configValue) {
+            config([$configKey => true]);
+        }
+
+        $maxPrice = $this->getProductMaxPrice();
+        $currency = get_application_currency();
+
+        $priceRanges[] = [
+            'from' => 0,
+            'to' => $last = $stepPrice,
+            'label' => __('Below :toPrice', ['toPrice' => human_price_text($stepPrice, $currency)]),
+        ];
+
+        for ($i = 1; $i < $stepCount; $i++) {
+            $priceRanges[] = [
+                'from' => $first = $last,
+                'to' => $last += $stepPrice,
+                'label' => __('From :fromPrice to :toPrice', [
+                    'fromPrice' => human_price_text($first, $currency),
+                    'toPrice' => human_price_text($last, $currency),
+                ]),
+            ];
+        }
+
+        $priceRanges[] = [
+            'from' => $last,
+            'to' => $maxPrice,
+            'label' => __('Over :fromPrice', ['fromPrice' => human_price_text($last, $currency)]),
+        ];
+
+        if (! $configValue) {
+            config([$configKey => false]);
+        }
+
+        return $priceRanges;
+    }
+
     public function useCityFieldAsTextField(): bool
     {
         return ! self::loadCountriesStatesCitiesFromPluginLocation() ||
             get_ecommerce_setting('use_city_field_as_field_text', false);
+    }
+
+    public function usePhoneInOrderTracking(): void
+    {
+        OrderTrackingForm::extend(function (OrderTrackingForm $form) {
+            $form
+                ->remove('email')
+                ->addAfter(
+                    'order_id',
+                    'phone',
+                    'tel',
+                    TextFieldOption::make()
+                        ->label(__('Phone number'))
+                        ->placeholder(__('Enter your phone number'))
+                        ->required()
+                        ->toArray()
+                );
+        });
+
+        add_filter('core_request_rules', function (array $rules, BaseRequest $request) {
+            if ($request instanceof OrderTrackingRequest) {
+                $rules['phone'] = 'nullable|string|' . BaseHelper::getPhoneValidationRule();
+            }
+
+            return $rules;
+        }, 10, 2);
+
+        add_filter('ecommerce_order_tracking_query', function (BaseQueryBuilder $query) {
+            return $query->when(request()->input('phone'), function (BaseQueryBuilder $query, string $phone) {
+                $query->orWhere(function (BaseQueryBuilder $query) use ($phone) {
+                    $query
+                        ->where(function (BaseQueryBuilder $query) {
+                            $code = request()->input('order_id');
+
+                            $query
+                                ->where('ec_orders.code', $code)
+                                ->orWhere('ec_orders.code', '#' . $code);
+                        })
+                        ->whereHas('address', fn ($subQuery) => $subQuery->where('phone', $phone))
+                        ->orWhereHas('user', fn ($subQuery) => $subQuery->where('phone', $phone));
+                });
+            });
+        });
+    }
+
+    public function isLoginUsingPhone(): bool
+    {
+        return (bool) get_ecommerce_setting('login_using_phone', false);
     }
 }

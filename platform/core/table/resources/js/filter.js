@@ -46,7 +46,9 @@ class TableFilter {
                 $(document).find('.filter-items-wrap').append(html.replace('<script>', '').replace('<\\/script>', ''))
                 Botble.initResources()
 
-                const element = $(document).find('.filter-items-wrap .filter-item:last-child').find('.filter-column-key')
+                const element = $(document)
+                    .find('.filter-items-wrap .filter-item:last-child')
+                    .find('.filter-column-key')
                 if ($(element).val()) {
                     that.loadData(element)
                 }

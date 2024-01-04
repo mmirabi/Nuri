@@ -21,6 +21,9 @@ class ProductReviewSettingForm extends SettingForm
             ->add('review_enabled', 'onOffCheckbox', [
                 'label' => trans('plugins/ecommerce::setting.product_review.form.enable_review'),
                 'value' => EcommerceHelper::isReviewEnabled(),
+                'wrapper' => [
+                    'class' => 'mb-0',
+                ],
                 'attr' => [
                     'data-bb-toggle' => 'collapse',
                     'data-bb-target' => '.review-settings',
@@ -28,7 +31,7 @@ class ProductReviewSettingForm extends SettingForm
             ])
             ->add('open_fieldset_review_settings', 'html', [
                 'html' => sprintf(
-                    '<fieldset class="form-fieldset review-settings" style="display: %s;" data-bb-value="1">',
+                    '<fieldset class="form-fieldset mt-3 review-settings" style="display: %s;" data-bb-value="1">',
                     EcommerceHelper::isReviewEnabled() ? 'block' : 'none'
                 ),
             ])

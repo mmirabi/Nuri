@@ -759,11 +759,10 @@ class Theme implements ThemeContract
 
         $schema = json_encode($schema);
 
-        $this->asset()->container('header')->writeScript(
-            'breadcrumb-schema',
-            $schema,
-            attributes: ['type' => 'application/ld+json']
-        );
+        $this
+            ->asset()
+            ->container('header')
+            ->writeScript('breadcrumb-schema', $schema, attributes: ['type' => 'application/ld+json']);
 
         return $this->view->make('packages/theme::partials.header')->render();
     }
@@ -882,7 +881,6 @@ class Theme implements ThemeContract
             theme_option()
                 ->setSection([
                     'title' => __('Facebook Integration'),
-                    'desc' => __('Facebook Integration'),
                     'id' => 'opt-text-subsection-facebook-integration',
                     'subsection' => true,
                     'icon' => 'ti ti-brand-facebook',
@@ -907,9 +905,8 @@ class Theme implements ThemeContract
                                 [
                                     'domain' => Html::link(url('')),
                                     'link' => Html::link(
-                                        'https://www.facebook.com/' . theme_option(
-                                            'facebook_page_id'
-                                        ) . '/settings/?tab=messenger_platform'
+                                        'https://www.facebook.com/' . theme_option('facebook_page_id', '[PAGE_ID]') .
+                                        '/settings/?tab=messenger_platform'
                                     ),
                                 ]
                             ),
@@ -923,7 +920,7 @@ class Theme implements ThemeContract
                                 ['link' => Html::link('https://findidfb.com')]
                             ),
                             'attributes' => [
-                                'name' => 'facebook_comment_enabled_in_post',
+                                'name' => 'facebook_page_id',
                                 'value' => null,
                                 'options' => [
                                     'class' => 'form-control',

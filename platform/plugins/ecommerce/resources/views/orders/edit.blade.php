@@ -313,57 +313,60 @@
                                 @endif
                             </div>
                         @endif
-                        <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
-                            @if ($order->status == Botble\Ecommerce\Enums\OrderStatusEnum::CANCELED)
-                                <div class="text-uppercase">
-                                    <x-core::icon name="ti ti-circle-off" />
-                                    <span>{{ trans('plugins/ecommerce::order.order_was_canceled') }}</span>
-                                </div>
-                            @elseif (is_plugin_active('payment') && $order->payment->id)
-                                <div class="text-uppercase">
-                                    @if (!$order->payment->status || $order->payment->status == Botble\Payment\Enums\PaymentStatusEnum::PENDING)
-                                        <x-core::icon name="ti ti-credit-card" />
-                                    @elseif (
-                                        $order->payment->status == Botble\Payment\Enums\PaymentStatusEnum::COMPLETED
-                                        || $order->payment->status == Botble\Payment\Enums\PaymentStatusEnum::PENDING
-                                    )
-                                        <x-core::icon name="ti ti-check" class="text-success" />
-                                    @endif
-
-                                    @if (!$order->payment->status || $order->payment->status == Botble\Payment\Enums\PaymentStatusEnum::PENDING)
-                                        {{ trans('plugins/ecommerce::order.pending_payment') }}
-                                    @elseif ($order->payment->status == Botble\Payment\Enums\PaymentStatusEnum::COMPLETED)
-                                        {{ trans('plugins/ecommerce::order.payment_was_accepted', ['money' => format_price($order->payment->amount - $order->payment->refunded_amount)]) }}
-                                    @elseif ($order->payment->amount - $order->payment->refunded_amount == 0)
-                                        {{ trans('plugins/ecommerce::order.payment_was_refunded') }}
-                                    @endif
-                                </div>
-
-                                <div class="btn-list">
-                                    @if (!$order->payment->status || in_array($order->payment->status, [Botble\Payment\Enums\PaymentStatusEnum::PENDING]))
-                                        <x-core::button
-                                            type="button"
-                                            color="info"
-                                            class="btn-trigger-confirm-payment"
-                                            :data-target="route('orders.confirm-payment', $order->id)"
-                                        >
-                                            {{ trans('plugins/ecommerce::order.confirm_payment') }}
-                                        </x-core::button>
-                                    @endif
-                                    @if (
-                                        $order->payment->status == Botble\Payment\Enums\PaymentStatusEnum::COMPLETED
-                                        && (
-                                            $order->payment->amount - $order->payment->refunded_amount > 0
-                                            || $order->products->sum('qty') - $order->products->sum('restock_quantity') > 0
+                        @if ($order->status == Botble\Ecommerce\Enums\OrderStatusEnum::CANCELED || is_plugin_active('payment') && $order->payment->id)
+                            <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
+                                @if ($order->status == Botble\Ecommerce\Enums\OrderStatusEnum::CANCELED)
+                                    <div class="text-uppercase">
+                                        <x-core::icon name="ti ti-circle-off" />
+                                        <span>{{ trans('plugins/ecommerce::order.order_was_canceled') }}</span>
+                                    </div>
+                                @elseif (is_plugin_active('payment') && $order->payment->id)
+                                    <div class="text-uppercase">
+                                        @if (!$order->payment->status || $order->payment->status == Botble\Payment\Enums\PaymentStatusEnum::PENDING)
+                                            <x-core::icon name="ti ti-credit-card" />
+                                        @elseif (
+                                            $order->payment->status == Botble\Payment\Enums\PaymentStatusEnum::COMPLETED
+                                            || $order->payment->status == Botble\Payment\Enums\PaymentStatusEnum::PENDING
                                         )
-                                    )
-                                        <x-core::button type="button" class="btn-trigger-refund">
-                                            {{ trans('plugins/ecommerce::order.refund') }}
-                                        </x-core::button>
-                                    @endif
-                                </div>
-                            @endif
-                        </div>
+                                            <x-core::icon name="ti ti-check" class="text-success" />
+                                        @endif
+
+                                        @if (!$order->payment->status || $order->payment->status == Botble\Payment\Enums\PaymentStatusEnum::PENDING)
+                                            {{ trans('plugins/ecommerce::order.pending_payment') }}
+                                        @elseif ($order->payment->status == Botble\Payment\Enums\PaymentStatusEnum::COMPLETED)
+                                            {{ trans('plugins/ecommerce::order.payment_was_accepted', ['money' => format_price($order->payment->amount - $order->payment->refunded_amount)]) }}
+                                        @elseif ($order->payment->amount - $order->payment->refunded_amount == 0)
+                                            {{ trans('plugins/ecommerce::order.payment_was_refunded') }}
+                                        @endif
+                                    </div>
+
+                                    <div class="btn-list">
+                                        @if (!$order->payment->status || in_array($order->payment->status, [Botble\Payment\Enums\PaymentStatusEnum::PENDING]))
+                                            <x-core::button
+                                                type="button"
+                                                color="info"
+                                                class="btn-trigger-confirm-payment"
+                                                :data-target="route('orders.confirm-payment', $order->id)"
+                                            >
+                                                {{ trans('plugins/ecommerce::order.confirm_payment') }}
+                                            </x-core::button>
+                                        @endif
+                                        @if (
+                                            $order->payment->status == Botble\Payment\Enums\PaymentStatusEnum::COMPLETED
+                                            && (
+                                                $order->payment->amount - $order->payment->refunded_amount > 0
+                                                || $order->products->sum('qty') - $order->products->sum('restock_quantity') > 0
+                                            )
+                                        )
+                                            <x-core::button type="button" class="btn-trigger-refund">
+                                                {{ trans('plugins/ecommerce::order.refund') }}
+                                            </x-core::button>
+                                        @endif
+                                    </div>
+                                @endif
+                            </div>
+                        @endif
+
                         @if (EcommerceHelper::countDigitalProducts($order->products) != $order->products->count())
                             <div class="p-3 d-flex justify-content-between align-items-center">
                                 @if ($order->status == Botble\Ecommerce\Enums\OrderStatusEnum::CANCELED && !$order->shipment->id)
@@ -430,7 +433,7 @@
                                             {{ OrderHelper::processHistoryVariables($history) }}
                                         @endif
                                     </div>
-                                    <div class="text-secondary">{{ $history->created_at }}</div>
+                                    <div class="text-secondary">{{ BaseHelper::formatDateTime($history->created_at) }}</div>
                                     @if ($history->action == 'refund' && Arr::get($history->extras, 'amount', 0) > 0)
                                         <div
                                             class="timeline-dropdown bg-body mt-2 rounded-2"
@@ -498,7 +501,7 @@
                                                             {{ trans('plugins/ecommerce::order.refund_date') }}
                                                         </x-core::table.body.cell>
                                                         <x-core::table.body.cell>
-                                                            {{ $history->created_at }}
+                                                            {{ BaseHelper::formatDateTime($history->created_at) }}
                                                         </x-core::table.body.cell>
                                                     </x-core::table.body.row>
                                                 </x-core::table.body>
@@ -581,7 +584,8 @@
                                                         {{ trans('plugins/ecommerce::order.payment_date') }}
                                                     </x-core::table.body.cell>
                                                     <x-core::table.body.cell>
-                                                        {{ $history->created_at }}</x-core::table.body.cell>
+                                                        {{ BaseHelper::formatDateTime($history->created_at) }}
+                                                    </x-core::table.body.cell>
                                                 </x-core::table.body.row>
                                             </x-core::table>
                                         </div>

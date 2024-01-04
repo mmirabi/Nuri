@@ -2,7 +2,7 @@
     @if (theme_option('vendor_page_detail_layout') == 'list')
         <div class="row">
             <div class="col-sm-6">
-                <div class="form-group">
+                <div class="mb-3">
                     <label for="cover_image">{{ __('Cover Image') }}</label>
                     @if(is_in_admin(true))
                         {!! Form::mediaImage('cover_image', old('cover_image', $model->getMetaData('cover_image', true))) !!}
@@ -21,7 +21,7 @@
             </div>
             @foreach ($storeSocialLinks as $key => $item)
                 <div class="col-sm-6">
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label for="social_links_{{ $key }}">{{ $item['title'] }}</label>
                         <div class="input-group mb-3">
                             @if (Arr::get($item, 'domain'))

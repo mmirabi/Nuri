@@ -144,7 +144,15 @@
                                         </x-core::table.header.cell>
                                     </x-core::table.header>
                                     <x-core::table.body>
-                                        @each('plugins/language::partials.language-item', $activeLanguages, 'item')
+                                        @if(count($activeLanguages))
+                                            @each('plugins/language::partials.language-item', $activeLanguages, 'item')
+                                        @else
+                                            <tr>
+                                                <td colspan="6" class="bg-gray-200">
+                                                    {{ trans('plugins/language::language.no_languages') }}
+                                                </td>
+                                            </tr>
+                                        @endif
                                     </x-core::table.body>
                                 </x-core::table>
                             </div>

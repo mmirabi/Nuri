@@ -152,11 +152,16 @@ class LanguageManagement {
         return $(
             `<div>
                 <span class="dropdown-item-indicator">
-                    <img src="${$('#language_flag_path').val()}${state.element.value.toLowerCase()}.svg" class="flag" style="height: 16px;" alt="${state.text}">
+                    <img src="${$(
+                        '#language_flag_path'
+                    ).val()}${state.element.value.toLowerCase()}.svg" class="flag" style="height: 16px;" alt="${
+                        state.text
+                    }">
                 </span>
                 <span>${state.text}</span>
             </div
-        `)
+        `
+        )
     }
 
     static createOrUpdateLanguage(id, name, locale, code, flag, order, isRTL, edit) {

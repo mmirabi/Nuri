@@ -106,8 +106,9 @@ class EventServiceProvider extends ServiceProvider
     {
         $events = $this->app['events'];
 
+        // Something wrong here, need to remove cart.removed event for now.
         $events->listen(
-            ['cart.removed', 'cart.added', 'cart.updated'],
+            ['cart.added', 'cart.updated'],
             fn () => $this->app->make(HandleApplyProductCrossSaleService::class)->handle()
         );
 

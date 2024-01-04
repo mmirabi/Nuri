@@ -5,13 +5,14 @@ namespace Botble\Base\Traits\Forms;
 use Botble\Base\Facades\MetaBox;
 use Botble\Base\Models\BaseModel;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Kris\LaravelFormBuilder\Fields\FormField;
 
 trait HasMetadata
 {
     protected array $metadataFields;
 
-    protected function isMetadataField(FormField $field): bool
+    public function isMetadataField(FormField $field): bool
     {
         $options = $field->getOptions();
 
@@ -22,19 +23,19 @@ trait HasMetadata
         return (bool) Arr::get($options, 'metadata', false);
     }
 
-    protected function getMetadataFields(): array
+    public function getMetadataFields(): array
     {
         return $this->metadataFields ??= collect($this->fields)
             ->filter(fn (FormField $field) => $this->isMetadataField($field))
             ->all();
     }
 
-    protected function hasMetadataFields(): bool
+    public function hasMetadataFields(): bool
     {
         return count($this->getMetadataFields()) > 0;
     }
 
-    protected function setupMetadataFields(): void
+    public function setupMetadataFields(): void
     {
         $model = $this->model;
 
@@ -50,12 +51,12 @@ trait HasMetadata
 
         foreach ($this->getMetadataFields() as $field) {
             $field->setValue(
-                $model->getMetaData($field->getName(), true)
+                $model->getMetaData($this->getMetadataFieldName($field), true)
             );
         }
     }
 
-    protected function saveMetadataFields(): void
+    public function saveMetadataFields(): void
     {
         if (! $this->model instanceof  BaseModel) {
             return;
@@ -66,11 +67,18 @@ trait HasMetadata
         }
 
         foreach ($this->getMetadataFields() as $field) {
+            $name = $this->getMetadataFieldName($field);
+
             MetaBox::saveMetaBoxData(
                 $this->model,
-                $field->getName(),
-                $this->getRequest()->input($field->getName())
+                $name,
+                $this->getRequest()->input($name)
             );
         }
+    }
+
+    protected function getMetadataFieldName(FormField $field): string
+    {
+        return Str::before($field->getName(), '[');
     }
 }

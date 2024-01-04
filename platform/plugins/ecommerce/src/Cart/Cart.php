@@ -23,7 +23,7 @@ class Cart
 {
     protected static Dispatcher $dispatcher;
 
-    public const DEFAULT_INSTANCE = 'default';
+    public const DEFAULT_INSTANCE = 'cart';
 
     protected string $instance;
 
@@ -805,7 +805,7 @@ class Cart
     {
         $cart = $this->instance('cart');
 
-        if ($this->isEmpty()) {
+        if ($cart->isEmpty()) {
             return;
         }
 
@@ -832,6 +832,8 @@ class Cart
 
                 $options = $cartItem->options->toArray();
                 $options['image'] = $product->image ?: $parentProduct->image;
+
+                $options['taxRate'] = $cartItem->getTaxRate();
 
                 $cart->addQuietly(
                     $cartItem->id,

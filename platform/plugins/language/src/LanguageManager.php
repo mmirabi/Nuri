@@ -1064,7 +1064,7 @@ class LanguageManager
         if (setting('language_show_default_item_if_current_version_not_existed', true)) {
             $url = $this->getLocalizedURL($localeCode);
 
-            if (Facades\Language::getCurrentLocale() == Facades\Language::getDefaultLocale()) {
+            if (Facades\Language::getCurrentLocaleCode() == Facades\Language::getDefaultLocaleCode()) {
                 return $url;
             }
 

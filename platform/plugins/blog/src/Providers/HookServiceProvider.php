@@ -111,7 +111,7 @@ class HookServiceProvider extends ServiceProvider
         if (defined('THEME_FRONT_HEADER') && setting('blog_post_schema_enabled', 1)) {
             add_action(BASE_ACTION_PUBLIC_RENDER_SINGLE, function ($screen, $post) {
                 add_filter(THEME_FRONT_HEADER, function ($html) use ($post) {
-                    if (get_class($post) != Post::class) {
+                    if (! $post instanceof Post) {
                         return $html;
                     }
 
@@ -167,8 +167,7 @@ class HookServiceProvider extends ServiceProvider
 
         theme_option()
             ->setSection([
-                'title' => 'Blog',
-                'desc' => 'Theme options for Blog',
+                'title' => trans('plugins/blog::base.settings.title'),
                 'id' => 'opt-text-subsection-blog',
                 'subsection' => true,
                 'icon' => 'ti ti-edit',

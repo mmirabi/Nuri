@@ -36,6 +36,7 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Conditionable;
@@ -109,7 +110,7 @@ abstract class TableAbstract extends DataTable implements ExtensibleContract
      */
     protected Closure $modifyQueryUsingCallback;
 
-    protected string $dom = "<'d-none d-md-block'B>rt<'card-footer d-flex flex-column flex-sm-row justify-content-between align-items-center gap-2'<'d-flex justify-content-between align-items-center gap-3'l<'m-0 text-muted'i>><'d-flex justify-content-center'p>>";
+    protected string $dom = "Brt<'card-footer d-flex flex-column flex-sm-row justify-content-between align-items-center gap-2'<'d-flex justify-content-between align-items-center gap-3'l<'m-0 text-muted'i>><'d-flex justify-content-center'p>>";
 
     public function __construct(protected DataTables $table, UrlGenerator $urlGenerator)
     {
@@ -537,7 +538,7 @@ abstract class TableAbstract extends DataTable implements ExtensibleContract
         if ($this->hasColumnVisibility) {
             $buttons[] = [
                 'extend' => 'colvis',
-                'text' => '<i class="fas fa-list"></i>',
+                'text' => Blade::render('<x-core::icon name="ti ti-list" />'),
                 'align' => 'button-right',
                 'columns' => ':not(.no-column-visibility)',
             ];
@@ -682,13 +683,14 @@ abstract class TableAbstract extends DataTable implements ExtensibleContract
         switch ($type) {
             case 'select':
             case 'customSelect':
-                $attributes['class'] = $attributes['class'] . ' select';
+                $attributes['class'] = str_replace('form-control ', '', $attributes['class']);
                 $attributes['placeholder'] = trans('core/table::table.select_option');
                 $html = Form::customSelect($inputName, $data, $value, $attributes)->toHtml();
 
                 break;
 
             case 'select-search':
+                $attributes['class'] = str_replace('form-control ', '', $attributes['class']);
                 $attributes['class'] = $attributes['class'] . ' select-search-full';
                 $attributes['placeholder'] = trans('core/table::table.select_option');
                 $html = Form::customSelect($inputName, $data, $value, $attributes)->toHtml();
@@ -696,6 +698,7 @@ abstract class TableAbstract extends DataTable implements ExtensibleContract
                 break;
 
             case 'select-ajax':
+                $attributes['class'] = str_replace('form-control ', '', $attributes['class']);
                 $attributes = [
                     'class' => $attributes['class'] . ' select-autocomplete',
                     'data-url' => Arr::get($data, 'url'),

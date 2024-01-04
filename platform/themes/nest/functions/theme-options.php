@@ -1,5 +1,7 @@
 <?php
 
+use Carbon\Carbon;
+
 app()->booted(function () {
     theme_option()
         ->setField([
@@ -15,7 +17,7 @@ app()->booted(function () {
                 ],
                 'value' => 'yes',
                 'options' => [
-                    'class' => 'form-control',
+                    'class' => 'form-select',
                 ],
             ],
         ])
@@ -32,7 +34,7 @@ app()->booted(function () {
                 ],
                 'value' => 'v1',
                 'options' => [
-                    'class' => 'form-control',
+                    'class' => 'form-select',
                 ],
             ],
         ])
@@ -59,7 +61,7 @@ app()->booted(function () {
                 ],
                 'value' => 'yes',
                 'options' => [
-                    'class' => 'form-control',
+                    'class' => 'form-select',
                 ],
             ],
         ])
@@ -70,7 +72,7 @@ app()->booted(function () {
             'label' => __('Copyright'),
             'attributes' => [
                 'name' => 'copyright',
-                'value' => 'Copyright © 2021 Wowy all rights reserved. Powered by Botble.',
+                'value' => sprintf('Copyright © %s Your Company. All rights reserved.', Carbon::now()->year),
                 'options' => [
                     'class' => 'form-control',
                     'placeholder' => __('Change copyright'),
@@ -344,7 +346,7 @@ app()->booted(function () {
                 'list' => get_blog_single_layouts(),
                 'value' => 'blog-right-sidebar',
                 'options' => [
-                    'class' => 'form-control',
+                    'class' => 'form-select',
                 ],
             ],
         ])
@@ -378,7 +380,7 @@ app()->booted(function () {
                 'list' => get_product_single_layouts(),
                 'value' => 'product-right-sidebar',
                 'options' => [
-                    'class' => 'form-control',
+                    'class' => 'form-select',
                 ],
             ],
         ])
@@ -392,7 +394,7 @@ app()->booted(function () {
                 'list' => get_product_single_layouts(),
                 'value' => 'product-full-width',
                 'options' => [
-                    'class' => 'form-control',
+                    'class' => 'form-select',
                 ],
             ],
         ])
@@ -433,7 +435,7 @@ app()->booted(function () {
                 'list' => get_layout_header_styles(),
                 'value' => 'default',
                 'options' => [
-                    'class' => 'form-control',
+                    'class' => 'form-select',
                 ],
             ],
         ])
@@ -630,7 +632,7 @@ app()->booted(function () {
                 ],
                 'value' => 'no',
                 'options' => [
-                    'class' => 'form-control',
+                    'class' => 'form-select',
                 ],
             ],
         ])
@@ -647,7 +649,7 @@ app()->booted(function () {
                 ],
                 'value' => 'yes',
                 'options' => [
-                    'class' => 'form-control',
+                    'class' => 'form-select',
                 ],
             ],
         ])
@@ -664,7 +666,7 @@ app()->booted(function () {
                 ],
                 'value' => 'yes',
                 'options' => [
-                    'class' => 'form-control',
+                    'class' => 'form-select',
                 ],
             ],
         ])
@@ -681,7 +683,7 @@ app()->booted(function () {
                 ],
                 'value' => 'grid',
                 'options' => [
-                    'class' => 'form-control',
+                    'class' => 'form-select',
                 ],
             ],
         ]);

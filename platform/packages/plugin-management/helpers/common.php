@@ -37,7 +37,9 @@ if (! function_exists('get_active_plugins')) {
 
         $existingPlugins = BaseHelper::scanFolder(plugin_path());
 
-        return array_diff($plugins, array_diff($plugins, $existingPlugins));
+        $activatedPlugins = array_diff($plugins, array_diff($plugins, $existingPlugins));
+
+        return array_values($activatedPlugins);
     }
 }
 

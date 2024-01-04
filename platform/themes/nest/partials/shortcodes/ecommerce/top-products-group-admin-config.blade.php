@@ -1,5 +1,5 @@
-<div class="form-group">
-    <label class="control-label">{{ __('Tabs') }}</label>
+<div class="mb-3">
+    <label class="form-label">{{ __('Tabs') }}</label>
     <div class="mt-2">
         <label class="me-2">
             <input type="checkbox" name="tabs[]" value="top-selling" @if (in_array('top-selling', $tabs)) checked @endif> {{ __('Top selling') }}
@@ -16,7 +16,7 @@
     </div>
 </div>
 
-<div class="form-group">
-    <label class="control-label">{{ __('Top selling products within x days') }}</label>
+<div class="mb-3">
+    <label class="form-label">{{ __('Top selling products within x days') }}</label>
     <input type="number" name="top_selling_in_days" value="{{ Arr::get($attributes, 'top_selling_in_days', 30) }}" class="form-control">
 </div>

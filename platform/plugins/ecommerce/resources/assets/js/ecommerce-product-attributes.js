@@ -119,7 +119,6 @@ class EcommerceProductAttribute {
             .replace(/__position__/gi, 0)
             .replace(/__checked__/gi, _self.totalItem == 0 ? 'checked' : '')
             .replace(/__title__/gi, '')
-            .replace(/__slug__/gi, '')
             .replace(/__color__/gi, '')
             .replace(/__image__/gi, '')
 
@@ -141,7 +140,6 @@ class EcommerceProductAttribute {
                 is_default: $current.find('input[type=radio]').is(':checked') ? 1 : 0,
                 order: $current.index(),
                 title: $current.find('input[name="swatch-title"]').val(),
-                slug: $current.find('input[name="swatch-slug"]').val(),
                 color: $current.find('input[name="swatch-value"]').val(),
                 image: $current.find('input[name="swatch-image"]').val(),
             })

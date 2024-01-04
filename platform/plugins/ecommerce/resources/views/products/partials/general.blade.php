@@ -48,7 +48,12 @@
             :data-decimal-separator="EcommerceHelper::getDecimalSeparatorForInputMask()"
             :value="old('sale_price', $product ? $product->sale_price : $originalProduct->sale_price ?? null)"
             :group-flat="true"
+            :data-sale-percent-text="trans('plugins/ecommerce::products.form.price_sale_percent_helper')"
         >
+            <x-slot:helper-text>
+                {!! trans('plugins/ecommerce::products.form.price_sale_percent_helper', ['percent' => '<strong>' . ($product ? $product->sale_percent : 0) . '%</strong>']) !!}
+            </x-slot:helper-text>
+
             <x-slot:prepend>
                 <span class="input-group-text">{{ get_application_currency()->symbol }}</span>
             </x-slot:prepend>
@@ -90,38 +95,36 @@
         />
     </div>
 
-    <div class="row">
-        <div class="col-md-6">
-            <x-core::form.text-input
-                :label="trans('plugins/ecommerce::products.form.cost_per_item')"
-                name="cost_per_item"
-                :value="old('cost_per_item', $product ? $product->cost_per_item : $originalProduct->cost_per_item ?? 0)"
-                :placeholder="trans('plugins/ecommerce::products.form.cost_per_item_placeholder')"
-                step="any"
-                class="input-mask-number"
-                :group-flat="true"
-                :helper-text="trans('plugins/ecommerce::products.form.cost_per_item_helper')"
-            >
-                <x-slot:prepend>
-                    <span class="input-group-text">{{ get_application_currency()->symbol }}</span>
-                </x-slot:prepend>
-            </x-core::form.text-input>
-        </div>
-        <input
-            name="product_id"
-            type="hidden"
-            value="{{ $product->id ?? null }}"
+    <div class="col-md-6">
+        <x-core::form.text-input
+            :label="trans('plugins/ecommerce::products.form.cost_per_item')"
+            name="cost_per_item"
+            :value="old('cost_per_item', $product ? $product->cost_per_item : $originalProduct->cost_per_item ?? 0)"
+            :placeholder="trans('plugins/ecommerce::products.form.cost_per_item_placeholder')"
+            step="any"
+            class="input-mask-number"
+            :group-flat="true"
+            :helper-text="trans('plugins/ecommerce::products.form.cost_per_item_helper')"
         >
-        <div class="col-md-6">
-            <x-core::form.text-input
-                :label="trans('plugins/ecommerce::products.form.barcode')"
-                name="barcode"
-                type="text"
-                :value="old('barcode', $product ? $product->barcode : $originalProduct->barcode ?? null)"
-                step="any"
-                :placeholder="trans('plugins/ecommerce::products.form.barcode_placeholder')"
-            />
-        </div>
+            <x-slot:prepend>
+                <span class="input-group-text">{{ get_application_currency()->symbol }}</span>
+            </x-slot:prepend>
+        </x-core::form.text-input>
+    </div>
+    <input
+        name="product_id"
+        type="hidden"
+        value="{{ $product->id ?? null }}"
+    >
+    <div class="col-md-6">
+        <x-core::form.text-input
+            :label="trans('plugins/ecommerce::products.form.barcode')"
+            name="barcode"
+            type="text"
+            :value="old('barcode', $product ? $product->barcode : $originalProduct->barcode ?? null)"
+            step="any"
+            :placeholder="trans('plugins/ecommerce::products.form.barcode_placeholder')"
+        />
     </div>
 </div>
 
@@ -245,7 +248,7 @@
     />
 
     <x-core::form-group class="product-type-digital-management">
-        <x-core::form.label for="product_file">
+        <x-core::form.label for="product_file" class="mb-3">
             {{ trans('plugins/ecommerce::products.digital_attachments.title') }}
 
             <x-slot:description>

@@ -16,21 +16,21 @@
                             @csrf
                             <input type="hidden" name="token" value="{{ $token }}">
                             <div class="form__content">
-                                <div class="form-group">
+                                <div class="mb-3">
                                     <label for="txt-email" class="required">{{ __('Email Address') }}</label>
                                     <input class="form-control" name="email" id="txt-email" type="email" value="{{ old('email') }}" placeholder="{{ __('Please enter your email address') }}">
                                     @if ($errors->has('email'))
                                         <span class="text-danger">{{ $errors->first('email') }}</span>
                                     @endif
                                 </div>
-                                <div class="form-group">
+                                <div class="mb-3">
                                     <label for="txt-password" class="required">{{ __('Password') }}</label>
                                     <input class="form-control" type="password" name="password" id="txt-password" placeholder="{{ __('Please enter your password') }}">
                                     @if ($errors->has('password'))
                                         <span class="text-danger">{{ $errors->first('password') }}</span>
                                     @endif
                                 </div>
-                                <div class="form-group">
+                                <div class="mb-3">
                                     <label for="txt-password-confirmation" class="required">{{ __('Password confirmation') }}</label>
                                     <input class="form-control" type="password" name="password_confirmation" id="txt-password-confirmation" placeholder="{{ __('Please enter your password confirmation') }}">
                                     @if ($errors->has('password_confirmation'))
@@ -38,7 +38,7 @@
                                     @endif
                                 </div>
                             </div>
-                            <div class="form-group">
+                            <div class="mb-3">
                                 <button type="submit" class="btn btn-fill-out btn-block hover-up">{{ __('Submit') }}</button>
                             </div>
                             @if (session('status'))

@@ -12,13 +12,13 @@ use Botble\ACL\Http\Requests\PreferenceRequest;
 use Botble\ACL\Http\Requests\UpdatePasswordRequest;
 use Botble\ACL\Http\Requests\UpdateProfileRequest;
 use Botble\ACL\Models\User;
-use Botble\ACL\Models\UserMeta;
 use Botble\ACL\Services\ChangePasswordService;
 use Botble\ACL\Services\CreateUserService;
 use Botble\ACL\Tables\UserTable;
 use Botble\Base\Facades\Assets;
 use Botble\Base\Http\Actions\DeleteResourceAction;
 use Botble\Base\Http\Controllers\BaseSystemController;
+use Botble\Base\Supports\Breadcrumb;
 use Botble\Media\Facades\RvMedia;
 use Botble\Media\Models\MediaFile;
 use Exception;
@@ -27,14 +27,13 @@ use Throwable;
 
 class UserController extends BaseSystemController
 {
-    public function __construct()
+    protected function breadcrumb(): Breadcrumb
     {
-        parent::__construct();
-
-        $this->breadcrumb()->add(
-            trans('core/acl::users.users'),
-            route('users.index')
-        );
+        return parent::breadcrumb()
+            ->add(
+                trans('core/acl::users.users'),
+                route('users.index')
+            );
     }
 
     public function index(UserTable $dataTable)
@@ -104,7 +103,7 @@ class UserController extends BaseSystemController
         $passwordForm = PasswordForm::createFromModel($user)
             ->setUrl(route('users.change-password', $user->getKey()));
 
-        $preferenceForm = PreferenceForm::create()
+        $preferenceForm = PreferenceForm::createFromModel($user)
             ->setUrl(route('users.update-preferences', $user->getKey()))
             ->renderForm();
 
@@ -193,9 +192,10 @@ class UserController extends BaseSystemController
 
     public function updatePreferences(User $user, PreferenceRequest $request)
     {
-        PreferenceForm::create()->saving(function () use ($request) {
-            UserMeta::setMeta('locale', $request->input('locale'));
-            UserMeta::setMeta('theme_mode', $request->input('theme_mode'));
+        PreferenceForm::createFromModel($user)->saving(function () use ($request, $user) {
+            $user->setMeta('locale', $request->input('locale'));
+            $user->setMeta('locale_direction', $request->input('locale_direction'));
+            $user->setMeta('theme_mode', $request->input('theme_mode'));
         });
 
         return $this

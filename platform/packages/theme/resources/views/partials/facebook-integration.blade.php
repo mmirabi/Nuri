@@ -23,7 +23,6 @@
             var chatbox = document.getElementById('fb-customer-chat');
             chatbox.setAttribute("page_id", "{{ theme_option('facebook_page_id') }}");
             chatbox.setAttribute("attribution", "biz_inbox");
-            chatbox.setAttribute("theme_color", {{ theme_option('primary_color', '#AF0F26') }});
         </script>
     @endif
 @endif

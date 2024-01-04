@@ -4,7 +4,9 @@ namespace Botble\Theme\Http\Controllers;
 
 use Botble\Base\Facades\Assets;
 use Botble\Base\Facades\BaseHelper;
-use Botble\Setting\Http\Controllers\SettingController;
+use Botble\Base\Http\Controllers\BaseController;
+use Botble\Base\Supports\Breadcrumb;
+use Botble\Setting\Http\Controllers\Concerns\InteractsWithSettings;
 use Botble\Theme\Events\RenderingThemeOptionSettings;
 use Botble\Theme\Facades\Theme;
 use Botble\Theme\Facades\ThemeOption;
@@ -20,21 +22,18 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\File;
 
-class ThemeController extends SettingController
+class ThemeController extends BaseController
 {
-    public function __construct()
+    use InteractsWithSettings;
+
+    protected function breadcrumb(): Breadcrumb
     {
-        $this
-            ->breadcrumb()
+        return parent::breadcrumb()
             ->add(trans('packages/theme::theme.appearance'));
     }
 
     public function index()
     {
-        if (! config('packages.theme.general.display_theme_manager_in_admin_panel', true)) {
-            abort(404);
-        }
-
         $this->pageTitle(trans('packages/theme::theme.name'));
 
         if (File::exists(theme_path('.DS_Store'))) {

@@ -38,12 +38,12 @@ class ApiLayerExchangeRateService implements ExchangeRateInterface
 
     public function cacheExchangeRates(): array
     {
-        $currencies = Currency::currencies();
         $defaultCurrency = Currency::getDefaultCurrency();
+        $currencies = Currency::currencies()->pluck('title')->all();
 
         $params = [
-            'symbols' => implode(',', $currencies->pluck('title')->toArray()),
-            'base' => strtoupper(get_application_currency()->title),
+            'symbols' => implode(',', $currencies),
+            'base' => strtoupper($defaultCurrency->title),
         ];
 
         $rates = Cache::remember('currency_exchange_rate', 86_400, function () use ($params) {

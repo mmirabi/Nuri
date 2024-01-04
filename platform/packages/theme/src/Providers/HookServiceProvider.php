@@ -43,6 +43,10 @@ class HookServiceProvider extends ServiceProvider
         });
 
         $this->app['events']->listen(RenderingDashboardWidgets::class, function () {
+            if (! config('packages.theme.general.display_theme_manager_in_admin_panel', true)) {
+                return;
+            }
+
             add_filter(DASHBOARD_FILTER_ADMIN_LIST, [$this,  'addStatsWidgets'], 4, 2);
         });
 
@@ -58,7 +62,6 @@ class HookServiceProvider extends ServiceProvider
             theme_option()
                 ->setSection([
                     'title' => trans('packages/theme::theme.theme_option_general'),
-                    'desc' => trans('packages/theme::theme.theme_option_general_description'),
                     'priority' => 0,
                     'id' => 'opt-text-subsection-general',
                     'subsection' => true,
@@ -146,7 +149,6 @@ class HookServiceProvider extends ServiceProvider
                 ])
                 ->setSection([
                     'title' => trans('packages/theme::theme.theme_option_logo'),
-                    'desc' => trans('packages/theme::theme.theme_option_logo'),
                     'priority' => 0,
                     'id' => 'opt-text-subsection-logo',
                     'subsection' => true,
@@ -387,6 +389,7 @@ class HookServiceProvider extends ServiceProvider
             ->setColor('pink')
             ->setStatsTotal($themes)
             ->setRoute(route('theme.index'))
+            ->setColumn('col-12 col-md-6 col-lg-3')
             ->init($widgets, $widgetSettings);
     }
 }

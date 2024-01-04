@@ -22,6 +22,9 @@ class InvoiceSettingRequest extends Request
         return [
             'company_name_for_invoicing' => ['nullable', 'string', 'max:120'],
             'company_address_for_invoicing' => ['nullable', 'string', 'max:255'],
+            'company_country_for_invoicing' => ['nullable', 'string', 'max:120'],
+            'company_state_for_invoicing' => ['nullable', 'string', 'max:120'],
+            'company_city_for_invoicing' => ['nullable', 'string', 'max:120'],
             'company_email_for_invoicing' => ['nullable', 'email'],
             'company_phone_for_invoicing' => 'sometimes|' . BaseHelper::getPhoneValidationRule(),
             'company_tax_id_for_invoicing' => ['nullable', 'string', 'max:120'],

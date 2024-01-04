@@ -2,15 +2,49 @@
 
 namespace Botble\Base\Supports;
 
+use Botble\ACL\Contracts\HasPreferences;
 use Botble\Setting\Facades\Setting;
+use Illuminate\Contracts\Auth\Authenticatable;
 
 class AdminAppearance
 {
     protected string $settingKey = 'admin_appearance';
 
+    protected Authenticatable|HasPreferences $user;
+
+    public function forUser(Authenticatable|HasPreferences $user): static
+    {
+        $this->user = $user;
+
+        return $this;
+    }
+
+    public function forCurrentUser(string $guard = null): static
+    {
+        $auth = auth($guard);
+
+        if ($auth->check()) {
+            $this->user = $auth->user();
+        }
+
+        return $this;
+    }
+
+    public function getLocale(): string
+    {
+        $generalLocale = config('core.base.general.locale', config('app.locale'));
+
+        return $this->getUserSetting('locale', $generalLocale);
+    }
+
+    public function getLocaleDirection(): string
+    {
+        return $this->getUserSetting('locale_direction', setting('admin_locale_direction', 'ltr'));
+    }
+
     public function getCurrentLayout(): string
     {
-        return $this->getSetting('layout', array_key_first($this->getLayouts()));
+        return $this->getUserSetting('layout', array_key_first($this->getLayouts()));
     }
 
     public function isVerticalLayout(): bool
@@ -25,7 +59,7 @@ class AdminAppearance
 
     public function showMenuItemIcon(): bool
     {
-        return $this->getSetting('show_menu_item_icon', true);
+        return $this->getUserSetting('show_menu_item_icon', true);
     }
 
     public function getLayouts(): array
@@ -38,7 +72,7 @@ class AdminAppearance
 
     public function getContainerWidth(): string
     {
-        return $this->getSetting('container_width', array_key_first($this->getContainerWidths()));
+        return $this->getUserSetting('container_width', array_key_first($this->getContainerWidths()));
     }
 
     public function getContainerWidths(): array
@@ -52,7 +86,18 @@ class AdminAppearance
 
     public function getSetting(string $key, mixed $default = null)
     {
-        return Setting::get("{$this->settingKey}_{$key}", $default);
+        return Setting::get($this->getSettingKey($key), $default);
+    }
+
+    public function getUserSetting(string $key, mixed $default = null)
+    {
+        $setting = null;
+
+        if (isset($this->user) && $this->user->getAuthIdentifier() && $this->user instanceof HasPreferences) {
+            $setting = $this->user->getMeta($key);
+        }
+
+        return $setting ?: $this->getSetting($key, $default);
     }
 
     public function getSettingKey(string $key): string

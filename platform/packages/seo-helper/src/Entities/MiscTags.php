@@ -5,8 +5,6 @@ namespace Botble\SeoHelper\Entities;
 use Botble\SeoHelper\Contracts\Entities\MetaCollectionContract;
 use Botble\SeoHelper\Contracts\Entities\MiscTagsContract;
 use Botble\SeoHelper\Contracts\Entities\WebmastersContract;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\URL;
 
 class MiscTags implements MiscTagsContract
 {
@@ -154,18 +152,7 @@ class MiscTags implements MiscTagsContract
     protected function addCanonical(): static
     {
         if ($this->hasUrl()) {
-            $url = $this->currentUrl;
-
-            $request = URL::getRequest();
-
-            if ($queryString = $request->getQueryString()) {
-                $parsed = parse_url($url);
-                $url= $parsed['scheme'] . '://' . $parsed['host'] . Arr::get($parsed, 'path');
-
-                $url .= '?' . $queryString;
-            }
-
-            $this->add('canonical', $url);
+            $this->add('canonical', $this->currentUrl);
         }
 
         return $this;

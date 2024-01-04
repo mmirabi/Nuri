@@ -2,6 +2,7 @@
 
 namespace Botble\Base\Helpers;
 
+use Botble\Base\Facades\AdminAppearance;
 use Botble\Base\Facades\Html;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
@@ -148,9 +149,7 @@ class BaseHelper
 
     public function adminLanguageDirection(): string
     {
-        $direction = session('admin_locale_direction', setting('admin_locale_direction', 'ltr'));
-
-        return apply_filters(BASE_FILTER_ADMIN_LANGUAGE_DIRECTION, $direction);
+        return apply_filters(BASE_FILTER_ADMIN_LANGUAGE_DIRECTION, AdminAppearance::forCurrentUser()->getLocaleDirection());
     }
 
     public function isHomepage(int|string|null $pageId = null): bool
@@ -235,9 +234,15 @@ class BaseHelper
         return htmlentities($this->clean($value));
     }
 
-    public function getPhoneValidationRule(): string
+    public function getPhoneValidationRule(bool $asArray = false): string|array
     {
-        return config('core.base.general.phone_validation_rule');
+        $rule = config('core.base.general.phone_validation_rule');
+
+        if ($asArray) {
+            return explode('|', $rule);
+        }
+
+        return $rule;
     }
 
     public function sortSearchResults(array|Collection $collection, string $searchTerms, string $column): Collection

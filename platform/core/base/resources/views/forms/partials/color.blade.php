@@ -7,3 +7,8 @@
     :value="$value ?? '#000'"
     :attributes="new Illuminate\View\ComponentAttributeBag((array) $attributes)"
 />
+
+@if(request()->ajax())
+    {!! Assets::scriptToHtml('coloris') !!}
+    {!! Assets::styleToHtml('coloris') !!}
+@endif
