@@ -167,7 +167,7 @@
                                         <img class="svgInject" alt="{{ __('Compare') }}" src="{{ Theme::asset()->url('imgs/theme/icons/icon-compare.svg') }}" />
                                         <span class="pro-count blue compare-count">{{ Cart::instance('compare')->count() }}</span>
                                     </a>
-                                    <a href="{{ route('public.compare') }}"><span class="lable">{{ __('Compare') }}</span></a>
+{{--                                    <a href="{{ route('public.compare') }}"><span class="lable">{{ __('Compare') }}</span></a>--}}
                                 </div>
                             @endif
                             @if (EcommerceHelper::isWishlistEnabled())
@@ -176,7 +176,7 @@
                                         <img class="svgInject" alt="{{ __('Wishlist') }}" src="{{ Theme::asset()->url('imgs/theme/icons/icon-heart.svg') }}" />
                                         <span class="pro-count blue wishlist-count">@if (auth('customer')->check()) {{ auth('customer')->user()->wishlist()->count() }} @else {{ Cart::instance('wishlist')->count() }} @endif</span>
                                     </a>
-                                    <a href="{{ route('public.wishlist') }}"><span class="lable">{{ __('Wishlist') }}</span></a>
+{{--                                    <a href="{{ route('public.wishlist') }}"><span class="lable">{{ __('Wishlist') }}</span></a>--}}
                                 </div>
                             @endif
                             <div class="header-action-icon-2">
@@ -184,7 +184,7 @@
                                     <img alt="{{ __('Cart') }}" src="{{ Theme::asset()->url('imgs/theme/icons/icon-cart.svg') }}" />
                                     <span class="pro-count blue">{{ Cart::instance('cart')->count() }}</span>
                                 </a>
-                                <a href="{{ route('public.cart') }}"><span class="lable">{{ __('Cart') }}</span></a>
+{{--                                <a href="{{ route('public.cart') }}"><span class="lable">{{ __('Cart') }}</span></a>--}}
                                 <div class="cart-dropdown-wrap cart-dropdown-hm2 cart-dropdown-panel">
                                     {!! Theme::partial('cart-panel') !!}
                                 </div>
@@ -195,7 +195,7 @@
                                         alt="{{ __('Account') }}"
                                         src="{{ auth('customer')->check() ? auth('customer')->user()->avatar_url : Theme::asset()->url('imgs/theme/icons/icon-user.svg') }}" />
                                 </a>
-                                <a href="{{ route('customer.overview') }}"><span class="lable me-1">{{ auth('customer')->check() ? Str::limit(auth('customer')->user()->name, 10) : __('Account') }}</span></a>
+{{--                                <a href="{{ route('customer.overview') }}"><span class="lable me-1">{{ auth('customer')->check() ? Str::limit(auth('customer')->user()->name, 10) : __('Account') }}</span></a>--}}
                                 <div class="cart-dropdown-wrap cart-dropdown-hm2 account-dropdown">
                                     <ul>
                                         @if (auth('customer')->check())

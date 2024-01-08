@@ -17,7 +17,7 @@ abstract class AuthForm extends FormAbstract
             ->template('plugins/ecommerce::customers.forms.auth');
     }
 
-    protected function submitButton(string $label): static
+    public function submitButton(string $label): static
     {
         return $this
             ->add('openButtonWrap', HtmlField::class, [
@@ -34,22 +34,22 @@ abstract class AuthForm extends FormAbstract
             ]);
     }
 
-    protected function banner(string $banner): static
+    public function banner(string $banner): static
     {
         return $this->setFormOption('banner', $banner);
     }
 
-    protected function icon(string $icon): static
+    public function icon(string $icon): static
     {
         return $this->setFormOption('icon', $icon);
     }
 
-    protected function heading(string $heading): static
+    public function heading(string $heading): static
     {
         return $this->setFormOption('heading', $heading);
     }
 
-    protected function description(string $description): static
+    public function description(string $description): static
     {
         return $this->setFormOption('description', $description);
     }

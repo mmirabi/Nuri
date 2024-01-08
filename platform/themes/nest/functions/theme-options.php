@@ -146,7 +146,7 @@ app()->booted(function () {
             'desc' => __('Social links'),
             'id' => 'opt-text-subsection-social-links',
             'subsection' => true,
-            'icon' => 'fa fa-share-alt',
+            'icon' => 'ti ti-share',
         ])
         ->setField([
             'id' => 'social_links',
@@ -198,7 +198,7 @@ app()->booted(function () {
             'desc' => __('Header messages'),
             'id' => 'opt-text-subsection-header-messages',
             'subsection' => true,
-            'icon' => 'fa fa-bell',
+            'icon' => 'ti ti-bell',
         ])
         ->setField([
             'id' => 'mobile-header-message',
@@ -277,7 +277,7 @@ app()->booted(function () {
             'desc' => __('Contact info boxes'),
             'id' => 'opt-contact',
             'subsection' => false,
-            'icon' => 'fa fa-info-circle',
+            'icon' => 'ti ti-info-circle',
             'fields' => [],
         ])
         ->setField([
@@ -403,7 +403,7 @@ app()->booted(function () {
             'desc' => __('Style of page'),
             'id' => 'opt-text-subsection-style',
             'subsection' => true,
-            'icon' => 'fa fa-bars',
+            'icon' => 'ti ti-brush',
         ])
         ->setField([
             'id' => 'font_text',
@@ -607,16 +607,6 @@ app()->booted(function () {
             'attributes' => [
                 'name' => 'color_body',
                 'value' => '#7E7E7E',
-            ],
-        ])
-        ->setField([
-            'id' => 'image_in_login_page',
-            'section_id' => 'opt-text-subsection-ecommerce',
-            'type' => 'mediaImage',
-            'label' => __('Image in login page'),
-            'attributes' => [
-                'name' => 'image_in_login_page',
-                'value' => '',
             ],
         ])
         ->setField([

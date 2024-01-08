@@ -2,6 +2,7 @@
 
 namespace Botble\Ecommerce\Http\Controllers;
 
+use Botble\Base\Http\Actions\DeleteResourceAction;
 use Botble\Base\Http\Controllers\BaseController;
 use Botble\Ecommerce\Http\Requests\ReviewReplyRequest;
 use Botble\Ecommerce\Models\Review;
@@ -48,5 +49,10 @@ class ReviewReplyController extends BaseController
         return $this
             ->httpResponse()
             ->withUpdatedSuccessMessage();
+    }
+
+    public function destroy(Review $review, ReviewReply $reply)
+    {
+        return DeleteResourceAction::make($reply);
     }
 }

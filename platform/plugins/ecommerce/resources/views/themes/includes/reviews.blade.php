@@ -53,30 +53,7 @@
                 </div>
             @endif
 
-            <div @class(['col-12', 'col-md-8' => $showAvgRating])>
-                <h4>{{ __('Add your review') }}</h4>
-
-                @if (! $checkReview['error'])
-                    <p>
-                        {{ __('Your email address will not be published. Required fields are marked.') }}
-                        <span class="required"></span>
-                    </p>
-                @endif
-
-                @guest('customer')
-                    <p class="text-danger">
-                        {!! BaseHelper::clean(
-                            __('Please <a href=":link">login</a> to write review!', ['link' => route('customer.login')]),
-                        ) !!}
-                    </p>
-                @endguest
-
-                @if ($checkReview['error'])
-                    <p class="text-warning">{{ $checkReview['message'] }}</p>
-                @else
-                    @include('plugins/ecommerce::themes.includes.review-form')
-                @endif
-            </div>
+            @include($reviewFormView ?? 'plugins/ecommerce::themes.includes.review-form')
         </div>
 
         @if (($reviewImagesCount = count($product->review_images)) > 0)

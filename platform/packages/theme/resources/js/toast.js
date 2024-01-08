@@ -73,7 +73,7 @@ Theme.handleError = (data) => {
 Theme.handleValidationError = (errors) => {
     let message = ''
 
-    errors.forEach((item) => {
+    Object.values(errors).forEach((item) => {
         if (message !== '') {
             message += '<br />'
         }

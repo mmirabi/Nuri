@@ -258,7 +258,7 @@ export default defineComponent({
                                 <path d="M21 21l-6 -6"></path>
                             </svg>
                         </span>
-                        <input type="text" v-model="search" class="form-control" :placeholder="__('base.search')" />
+                        <input type="search" v-model="search" class="form-control" :placeholder="__('base.search')" />
                         <span class="input-group-text" v-if="search">
                             <a
                                 href="javascript:void(0)"

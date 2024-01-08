@@ -478,14 +478,7 @@ class HookServiceProvider extends ServiceProvider
                 if ($discountPrice < $flashSalePrice) {
                     $flashSale = null;
 
-                    if (! $data->is_variation) {
-                        $productCollections = $data->productCollections;
-                    } else {
-                        $productCollections = $data->original_product->productCollections;
-                    }
-
-                    $discount = Discount::getFacadeRoot()
-                        ->promotionForProduct([$data->getKey()], $productCollections->pluck('id')->all());
+                    $discount = Discount::getFacadeRoot()->promotionForProduct([$data->getKey()]);
                 }
             }
 

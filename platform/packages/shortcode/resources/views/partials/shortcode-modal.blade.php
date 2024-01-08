@@ -12,6 +12,7 @@
                 <label
                     class="shortcode-item-wrapper w-100"
                     data-bb-toggle="shortcode-select"
+                    data-name="{{ $shortcode['name'] }}"
                     data-description="{{ $shortcode['description'] }}"
                     href="{{ route('short-codes.ajax-get-admin-config', $key) }}"
                     data-key="{{ $key }}"

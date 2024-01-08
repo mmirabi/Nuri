@@ -32,6 +32,7 @@ use Botble\Ecommerce\Services\HandleShippingFeeService;
 use Botble\Ecommerce\Services\HandleTaxService;
 use Botble\Optimize\Facades\OptimizerHelper;
 use Botble\Payment\Enums\PaymentStatusEnum;
+use Botble\Payment\Facades\PaymentMethods;
 use Botble\Payment\Supports\PaymentHelper;
 use Botble\Theme\Facades\Theme;
 use Illuminate\Auth\Events\Registered;
@@ -808,7 +809,7 @@ class PublicCheckoutController extends BaseController
 
         do_action('ecommerce_before_processing_payment', $products, $request, $token, $sessionData);
 
-        if (! is_plugin_active('payment') || ! $orderAmount) {
+        if (! is_plugin_active('payment') || empty(PaymentMethods::methods()) || ! $orderAmount) {
             OrderHelper::processOrder($order->getKey());
 
             return redirect()->to(route('public.checkout.success', OrderHelper::getOrderSessionToken()));

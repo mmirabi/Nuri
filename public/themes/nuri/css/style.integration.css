@@ -129,3 +129,13 @@ background-color: var(--color-brand);
 .header-style-1 .search-style-2 form{
     max-width: 645px!important;
 }
+.product-cart-wrap .product-card-bottom .add-cart {
+    position: absolute;
+    bottom: 0;
+}
+.product-cart-wrap .product-card-bottom .product-price {
+    margin-bottom: 30px;
+}
+p.mb-45.nuri-p-color {
+    color: black!important;
+}

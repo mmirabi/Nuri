@@ -116,9 +116,10 @@ $(() => {
                     $form.find('select').val(0)
                     $form.find('textarea').val('')
                     $form.find('input[type=file]').val('')
+                    $form.find('input.custom-field').val('')
                     imagesReviewBuffer = []
 
-                    MartApp.showSuccess(message)
+                    Theme.showSuccess(message)
 
                     getReviewList($reviewListContainer.data('ajax-url'), () => {
                         if (! $('.review-list').length) {
@@ -126,11 +127,11 @@ $(() => {
                         }
                     })
                 } else {
-                    MartApp.showError(message)
+                    Theme.showError(message)
                 }
             },
             error: (error) => {
-                MartApp.handleError(error, $form)
+                Theme.handleError(error, $form)
             },
             complete: () => {
                 $button.prop('disabled', false).removeClass('loading')
@@ -151,7 +152,7 @@ $(() => {
                     .data('max-size-message')
                     .replace('__attribute__', input.files[i].name)
                     .replace('__max__', maxSize)
-                MartApp.showError(message)
+                Theme.showError(message)
             } else {
                 imagesReviewBuffer.push(input.files[i])
             }

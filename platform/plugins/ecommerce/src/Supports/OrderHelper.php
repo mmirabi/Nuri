@@ -35,6 +35,7 @@ use Botble\Ecommerce\Models\ShipmentHistory;
 use Botble\Ecommerce\Models\ShippingRule;
 use Botble\Payment\Enums\PaymentMethodEnum;
 use Botble\Payment\Enums\PaymentStatusEnum;
+use Botble\Payment\Facades\PaymentMethods;
 use Botble\Payment\Models\Payment;
 use Carbon\Carbon;
 use Dompdf\Dompdf;
@@ -83,7 +84,7 @@ class OrderHelper
         }
 
         foreach ($orders as $order) {
-            if ((float)$order->amount && (is_plugin_active('payment') && ! $order->payment_id)) {
+            if ((float)$order->amount && (is_plugin_active('payment') && ! empty(PaymentMethods::methods()) && ! $order->payment_id)) {
                 continue;
             }
 

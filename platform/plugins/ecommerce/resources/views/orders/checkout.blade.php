@@ -218,48 +218,46 @@
 
                             {!! apply_filters('ecommerce_checkout_form_before_payment_form', null, $products) !!}
 
+                            <input
+                                name="amount"
+                                type="hidden"
+                                value="{{ format_price($orderAmount, null, true) }}"
+                            >
+
                             @if (is_plugin_active('payment') && $orderAmount)
-                                <div class="position-relative mb-4">
-                                    <div class="payment-info-loading" style="display: none;">
-                                        <div class="payment-info-loading-content">
-                                            <i class="fas fa-spinner fa-spin"></i>
-                                        </div>
-                                    </div>
-                                    <h5 class="checkout-payment-title">{{ __('Payment method') }}</h5>
-                                    <input
-                                        name="amount"
-                                        type="hidden"
-                                        value="{{ format_price($orderAmount, null, true) }}"
-                                    >
-                                    <input
-                                        name="currency"
-                                        type="hidden"
-                                        value="{{ strtoupper(get_application_currency()->title) }}"
-                                    >
+                                @php
+                                    $paymentMethods = apply_filters(PAYMENT_FILTER_ADDITIONAL_PAYMENT_METHODS, null, [
+                                            'amount' => format_price($orderAmount, null, true),
+                                            'currency' => strtoupper(get_application_currency()->title),
+                                            'name' => null,
+                                            'selected' => PaymentMethods::getSelectedMethod(),
+                                            'default' => PaymentMethods::getDefaultMethod(),
+                                            'selecting' => PaymentMethods::getSelectingMethod(),
+                                        ]) . PaymentMethods::render();
+                                @endphp
 
-                                    {!! apply_filters(PAYMENT_FILTER_PAYMENT_PARAMETERS, null) !!}
-
-                                    <ul class="list-group list_payment_method">
-                                        @if ($orderAmount)
-                                            {!! apply_filters(PAYMENT_FILTER_ADDITIONAL_PAYMENT_METHODS, null, [
-                                                'amount' => format_price($orderAmount, null, true),
-                                                'currency' => strtoupper(get_application_currency()->title),
-                                                'name' => null,
-                                                'selected' => PaymentMethods::getSelectedMethod(),
-                                                'default' => PaymentMethods::getDefaultMethod(),
-                                                'selecting' => PaymentMethods::getSelectingMethod(),
-                                            ]) !!}
-
-                                            {!! PaymentMethods::render() !!}
-                                        @endif
-                                    </ul>
-                                </div>
-                            @else
                                 <input
-                                    name="amount"
+                                    name="currency"
                                     type="hidden"
-                                    value="{{ format_price($orderAmount, null, true) }}"
+                                    value="{{ strtoupper(get_application_currency()->title) }}"
                                 >
+
+                                @if($paymentMethods)
+                                    <div class="position-relative mb-4">
+                                        <div class="payment-info-loading" style="display: none;">
+                                            <div class="payment-info-loading-content">
+                                                <i class="fas fa-spinner fa-spin"></i>
+                                            </div>
+                                        </div>
+                                        <h5 class="checkout-payment-title">{{ __('Payment method') }}</h5>
+
+                                        {!! apply_filters(PAYMENT_FILTER_PAYMENT_PARAMETERS, null) !!}
+
+                                        <ul class="list-group list_payment_method">
+                                            {!! $paymentMethods !!}
+                                        </ul>
+                                    </div>
+                                @endif
                             @endif
 
                             {!! apply_filters('ecommerce_checkout_form_after_payment_form', null, $products) !!}

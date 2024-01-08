@@ -1,9 +1,5 @@
 $ratingSize: 80px;
 
-:root {
-    --primary-button-color: #fff;
-}
-
 .review-container {
     .review {
         &-container {
@@ -154,7 +150,7 @@ $ratingSize: 80px;
     }
 
     .btn-primary {
-        color: var(--primary-button-color);;
+        color: #fff;
         background-color: var(--primary-color);
         border-color: var(--primary-color);
         padding: .5rem .75rem;
@@ -167,19 +163,19 @@ $ratingSize: 80px;
     }
 
     .btn-primary.focus, .btn-primary:focus {
-        color: var(--primary-button-color);;
+        color: #fff;
         background-color: var(--primary-color);
         border-color: var(--primary-color);
     }
 
     .btn-primary.disabled, .btn-primary:disabled {
-        color: var(--primary-button-color);;
+        color: #fff;
         background-color: var(--primary-color);
         border-color: var(--primary-color)
     }
 
     .btn-primary:not(:disabled):not(.disabled).active, .btn-primary:not(:disabled):not(.disabled):active, .show > .btn-primary.dropdown-toggle {
-        color: var(--primary-button-color);;
+        color: #fff;
         background-color: var(--primary-color);
         border-color: var(--primary-color)
     }

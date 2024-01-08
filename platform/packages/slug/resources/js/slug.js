@@ -2,7 +2,7 @@ class PermalinkField {
     constructor() {
         let $slugBox = $(document).find('.slug-field-wrapper')
 
-        $(document).on('blur', `#${$slugBox.data('field-name')}`, (e) => {
+        $(document).on('blur', `.js-base-form input[name=${$slugBox.data('field-name')}]`, (e) => {
             if ($slugBox.find('input[name="slug"]').is('[readonly]')) {
                 return
             }
@@ -30,23 +30,21 @@ class PermalinkField {
 
                 const value = input.val()
 
-                const id = $slugBox.find('.slug-data').data('id') || 0
-
                 if (value !== null && value !== '') {
-                    createSlug(value, id)
+                    createSlug(value, $slugBox.find('.slug-data').data('id') || 0)
                 } else {
                     input.addClass('is-invalid')
                 }
-            }, 200)
+            }, 700)
         })
 
         $(document).on('click', '[data-bb-toggle="generate-slug"]', (e) => {
             e.preventDefault()
 
-            const $name = $(document).find(`#${$slugBox.data('field-name')}`)
+            const $fromField = $(e.currentTarget).closest('.js-base-form').find(`input[name=${$slugBox.data('field-name')}]`)
 
-            if ($name.val() !== null && $name.val() !== '') {
-                createSlug($name.val(), 0)
+            if ($fromField.val() !== null && $fromField.val() !== '') {
+                createSlug($fromField.val(), $slugBox.find('.slug-data').data('id') || 0)
             }
         })
 

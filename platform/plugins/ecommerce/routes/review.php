@@ -74,6 +74,12 @@ Route::group(['namespace' => 'Botble\Ecommerce\Http\Controllers'], function () {
                 'uses' => 'ReviewReplyController@update',
                 'permission' => 'reviews.reply',
             ]);
+
+            Route::delete('{review}/reply/{reply}', [
+                'as' => 'reply.destroy',
+                'uses' => 'ReviewReplyController@destroy',
+                'permission' => 'reviews.reply',
+            ]);
         });
     });
 });

@@ -172,12 +172,9 @@
         <div class="tab-style3">
             <ul class="nav nav-tabs text-uppercase">
                 <li class="nav-item">
-                    <a class="nav-link active" id="InfoPro-tab" data-bs-toggle="tab" href="#InfoPro">{{ __('مشخصات فنی') }}</a>
+                    <a class="nav-link active" id="Description-tab" data-bs-toggle="tab" href="#Description">{{ __('Description') }}</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" id="Description-tab" data-bs-toggle="tab" href="#Description">{{ __('Description') }}</a>
-                </li>
-                
+
                 @if (EcommerceHelper::isReviewEnabled())
                     <li class="nav-item">
                         <a class="nav-link" id="Reviews-tab" data-bs-toggle="tab" href="#Reviews">{{ __('Reviews') }} ({{ $product->reviews_count }})</a>

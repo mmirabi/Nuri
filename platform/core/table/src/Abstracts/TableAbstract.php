@@ -110,7 +110,7 @@ abstract class TableAbstract extends DataTable implements ExtensibleContract
      */
     protected Closure $modifyQueryUsingCallback;
 
-    protected string $dom = "Brt<'card-footer d-flex flex-column flex-sm-row justify-content-between align-items-center gap-2'<'d-flex justify-content-between align-items-center gap-3'l<'m-0 text-muted'i>><'d-flex justify-content-center'p>>";
+    protected string $dom = "f<'d-none d-md-block'B>rt<'card-footer d-flex flex-column flex-sm-row justify-content-between align-items-center gap-2'<'d-flex justify-content-between align-items-center gap-3'l<'m-0 text-muted'i>><'d-flex justify-content-center'p>>";
 
     public function __construct(protected DataTables $table, UrlGenerator $urlGenerator)
     {
@@ -202,71 +202,77 @@ abstract class TableAbstract extends DataTable implements ExtensibleContract
             $this->bStateSave = false;
         }
 
-        return $this->builder()
-            ->columns($this->getColumns())
-            ->ajax(['url' => $this->getAjaxUrl(), 'method' => 'POST'])
-            ->parameters([
-                'dom' => $this->getDom(),
-                'buttons' => $this->getBuilderParameters(),
-                'initComplete' => $this->htmlInitComplete(),
-                'drawCallback' => $this->htmlDrawCallback(),
-                'paging' => true,
-                'searching' => true,
-                'info' => true,
-                'searchDelay' => 350,
-                'bStateSave' => $this->bStateSave,
-                'stateSaveParams' => 'function (settings, data) { data.search.search = "";}',
-                'lengthMenu' => [
-                    array_values(
-                        array_unique(array_merge(Arr::sortRecursive([10, 30, 50, 100, 500, $this->pageLength]), [-1]))
-                    ),
-                    array_values(
-                        array_unique(
-                            array_merge(
-                                Arr::sortRecursive([10, 30, 50, 100, 500, $this->pageLength]),
-                                [trans('core/base::tables.all')]
-                            )
+        $parameters = [
+            'dom' => $this->getDom(),
+            'buttons' => $this->getBuilderParameters(),
+            'initComplete' => $this->htmlInitComplete(),
+            'drawCallback' => $this->htmlDrawCallback(),
+            'paging' => true,
+            'searching' => true,
+            'info' => true,
+            'searchDelay' => 350,
+            'bStateSave' => $this->bStateSave,
+            'stateSaveParams' => 'function (settings, data) { data.search.search = "";}',
+            'lengthMenu' => [
+                array_values(
+                    array_unique(array_merge(Arr::sortRecursive([10, 30, 50, 100, 500, $this->pageLength]), [-1]))
+                ),
+                array_values(
+                    array_unique(
+                        array_merge(
+                            Arr::sortRecursive([10, 30, 50, 100, 500, $this->pageLength]),
+                            [trans('core/base::tables.all')]
                         )
-                    ),
-                ],
-                'pageLength' => $this->pageLength,
-                'processing' => true,
-                'serverSide' => true,
-                'bServerSide' => true,
-                'bDeferRender' => true,
-                'bProcessing' => true,
-                'language' => [
-                    'aria' => [
-                        'sortAscending' => 'orderby asc',
-                        'sortDescending' => 'orderby desc',
-                        'paginate' => [
-                            'next' => trans('pagination.next'),
-                            'previous' => trans('pagination.previous'),
-                        ],
-                    ],
-                    'emptyTable' => trans('core/base::tables.no_data'),
-                    'info' => view('core/table::table-info')->render(),
-                    'infoEmpty' => trans('core/base::tables.no_record'),
-                    'lengthMenu' => Html::tag('span', '_MENU_', ['class' => 'dt-length-style'])->toHtml(),
-                    'search' => '',
-                    'searchPlaceholder' => trans('core/table::table.search'),
-                    'zeroRecords' => trans('core/base::tables.no_record'),
-                    'processing' => Html::image('vendor/core/core/base/images/loading-spinner-blue.gif'),
+                    )
+                ),
+            ],
+            'pageLength' => $this->pageLength,
+            'processing' => true,
+            'serverSide' => true,
+            'bServerSide' => true,
+            'bDeferRender' => true,
+            'bProcessing' => true,
+            'language' => [
+                'aria' => [
+                    'sortAscending' => 'orderby asc',
+                    'sortDescending' => 'orderby desc',
                     'paginate' => [
                         'next' => trans('pagination.next'),
                         'previous' => trans('pagination.previous'),
                     ],
-                    'infoFiltered' => trans('core/table::table.filtered'),
                 ],
-                'aaSorting' => $this->useDefaultSorting ? [
-                    [
-                        ($this->hasBulkActions() ? $this->defaultSortColumn : 0),
-                        'desc',
-                    ],
-                ] : [],
-                'responsive' => $this->hasResponsive,
-                'autoWidth' => false,
-            ]);
+                'emptyTable' => trans('core/base::tables.no_data'),
+                'info' => view('core/table::table-info')->render(),
+                'infoEmpty' => trans('core/base::tables.no_record'),
+                'lengthMenu' => Html::tag('span', '_MENU_', ['class' => 'dt-length-style'])->toHtml(),
+                'search' => '',
+                'searchPlaceholder' => trans('core/table::table.search'),
+                'zeroRecords' => trans('core/base::tables.no_record'),
+                'processing' => Html::image('vendor/core/core/base/images/loading-spinner-blue.gif'),
+                'paginate' => [
+                    'next' => trans('pagination.next'),
+                    'previous' => trans('pagination.previous'),
+                ],
+                'infoFiltered' => trans('core/table::table.filtered'),
+            ],
+            'aaSorting' => $this->useDefaultSorting ? [
+                [
+                    ($this->hasBulkActions() ? $this->defaultSortColumn : 0),
+                    'desc',
+                ],
+            ] : [],
+            'responsive' => $this->hasResponsive,
+            'autoWidth' => false,
+        ];
+
+        if (setting('datatables_pagination_type') == 'dropdown') {
+            $parameters['sPaginationType'] = 'listbox';
+        }
+
+        return $this->builder()
+            ->columns($this->getColumns())
+            ->ajax(['url' => $this->getAjaxUrl(), 'method' => 'POST'])
+            ->parameters($parameters);
     }
 
     /**
@@ -590,6 +596,19 @@ abstract class TableAbstract extends DataTable implements ExtensibleContract
 
             tableWrapper.find(".dataTables_length").toggle(dtDataCount >= 10);
             tableWrapper.find(".dataTables_info").toggle(dtDataCount > 0);
+
+            setTimeout(function () {
+                var searchInputWrapper = $(".table-wrapper .table-search-input input");
+                if (! searchInputWrapper.val()) {
+                    searchInputWrapper.val(tableWrapper.find(".dataTables_filter input").val());
+                }
+
+                if (searchInputWrapper.val()) {
+                    searchInputWrapper.addClass('border-primary bg-info-subtle')
+                } else {
+                    searchInputWrapper.removeClass('border-primary bg-info-subtle')
+                }
+            }, 200);
         JS . $this->htmlInitCompleteFunction();
     }
 
@@ -608,6 +627,11 @@ abstract class TableAbstract extends DataTable implements ExtensibleContract
                 'vendor/core/core/table/js/table.js',
                 'vendor/core/core/table/js/filter.js',
             ]);
+
+        if (setting('datatables_pagination_type') == 'dropdown') {
+            Assets::addScriptsDirectly(['vendor/core/core/base/libraries/datatables/extensions/Pagination/js/dataTables.pagination.min.js'])
+                ->addStylesDirectly(['vendor/core/core/base/libraries/datatables/extensions/Pagination/css/dataTables.pagination.min.css']);
+        }
 
         $data['id'] = Arr::get($data, 'id', $this->getOption('id'));
         $data['class'] = Arr::get($data, 'class', $this->getOption('class'));
@@ -794,8 +818,8 @@ abstract class TableAbstract extends DataTable implements ExtensibleContract
 
         return tap(
             $data
-            ->escapeColumns($escapeColumn)
-            ->make($mDataSupport),
+                ->escapeColumns($escapeColumn)
+                ->make($mDataSupport),
             fn ($response) => $this->dispatchAfterRendering($response)
         );
     }

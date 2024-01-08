@@ -42,6 +42,7 @@ use Illuminate\Contracts\Session\Session;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\ServiceProvider as IlluminateServiceProvider;
@@ -380,6 +381,11 @@ final class Core
         try {
             $this->files->copy($this->coreDataFilePath, $coreTempPath);
             $zip = new Zipper();
+
+            $oldLibrary = base_path('vendor/maennchen/zipstream-php');
+            if ($this->files->exists($oldLibrary)) {
+                $this->files->deleteDirectory($oldLibrary);
+            }
 
             if ($zip->extract($filePath, $this->basePath)) {
                 $this->files->delete($filePath);

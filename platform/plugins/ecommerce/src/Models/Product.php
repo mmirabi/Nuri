@@ -410,11 +410,7 @@ class Product extends BaseModel
     public function getDiscountPrice(): float|int|null
     {
         $promotion = DiscountFacade::getFacadeRoot()
-            ->promotionForProduct(
-                [$this->id],
-                $this->original_product->productCollections->pluck('id')->all(),
-                $this->original_product->categories->pluck('id')->all()
-            );
+            ->promotionForProduct([$this->id]);
 
         if (! $promotion) {
             return $this->price;

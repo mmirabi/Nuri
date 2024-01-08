@@ -181,21 +181,8 @@ div.dt-buttons {
 }
 
 .card-table {
-    .table-has-filter,
-    .table-has-actions {
-        .dataTables_filter {
-            inset-inline-start: 9.75rem;
-
-            @media (max-width: 576px) {
-                display: none;
-            }
-        }
-    }
-
-    .table-has-filter.table-has-actions {
-        .dataTables_filter {
-            inset-inline-start: 15rem;
-        }
+    .dataTables_filter {
+        display: none !important;
     }
 }
 

@@ -30,6 +30,8 @@ class FormFieldOptions implements Arrayable
 
     protected Closure|bool $disabled = false;
 
+    protected array|bool|string|int|null $defaultValue;
+
     public static function make(): static
     {
         return app(static::class);
@@ -129,6 +131,18 @@ class FormFieldOptions implements Arrayable
         return is_callable($this->disabled) ? call_user_func($this->disabled) : $this->disabled;
     }
 
+    public function getDefaultValue(): array|bool|string|int|null
+    {
+        return $this->defaultValue;
+    }
+
+    public function defaultValue(array|bool|string|int|null $defaultValue): static
+    {
+        $this->defaultValue = $defaultValue;
+
+        return $this;
+    }
+
     public function toArray(): array
     {
         $data = [
@@ -159,6 +173,10 @@ class FormFieldOptions implements Arrayable
 
         if ($this->isDisabled()) {
             $data['attr']['disabled'] = true;
+        }
+
+        if (isset($this->defaultValue)) {
+            $data['default_value'] = $this->getDefaultValue();
         }
 
         return $data;

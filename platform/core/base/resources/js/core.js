@@ -665,6 +665,7 @@ class Botble {
 
         Botble.initCodeEditorComponent()
         Botble.initColorPicker()
+        Botble.initLightbox()
         Botble.initTreeCategoriesSelect()
 
         document.dispatchEvent(new CustomEvent('core-init-resources'))
@@ -1203,32 +1204,49 @@ class Botble {
     }
 
     static initFieldCollapse() {
-        $(document).on('change', '[data-bb-toggle="collapse"]', function (e) {
+        $(document).on('click', '[data-bb-toggle="collapse"]', function (e) {
             const target = $(this).data('bb-target')
 
             let targetElement = null
 
-            if (e.currentTarget.type === 'checkbox') {
-                targetElement = $(document).find(target)
-                const isReverse = $(this).data('bb-reverse')
-                const isChecked = $(this).prop('checked')
+            switch (e.currentTarget.type) {
+                case 'checkbox':
+                    targetElement = $(document).find(target)
+                    const isReverse = $(this).data('bb-reverse')
+                    const isChecked = $(this).prop('checked')
 
-                if (isReverse) {
-                    isChecked ? targetElement.slideUp() : targetElement.slideDown()
-                } else {
-                    isChecked ? targetElement.slideDown() : targetElement.slideUp()
-                }
-            } else {
-                targetElement = $(document).find(`${target}[data-bb-value="${$(this).val()}"]`)
+                    if (isReverse) {
+                        isChecked ? targetElement.slideUp() : targetElement.slideDown()
+                    } else {
+                        isChecked ? targetElement.slideDown() : targetElement.slideUp()
+                    }
+                    break;
 
-                const targets = $(document).find(`${target}[data-bb-value]`)
+                case 'radio':
+                    targetElement = $(document).find(`${target}[data-bb-value="${$(this).val()}"]`)
 
-                if (targetElement.length) {
-                    targets.not(targetElement).slideUp()
-                    targetElement.slideDown()
-                } else {
-                    targets.slideUp()
-                }
+                    const targets = $(document).find(`${target}[data-bb-value]`)
+
+                    if (targetElement.length) {
+                        targets.not(targetElement).slideUp()
+                        targetElement.slideDown()
+                    } else {
+                        targets.slideUp()
+                    }
+                    break;
+
+                case 'button':
+                    targetElement = $(document).find(target)
+
+                    if (targetElement.length) {
+                        targetElement.slideToggle()
+                    }
+                    break;
+
+                default:
+                    console.warn(`[Botble] Unknown type ${e.currentTarget.type} of collapse`)
+
+                    break;
             }
         })
     }
@@ -1388,6 +1406,39 @@ class Botble {
         }
 
         return lightbox
+    }
+
+    static initLightbox() {
+        let instance = window.lightboxInstance || {}
+
+        const a = document.querySelectorAll('a[data-bb-lightbox]')
+
+        if (!a.length) {
+            return
+        }
+
+        a.forEach((element) => {
+            const instanceName = element.dataset.bbLightbox
+
+            if (! instance[instanceName]) {
+                instance[instanceName] = Botble.lightbox()
+            }
+
+            const source = element.href
+
+            instance[instanceName].props.sources.push(source)
+            instance[instanceName].elements.a.push(element)
+
+            const currentIndex = instance[instanceName].props.sources.length - 1
+
+            element.addEventListener('click', (e) => {
+                e.preventDefault()
+
+                instance[instanceName].open(currentIndex)
+            })
+        })
+
+        window.lightboxInstance = instance
     }
 
     static initColorPicker() {

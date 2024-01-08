@@ -166,7 +166,13 @@ class ReviewController extends BaseController
 
         return $this
             ->httpResponse()
-            ->setData(view('plugins/ecommerce::themes.includes.review-list', compact('reviews'))->render())
+            ->setData(
+                Theme::scope(
+                    'ecommerce.includes.review-list',
+                    compact('reviews'),
+                    'plugins/ecommerce::themes.includes.review-list'
+                )->getContent()
+            )
             ->setMessage($message)
             ->toApiResponse();
     }

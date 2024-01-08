@@ -4,9 +4,11 @@
     $description = Arr::get($formOptions, 'description');
 @endphp
 
+@if (Arr::get($formOptions, 'has_wrapper', 'yes') === 'yes')
 <div class="container">
     <div class="row justify-content-center py-5">
         <div class="col-xl-6 col-lg-8">
+        @endif
             <div class="card bg-body-tertiary border-0 auth-card">
                 @if ($banner = Arr::get($formOptions, 'banner'))
                     {{ RvMedia::image($banner, $heading ?: '', attributes: ['class' => 'card-img-top mb-3']) }}
@@ -65,6 +67,8 @@
                     @endif
                 </div>
             </div>
+            @if (Arr::get($formOptions, 'has_wrapper', 'yes') === 'yes')
         </div>
     </div>
 </div>
+@endif

@@ -11,7 +11,7 @@
                                 </h2>
                             @endif
                             @if($config['subtitle'])
-                                <p class="mb-45">{!! BaseHelper::clean($config['subtitle']) !!}</p>
+                                <p class="mb-45 nuri-p-color">{!! BaseHelper::clean($config['subtitle']) !!}</p>
                             @endif
                             {!! Theme::partial('newsletter-form') !!}
                         </div>

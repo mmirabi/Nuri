@@ -168,6 +168,7 @@ class ProductCategoryHelper
                 'parent_id',
                 DB::raw('CONCAT(slugs.prefix, "/", slugs.key) as url'),
                 'icon',
+                'image',
                 'icon_image',
             ])
             ->leftJoin('slugs', function (JoinClause $join) {
