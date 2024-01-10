@@ -1,14 +1,18 @@
 @if ($posts->count() > 0)
+{{--    Mehdi Mirabi last blog or news home page deactive--}}
+<div class="container">
     <div class="shop-product-filter mb-50 pr-30">
         <div class="total-product">
             <h2>
-                @if (theme_option('blog_page_icon'))
-                    <img class="w-36px mr-10" src="{{ RvMedia::getImageUrl(theme_option('blog_page_icon')) }}" alt="{{ SeoHelper::getTitle() }}" />
-                @endif
-                {{ SeoHelper::getTitle() }}
+                {{--                @if (theme_option('blog_page_icon'))--}}
+                {{--                    <img class="w-36px mr-10" src="{{ RvMedia::getImageUrl(theme_option('blog_page_icon')) }}" alt="{{ SeoHelper::getTitle() }}" />--}}
+                {{--                @endif--}}
+                {{ __('Last News') }}
             </h2>
         </div>
     </div>
+
+
     @php
         $partial = 'item-grid';
         $className = 'pr-30';
@@ -39,3 +43,4 @@
 
     {!! $posts->withQueryString()->links(Theme::getThemeNamespace() . '::partials.custom-pagination') !!}
 @endif
+</div>

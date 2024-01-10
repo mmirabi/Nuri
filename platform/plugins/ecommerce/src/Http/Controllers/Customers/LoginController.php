@@ -24,6 +24,17 @@ class LoginController extends BaseController
 
     public string $redirectTo = '/';
 
+    public function Verify(Request $request){
+
+    }
+    public function showVerifyForm() {
+        return Theme::scope(
+            'ecommerce.customers.verify-sms',
+            ['form' => LoginForm::create()],
+            'plugins/ecommerce::themes.customers.verify-sms'
+        )->render();
+
+    }
     public function __construct()
     {
         $this->middleware('customer.guest', ['except' => 'logout']);

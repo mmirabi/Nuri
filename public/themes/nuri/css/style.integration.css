@@ -140,7 +140,7 @@ p.mb-45.nuri-p-color {
     color: black!important;
 }
 
-/*Login rigster style*/
+/*Login register style*/
 ul#EmailPhone {
     background-color: #f8f6f5;
     border-radius: 6px;
@@ -186,4 +186,62 @@ button.btn.btn-heading.btn-block.hover-up {
     margin-left: 0!important;
     padding: 0!important;
 }
+.social-media-login {
+    position: relative;
+    height: 30px;
+    margin: 15px 0;
+}
+.social-media-login:after {
+    content: "";
+    position: absolute;
+    z-index: 8;
+    left: 0;
+    width: 100%;
+    top: 50%;
+    border-top: 2px solid #E8ECEB;
+    transform: translateY(50%);
+}
+.span-social-media {
+    display: block;
+    color: #707070;
+    font-size: 12px;
+    font-weight: bold;
+    background-color: white;
+    padding: 8px 10px;
+    position: absolute;
+    z-index: 9;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    transform: translate(-50%);
+    white-space: nowrap;
+}
+.heading_s1, .padding_eight_all.bg-white {
+    text-align: center;
+}
+input#verify-code::-webkit-outer-spin-button,
+input#verify-code::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+input#verify-code[type=number] {
+    -moz-appearance:textfield;
+    text-align: center!important;
+}
 
+@media only screen and (max-width: 480px) {
+    .slider-arrow.slider-arrow-2.flex-right {
+        display: none;
+    }
+}
+@media only screen and (max-width: 480px) {
+    div#carousel-6-columns-3-arrows {
+        display: none;
+    }
+}
+@media only screen and (max-width: 480px) {
+    .row.justify-content-md-center {
+        margin-left: unset!important;
+        margin-right: unset!important;
+    }
+}

@@ -30,7 +30,7 @@
                                 <div class="tab-content" id="EmailPhoneContent">
                                     <div class="tab-pane fade show active" id="phone" role="tabpanel" aria-labelledby="phone-tab">
                                         <h1 class="title-login-register">{{ __('Login With Phone') }}</h1>
-                                        <form method="POST" action="{{ route('customer.login.post') }}">
+                                        <form method="POST" action="{{ route('customer.verify.code') }}">
                                             @csrf
                                             @if (isset($errors) && $errors->has('confirmation'))
                                                 <div class="alert alert-danger">
@@ -39,16 +39,13 @@
                                                 <br>
                                             @endif
                                             <div class="form-group">
-                                                <input name="phone" required id="txt-phone" type="phone" value="{{ old('email') }}" placeholder="{{ __('Phone Number') }}*">
+                                                <input name="phone" required id="txt-phone" type="tel" value="{{ old('phone') }}" placeholder="{{ __('Phone Number') }}*">
                                                 @if ($errors->has('phone'))
                                                     <span class="text-danger">{{ $errors->first('phone') }}</span>
                                                 @endif
                                             </div>
                                             <div class="form-group">
                                                 <button type="submit" class="btn btn-heading btn-block hover-up">{{ __('Login') }}</button>
-                                            </div>
-                                            <div class="text-left">
-                                                {!! apply_filters(BASE_FILTER_AFTER_LOGIN_OR_REGISTER_FORM, null, \Botble\Ecommerce\Models\Customer::class) !!}
                                             </div>
                                         </form>
                                     </div>
@@ -86,11 +83,14 @@
                                             <div class="form-group">
                                                 <button type="submit" class="btn btn-heading btn-block hover-up">{{ __('Login') }}</button>
                                             </div>
-                                            <div class="text-left">
-                                                {!! apply_filters(BASE_FILTER_AFTER_LOGIN_OR_REGISTER_FORM, null, \Botble\Ecommerce\Models\Customer::class) !!}
-                                            </div>
                                         </form>
                                     </div>
+                                </div>
+                                <div class="text-left">
+                                    <div class="social-media-login">
+                                        <span class="span-social-media">{{ __('Login with social account')  }}</span>
+                                    </div>
+                                    {!! apply_filters(BASE_FILTER_AFTER_LOGIN_OR_REGISTER_FORM, null, \Botble\Ecommerce\Models\Customer::class) !!}
                                 </div>
                             </div>
                         </div>

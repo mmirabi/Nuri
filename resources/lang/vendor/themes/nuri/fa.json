@@ -916,5 +916,13 @@
     "when shipping fee less than or equal :amount": "when shipping fee less than or equal :amount",
     "✅ Purchased :time": "✅ Purchased :time",
     "Login With Email": "ورود با ایمیل",
+    "Login with social account": "ورود با شبکه های اجتماعی",
+    "Register With Phone": "ثبت نام با موبایل",
+    "Register With Email": "ثبت نام با ایمیل",
+    "Verify SMS": "کد تایید",
+    "please enter verification code": "کد تایید را وارد کنید",
+    "Verify Code": "کد تایید",
+    "Verify": "تایید",
+    "Last News": "جدیدترین مطالب",
     "Login With Phone": "ورود با شماره موبایل"
 }

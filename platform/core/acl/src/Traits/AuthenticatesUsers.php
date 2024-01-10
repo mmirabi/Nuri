@@ -62,6 +62,12 @@ trait AuthenticatesUsers
         return 'email';
     }
 
+    public function phone(): string
+    {
+        return 'phone';
+    }
+
+
     protected function attemptLogin(Request $request): bool
     {
         return $this->guard()->attempt(
