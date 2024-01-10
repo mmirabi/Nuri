@@ -95,6 +95,9 @@ return [
         'form' => [
             'show_column_visibility' => 'Default show column visibility?',
             'show_export_button' => 'Default show export button?',
+            'pagination_type' => 'Pagination type',
+            'default' => 'Default',
+            'dropdown' => 'Dropdown',
         ],
     ],
     'email' => [

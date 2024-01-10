@@ -514,7 +514,7 @@
     "Payout info": "اطلاعات پرداخت",
     "Payout method is not accepted!": "روش پرداخت پذیرفته نمی شود!",
     "Phone": "تلفن",
-    "Phone Number": "شماره تلفن",
+    "Phone Number": "شماره موبایل",
     "Please": "لطفا",
     "Please enter your email address": "لطفا آدرس ایمیل خود را وارد کنید",
     "Please enter your password": "لطفا رمز عبور خود را وارد کنید",
@@ -914,5 +914,7 @@
     "to write review!": "برای درج نظر!",
     "version :version required": "version :version required",
     "when shipping fee less than or equal :amount": "when shipping fee less than or equal :amount",
-    "✅ Purchased :time": "✅ Purchased :time"
+    "✅ Purchased :time": "✅ Purchased :time",
+    "Login With Email": "ورود با ایمیل",
+    "Login With Phone": "ورود با شماره موبایل"
 }
