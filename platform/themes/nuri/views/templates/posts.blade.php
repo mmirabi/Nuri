@@ -30,7 +30,7 @@
         }
     @endphp
     <div class="loop-grid {{ $className }}">
-        @if ($hasRowWrapper) <div class="row"> @endif
+        @if ($hasRowWrapper) <div class="row justify-content-md-center"> @endif
             @foreach ($posts as $post)
                 {!! Theme::partial('blog.posts.' . $partial, compact('post')) !!}
             @endforeach

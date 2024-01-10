@@ -196,7 +196,7 @@
                 @endif
             </ul>
             <div class="tab-content shop_info_tab entry-main-content">
-                <div class="tab-pane fade show" id="Description">
+                <div class="tab-pane fade show active" id="Description">
                     <div class="ck-content">
                         {!! BaseHelper::clean($product->content) !!}
                     </div>
@@ -345,7 +345,7 @@
                                 <div class="col-lg-8 col-md-12">
                                     {!! Form::open(['route' => 'public.reviews.create', 'method' => 'post', 'class' => 'form-contact comment_form form-review-product', 'files' => true]) !!}
                                         @if (!auth('customer')->check())
-                                            <p class="text-danger">{{ __('Please') }} <a href="{{ route('customer.login') }}">{{ __('login') }}</a> {{ __('to write review!') }}</p>
+                                            <p class="text-danger"> <a href="{{ route('customer.login') }}">{{ __('login') }}</a> {{ __('to write review!') }}</p>
                                         @endif
                                         <input type="hidden" name="product_id" value="{{ $product->id }}">
                                         <div class="form-group">

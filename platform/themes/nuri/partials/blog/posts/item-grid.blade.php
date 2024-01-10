@@ -1,4 +1,4 @@
-<article class="col-xl-4 col-lg-6 col-md-6 text-center hover-up mb-30 animated">
+<article class="col-xl-2 col-lg-4 col-md-4 text-center hover-up mb-30 animated">
     <div class="post-thumb">
         <a href="{{ $post->url }}">
             <img class="border-radius-15" src="{{ RvMedia::getImageUrl($post->image, 'medium', false, RvMedia::getDefaultImage()) }}" alt="{{ $post->name }}" />

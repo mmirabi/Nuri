@@ -359,22 +359,22 @@
 
         <div class="mobile-header-info-wrap">
 
-            @if (is_plugin_active('language'))
-                <div class="single-mobile-header-info">
-                    <a class="mobile-language-active" href="#"><i class="fi-rs-globe"></i> {{ __('Language') }} <span><i class="fi-rs-angle-down"></i></span></a>
-                    <div class="lang-curr-dropdown lang-dropdown-active">
-                        <ul>
-                            @php
-                                $showRelated = setting('language_show_default_item_if_current_version_not_existed', true);
-                            @endphp
+{{--            @if (is_plugin_active('language'))--}}
+{{--                <div class="single-mobile-header-info">--}}
+{{--                    <a class="mobile-language-active" href="#"><i class="fi-rs-globe"></i> {{ __('Language') }} <span><i class="fi-rs-angle-down"></i></span></a>--}}
+{{--                    <div class="lang-curr-dropdown lang-dropdown-active">--}}
+{{--                        <ul>--}}
+{{--                            @php--}}
+{{--                                $showRelated = setting('language_show_default_item_if_current_version_not_existed', true);--}}
+{{--                            @endphp--}}
 
-                            @foreach (Language::getSupportedLocales() as $localeCode => $properties)
-                                <li><a rel="alternate" hreflang="{{ $localeCode }}" href="{{ $showRelated ? Language::getLocalizedURL($localeCode) : url($localeCode) }}">{!! language_flag($properties['lang_flag'], $properties['lang_name']) !!} {{ $properties['lang_name'] }}</a></li>
-                            @endforeach
-                        </ul>
-                    </div>
-                </div>
-            @endif
+{{--                            @foreach (Language::getSupportedLocales() as $localeCode => $properties)--}}
+{{--                                <li><a rel="alternate" hreflang="{{ $localeCode }}" href="{{ $showRelated ? Language::getLocalizedURL($localeCode) : url($localeCode) }}">{!! language_flag($properties['lang_flag'], $properties['lang_name']) !!} {{ $properties['lang_name'] }}</a></li>--}}
+{{--                            @endforeach--}}
+{{--                        </ul>--}}
+{{--                    </div>--}}
+{{--                </div>--}}
+{{--            @endif--}}
 
             @if (count($currencies) > 1)
                 <div class="single-mobile-header-info">
