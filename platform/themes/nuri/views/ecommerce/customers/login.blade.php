@@ -12,9 +12,9 @@
 {{--                            <img class="border-radius-15" src="{{ RvMedia::getImageUrl($image) }}" alt="{{ theme_option('site_name') }}" />--}}
 {{--                        @endif--}}
 {{--                    </div>--}}
-                    <div class="col-lg-6 col-md-8">
+                    <div class="col-lg-8 col-md-8">
                         <div class="login_wrap widget-taber-content background-white">
-                            <div class="padding_eight_all bg-white">
+                            <div class="padding_eight_all verify-page">
                                 <div class="heading_s1">
                                     <h1 class="mb-5">{{ __('Login') }}</h1>
                                     <p class="mb-30">{{ __("Don't have an account?") }} <a href="{{ route('customer.register') }}">{{ __('Create one') }}</a></p>
@@ -28,7 +28,7 @@
                                     </li>
                                 </ul>
                                 <div class="tab-content" id="EmailPhoneContent">
-                                    <div class="tab-pane fade show active" id="phone" role="tabpanel" aria-labelledby="phone-tab">
+                                    <div class="tab-pane p-3 fade show active" id="phone" role="tabpanel" aria-labelledby="phone-tab">
                                         <h1 class="title-login-register">{{ __('Login With Phone') }}</h1>
                                         <form method="POST" action="{{ route('customer.verify.code') }}">
                                             @csrf
@@ -45,11 +45,11 @@
                                                 @endif
                                             </div>
                                             <div class="form-group">
-                                                <button type="submit" class="btn btn-heading btn-block hover-up">{{ __('Login') }}</button>
+                                                <button type="submit" class="btn btn-heading btn-block">{{ __('Login') }}</button>
                                             </div>
                                         </form>
                                     </div>
-                                    <div class="tab-pane fade" id="email" role="tabpanel" aria-labelledby="email-tab">
+                                    <div class="tab-pane p-3 fade" id="email" role="tabpanel" aria-labelledby="email-tab">
                                         <h1 class="title-login-register">{{ __('Login With Email') }}</h1>
                                         <form method="POST" action="{{ route('customer.login.post') }}">
                                             @csrf
@@ -81,12 +81,12 @@
                                                 <a class="text-muted" href="{{ route('customer.password.reset') }}">{{ __('Forgot password?') }}</a>
                                             </div>
                                             <div class="form-group">
-                                                <button type="submit" class="btn btn-heading btn-block hover-up">{{ __('Login') }}</button>
+                                                <button type="submit" class="btn btn-heading btn-block">{{ __('Login') }}</button>
                                             </div>
                                         </form>
                                     </div>
                                 </div>
-                                <div class="text-left">
+                                <div class="text-left p-3">
                                     <div class="social-media-login">
                                         <span class="span-social-media">{{ __('Login with social account')  }}</span>
                                     </div>

@@ -7,9 +7,9 @@
         <div class="row">
             <div class="col-xl-8 col-lg-10 col-md-12 m-auto">
                 <div class="row justify-content-md-center">
-                    <div class="col-lg-6 col-md-8">
+                    <div class="col-lg-8 col-md-8">
                         <div class="login_wrap widget-taber-content background-white">
-                            <div class="padding_eight_all bg-white">
+                            <div class="padding_eight_all verify-page">
                                 <div class="heading_s1">
                                     <h1 class="mb-5">{{ __('Verify SMS') }}</h1>
                                     <p class="mb-30">{{ __("please enter verification code") }} </p>
@@ -30,8 +30,12 @@
                                             <span class="text-danger">{{ $errors->first('verify-code') }}</span>
                                         @endif
                                     </div>
+                                    <div class="timer-2min"><p>{{ __('Left Time')  }}</p> <span id="timer"></span></div>
+                                    <div id="sendCode">
+                                        <button id="sendCodeButton" type="submit" class="btn btn-heading btn-block send-code">{{ __('Send again') }}</button>
+                                    </div>
                                     <div class="form-group">
-                                        <button type="submit" class="btn btn-heading btn-block hover-up">{{ __('Verify') }}</button>
+                                        <button type="submit" class="btn btn-heading btn-block">{{ __('Verify') }}</button>
                                     </div>
                                 </form>
                             </div>
@@ -42,3 +46,5 @@
         </div>
     </div>
 </div>
+<script src=""></script>
+<script src="{{ Theme::asset()->url('js/custom.js') }}"></script>

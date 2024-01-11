@@ -24,15 +24,25 @@ class LoginController extends BaseController
 
     public string $redirectTo = '/';
 
-    public function Verify(Request $request){
-
-    }
-    public function showVerifyForm() {
+    public function Verify(){
         return Theme::scope(
-            'ecommerce.customers.verify-sms',
-            ['form' => LoginForm::create()],
-            'plugins/ecommerce::themes.customers.verify-sms'
+            'ecommerce.customers.verify-sms'
         )->render();
+    }
+    public function showVerifyForm(Request $request) {
+        $this->validate($request, [
+            'code' => 'required|numeric'
+        ]);
+        if (!session()->has('code_id') || !session()->has('customer_id'))
+            redirect()->route('ecommerce.customers.login');
+
+        $request->update([
+            'used' => true
+        ]);
+        $customer = customer::find(session()->get('customer_id'));
+        $rememberMe = session()->get('remember');
+        auth()->login($customer, $rememberMe);
+        return redirect()->route('index');
 
     }
     public function __construct()

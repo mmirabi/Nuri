@@ -7,10 +7,10 @@
         <div class="row">
             <div class="col-xl-8 col-lg-10 col-md-12 m-auto">
                 <div class="row justify-content-md-center">
-                    <div class="col-lg-6 col-md-8">
+                    <div class="col-lg-8 col-md-8">
                         <div class="login_wrap widget-taber-content background-white">
-                            <div class="padding_eight_all bg-white">
-                                <div class="padding_eight_all bg-white">
+                            <div class="padding_eight_all verify-page">
+                                <div class="padding_eight_all">
                                     <h3 class="mb-20">{{ __('Register') }}</h3>
                                     <p>{{ __('Please fill in the information below') }}</p>
                                     <br>
@@ -25,7 +25,7 @@
                                     </li>
                                 </ul>
                                 <div class="tab-content" id="EmailPhoneContent">
-                                    <div class="tab-pane fade" id="email" role="tabpanel" aria-labelledby="email-tab">
+                                    <div class="tab-pane p-3 fade" id="email" role="tabpanel" aria-labelledby="email-tab">
                                         <h1 class="title-login-register">{{ __('Register With Email') }}</h1>
                                         <form method="POST" action="{{ route('customer.register.post') }}">
                                             @csrf
@@ -128,7 +128,7 @@
                                                 </div>
 
                                                 <div class="form-group">
-                                                    <button type="submit" class="btn btn-heading btn-block hover-up">{{ __('Register') }}</button>
+                                                    <button type="submit" class="btn btn-heading btn-block">{{ __('Register') }}</button>
                                                 </div>
 
                                                 <br>
@@ -136,7 +136,7 @@
                                             </div>
                                         </form>
                                     </div>
-                                    <div class="tab-pane fade show active" id="phone" role="tabpanel" aria-labelledby="phone-tab">
+                                    <div class="tab-pane p-3 fade show active" id="phone" role="tabpanel" aria-labelledby="phone-tab">
                                         <h1 class="title-login-register">{{ __('Register With Phone') }}</h1>
                                         <form method="POST" action="{{ route('customer.verify.code') }}">
                                             @csrf
@@ -153,17 +153,17 @@
                                                 @endif
                                             </div>
                                             <div class="form-group">
-                                                <button type="submit" class="btn btn-heading btn-block hover-up">{{ __('Login') }}</button>
+                                                <button type="submit" class="btn btn-heading btn-block">{{ __('Login') }}</button>
                                             </div>
                                         </form>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="text-left">
-                                <div class="social-media-login">
-                                    <span class="span-social-media">{{ __('Login with social account')  }}</span>
+                                <div class="text-left p-3">
+                                    <div class="social-media-login">
+                                        <span class="span-social-media">{{ __('Login with social account')  }}</span>
+                                    </div>
+                                    {!! apply_filters(BASE_FILTER_AFTER_LOGIN_OR_REGISTER_FORM, null, \Botble\Ecommerce\Models\Customer::class) !!}
                                 </div>
-                                {!! apply_filters(BASE_FILTER_AFTER_LOGIN_OR_REGISTER_FORM, null, \Botble\Ecommerce\Models\Customer::class) !!}
                             </div>
                         </div>
                     </div>

@@ -177,7 +177,7 @@ h1.title-login-register {
     color: var(--color-text);
     font-weight: 500;
 }
-button.btn.btn-heading.btn-block.hover-up {
+button.btn.btn-heading.btn-block {
     width: 100%;
 }
 .card-login {
@@ -189,7 +189,7 @@ button.btn.btn-heading.btn-block.hover-up {
 .social-media-login {
     position: relative;
     height: 30px;
-    margin: 15px 0;
+    margin: 40px 0;
 }
 .social-media-login:after {
     content: "";
@@ -198,7 +198,7 @@ button.btn.btn-heading.btn-block.hover-up {
     left: 0;
     width: 100%;
     top: 50%;
-    border-top: 2px solid #E8ECEB;
+    border-top: 2px solid #b1b1b1;
     transform: translateY(50%);
 }
 .span-social-media {
@@ -206,7 +206,7 @@ button.btn.btn-heading.btn-block.hover-up {
     color: #707070;
     font-size: 12px;
     font-weight: bold;
-    background-color: white;
+    background-color: #eaedff;
     padding: 8px 10px;
     position: absolute;
     z-index: 9;
@@ -244,4 +244,24 @@ input#verify-code[type=number] {
         margin-left: unset!important;
         margin-right: unset!important;
     }
+}
+
+.timer-2min {
+    margin-bottom: 32px;
+    font-size: 20px;
+}
+.padding_eight_all.verify-page {
+    background-color: #eaedff;
+    text-align: center;
+    padding: 15px;
+    border-radius: 10px;
+}
+#sendCodeButton {
+    display: none;
+}
+button#sendCodeButton {
+    width: 40%;
+    margin-top: 10px;
+    margin-bottom: 15px;
+    background-color: darkred;
 }
