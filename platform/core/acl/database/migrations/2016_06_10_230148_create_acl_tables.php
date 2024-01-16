@@ -25,8 +25,6 @@ return new class () extends Migration {
 
         Schema::create('activations', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->index();
-            $table->string('code', 120);
             $table->boolean('completed')->default(0);
             $table->timestamp('completed_at')->nullable();
             $table->timestamps();

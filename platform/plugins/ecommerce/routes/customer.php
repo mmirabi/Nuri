@@ -83,8 +83,8 @@ if (defined('THEME_MODULE_SCREEN_NAME')) {
             Route::get('register', 'RegisterController@showRegistrationForm')->name('register');
             Route::post('register', 'RegisterController@register')->name('register.post');
 
-            Route::get('verify-sms', 'LoginController@showVerifyForm')->name('verify');
-            Route::post('verify-sms', 'LoginController@Verify')->name('verify.code');
+            Route::get('verify-sms', 'LoginController@Verify')->name('verify');
+            Route::post('verify-sms', 'LoginController@showVerifyForm')->name('verify.code');
 
             Route::post('password/email', 'ForgotPasswordController@sendResetLinkEmail')->name('password.request');
             Route::post('password/reset', 'ResetPasswordController@reset')->name('password.reset.post');

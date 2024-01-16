@@ -35,6 +35,7 @@
                                         <button id="sendCodeButton" type="submit" class="btn btn-heading btn-block send-code">{{ __('Send again') }}</button>
                                     </div>
                                     <div class="form-group">
+{{--                                        <a class="btn btn-heading btn-block" href="{{ route('customer.verify', ['phone' => $mobile]) }}">{{ __('Verify') }}</a>--}}
                                         <button type="submit" class="btn btn-heading btn-block">{{ __('Verify') }}</button>
                                     </div>
                                 </form>

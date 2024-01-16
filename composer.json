@@ -25,6 +25,7 @@
         "botble/slug": "*@dev",
         "botble/theme": "*@dev",
         "botble/widget": "*@dev",
+        "cryptommer/smsir": "^1.1",
         "doctrine/dbal": "^3.6",
         "guzzlehttp/guzzle": "^7.7",
         "laravel/framework": "^10.24",

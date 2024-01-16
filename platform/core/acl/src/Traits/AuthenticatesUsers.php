@@ -57,6 +57,13 @@ trait AuthenticatesUsers
         ]);
     }
 
+    protected function validateLoginPhone(Request $request): void
+    {
+        $request->validate([
+            $this->phone() => 'required|string',
+        ]);
+    }
+
     public function username(): string
     {
         return 'email';
