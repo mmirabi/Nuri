@@ -11,29 +11,29 @@
         @endif
             <div class="card bg-body-tertiary border-0 auth-card">
                 @if ($banner = Arr::get($formOptions, 'banner'))
-                    {{ RvMedia::image($banner, $heading ?: '', attributes: ['class' => 'card-img-top mb-3']) }}
+                    {{ RvMedia::image($banner, $heading ?: '', attributes: ['class' => 'auth-card__banner card-img-top mb-3']) }}
                 @endif
 
                 @if ($icon || $heading || $description)
-                    <div class="card-header bg-body-tertiary border-0 p-5 pb-0">
+                    <div class="auth-card__header card-header bg-body-tertiary border-0 p-5 pb-0">
                         <div @class(['d-flex flex-column flex-md-row align-items-start gap-3' => $icon, 'text-center' => ! $icon])>
                             @if ($icon)
-                                <div class="bg-white p-3 rounded">
+                                <div class="auth-card__header-icon bg-white p-3 rounded">
                                     <x-core::icon :name="$icon" class="text-primary" />
                                 </div>
                             @endif
                             <div>
                                 @if ($heading)
-                                    <h3 class="fs-4 mb-1">{{ $heading }}</h3>
+                                    <h3 class="auth-card__header-title fs-4 mb-1">{{ $heading }}</h3>
                                 @endif
                                 @if ($description)
-                                    <p class="text-muted">{{ $description }}</p>
+                                    <p class="auth-card__header-description text-muted">{{ $description }}</p>
                                 @endif
                             </div>
                         </div>
                     </div>
                 @endif
-                <div class="card-body p-5 pt-3">
+                <div class="auth-card__body card-body p-5 pt-3">
                     @if ($showStart)
                         {!! Form::open(Arr::except($formOptions, ['template'])) !!}
                     @endif

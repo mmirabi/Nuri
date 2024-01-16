@@ -4,15 +4,12 @@ namespace Botble\Ecommerce\Supports;
 
 use Botble\Base\Enums\BaseStatusEnum;
 use Botble\Base\Facades\BaseHelper;
-use Botble\Base\Forms\FieldOptions\TextFieldOption;
 use Botble\Base\Models\BaseQueryBuilder;
 use Botble\Base\Supports\Helper;
 use Botble\Ecommerce\Enums\OrderStatusEnum;
 use Botble\Ecommerce\Enums\ProductTypeEnum;
 use Botble\Ecommerce\Facades\Cart;
 use Botble\Ecommerce\Facades\ProductCategoryHelper;
-use Botble\Ecommerce\Forms\Fronts\OrderTrackingForm;
-use Botble\Ecommerce\Http\Requests\Fronts\OrderTrackingRequest;
 use Botble\Ecommerce\Models\Brand;
 use Botble\Ecommerce\Models\Customer;
 use Botble\Ecommerce\Models\Product;
@@ -27,7 +24,6 @@ use Botble\Location\Models\State;
 use Botble\Location\Rules\CityRule;
 use Botble\Location\Rules\StateRule;
 use Botble\Payment\Enums\PaymentMethodEnum;
-use Botble\Support\Http\Requests\Request as BaseRequest;
 use Botble\Theme\Facades\Theme;
 use Carbon\Carbon;
 use Exception;
@@ -478,7 +474,12 @@ class EcommerceHelper
 
     public function loadCountriesStatesCitiesFromPluginLocation(): bool
     {
-        if (! is_plugin_active('location')) {
+        if (
+            ! is_plugin_active('location')
+            || ! Country::query()->exists()
+            || ! State::query()->exists()
+            || ! City::query()->exists()
+        ) {
             return false;
         }
 
@@ -572,7 +573,7 @@ class EcommerceHelper
                 new StateRule($prefix . 'country'),
             ];
 
-            if (self::useCityFieldAsTextField()) {
+            if ($this->useCityFieldAsTextField()) {
                 $rules[$prefix . 'city'] = [
                     'required',
                     'string',
@@ -1269,55 +1270,12 @@ class EcommerceHelper
 
     public function useCityFieldAsTextField(): bool
     {
-        return ! self::loadCountriesStatesCitiesFromPluginLocation() ||
+        return ! $this->loadCountriesStatesCitiesFromPluginLocation() ||
             get_ecommerce_setting('use_city_field_as_field_text', false);
-    }
-
-    public function usePhoneInOrderTracking(): void
-    {
-        OrderTrackingForm::extend(function (OrderTrackingForm $form) {
-            $form
-                ->remove('email')
-                ->addAfter(
-                    'order_id',
-                    'phone',
-                    'tel',
-                    TextFieldOption::make()
-                        ->label(__('Phone number'))
-                        ->placeholder(__('Enter your phone number'))
-                        ->required()
-                        ->toArray()
-                );
-        });
-
-        add_filter('core_request_rules', function (array $rules, BaseRequest $request) {
-            if ($request instanceof OrderTrackingRequest) {
-                $rules['phone'] = 'nullable|string|' . BaseHelper::getPhoneValidationRule();
-            }
-
-            return $rules;
-        }, 10, 2);
-
-        add_filter('ecommerce_order_tracking_query', function (BaseQueryBuilder $query) {
-            return $query->when(request()->input('phone'), function (BaseQueryBuilder $query, string $phone) {
-                $query->orWhere(function (BaseQueryBuilder $query) use ($phone) {
-                    $query
-                        ->where(function (BaseQueryBuilder $query) {
-                            $code = request()->input('order_id');
-
-                            $query
-                                ->where('ec_orders.code', $code)
-                                ->orWhere('ec_orders.code', '#' . $code);
-                        })
-                        ->whereHas('address', fn ($subQuery) => $subQuery->where('phone', $phone))
-                        ->orWhereHas('user', fn ($subQuery) => $subQuery->where('phone', $phone));
-                });
-            });
-        });
     }
 
     public function isLoginUsingPhone(): bool
     {
-        return (bool) get_ecommerce_setting('login_using_phone', false);
+        return (bool)get_ecommerce_setting('login_using_phone', false);
     }
 }

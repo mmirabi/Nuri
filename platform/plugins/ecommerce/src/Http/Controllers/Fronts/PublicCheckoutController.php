@@ -32,7 +32,6 @@ use Botble\Ecommerce\Services\HandleShippingFeeService;
 use Botble\Ecommerce\Services\HandleTaxService;
 use Botble\Optimize\Facades\OptimizerHelper;
 use Botble\Payment\Enums\PaymentStatusEnum;
-use Botble\Payment\Facades\PaymentMethods;
 use Botble\Payment\Supports\PaymentHelper;
 use Botble\Theme\Facades\Theme;
 use Illuminate\Auth\Events\Registered;
@@ -281,12 +280,13 @@ class PublicCheckoutController extends BaseController
             $data = array_merge($data, compact('addresses', 'isAvailableAddress', 'sessionAddressId'));
         }
 
-        $discounts = DiscountModel::query()
+        $discountsQuery = DiscountModel::query()
             ->where('type', DiscountTypeEnum::COUPON)
             ->where('display_at_checkout', true)
             ->active()
-            ->available()
-            ->get();
+            ->available();
+
+        $discounts = apply_filters('ecommerce_checkout_discounts_query', $discountsQuery, $products)->get();
 
         $data = [...$data, 'discounts' => $discounts];
 
@@ -809,7 +809,7 @@ class PublicCheckoutController extends BaseController
 
         do_action('ecommerce_before_processing_payment', $products, $request, $token, $sessionData);
 
-        if (! is_plugin_active('payment') || empty(PaymentMethods::methods()) || ! $orderAmount) {
+        if (! is_plugin_active('payment') || ! $orderAmount) {
             OrderHelper::processOrder($order->getKey());
 
             return redirect()->to(route('public.checkout.success', OrderHelper::getOrderSessionToken()));

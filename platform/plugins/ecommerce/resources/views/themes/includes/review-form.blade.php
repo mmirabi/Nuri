@@ -3,7 +3,7 @@
 
     @if (! $checkReview['error'])
         <p>
-            {{ __('Your email address will not be published. Required fields are marked.') }}
+            {{ __('Your email address will not be published. Required fields are marked *') }}
             <span class="required"></span>
         </p>
     @endif
@@ -106,7 +106,7 @@
                 ])
                 @disabled(! auth('customer')->check())
             >
-                {{ __('Submit Review') }}
+                {{ __('Submit') }}
             </button>
         </x-core::form>
     @endif

@@ -26,7 +26,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static string getRichEditor()
  * @method static string|null removeQueryStringVars(string|null $url, array|string $key)
  * @method static string cleanEditorContent(string|null $value)
- * @method static string|array getPhoneValidationRule(bool $asArray = false)
+ * @method static array|string getPhoneValidationRule(bool $asArray = false)
  * @method static \Illuminate\Support\Collection sortSearchResults(\Illuminate\Support\Collection|array $collection, string $searchTerms, string $column)
  * @method static array getDateFormats()
  * @method static array|string|null clean(array|string|null $dirty, array|string|null $config = null)

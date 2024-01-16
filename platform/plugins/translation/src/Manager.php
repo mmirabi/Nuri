@@ -35,6 +35,10 @@ class Manager
 
     public function publishLocales(): void
     {
+        if (! $this->files->isDirectory(lang_path('vendor/themes'))) {
+            $this->files->makeDirectory(lang_path('vendor/themes'));
+        }
+
         $paths = ServiceProvider::pathsToPublish(null, 'cms-lang');
 
         foreach ($paths as $from => $to) {
@@ -42,7 +46,7 @@ class Manager
             $this->files->copyDirectory($from, $to);
         }
 
-        if (! File::isDirectory(lang_path('en'))) {
+        if (! $this->files->isDirectory(lang_path('en'))) {
             $this->downloadRemoteLocale('en');
         }
     }

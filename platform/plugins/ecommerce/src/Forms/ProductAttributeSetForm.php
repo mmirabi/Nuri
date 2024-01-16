@@ -17,8 +17,7 @@ class ProductAttributeSetForm extends FormAbstract
 {
     public function setup(): void
     {
-        Assets::addScripts(['spectrum', 'jquery-ui'])
-            ->addStyles('spectrum')
+        Assets::addScripts('jquery-ui')
             ->addStylesDirectly('vendor/core/plugins/ecommerce/css/ecommerce-product-attributes.css')
             ->addScriptsDirectly('vendor/core/plugins/ecommerce/js/ecommerce-product-attributes.js');
 

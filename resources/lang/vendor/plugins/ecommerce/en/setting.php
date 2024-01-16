@@ -125,6 +125,7 @@ return [
             'use_city_field_as_field_text' => 'Use city field as a free text field',
             'available_countries' => 'Available countries',
             'all' => 'All',
+            'all_helper_text' => 'If you uncheck all countries, it will apply for all countries.',
             'enable_guest_checkout' => 'Enable guest checkout',
             'recently_viewed' => [
                 'enable' => 'Enable customer recently viewed products',

@@ -559,7 +559,7 @@ class MediaManagement {
             })
 
         /*Delete files*/
-        _self.$body.off('submit', '.form-delete-items').on('submit', '.form-delete-items', (event) => {
+        _self.$body.off('submit', 'form.form-delete-items').on('submit', 'form.form-delete-items', (event) => {
             event.preventDefault()
             let items = []
             let $form = $(event.currentTarget)

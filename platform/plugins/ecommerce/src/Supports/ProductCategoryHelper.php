@@ -157,7 +157,7 @@ class ProductCategoryHelper
         ])->render();
     }
 
-    public function getProductCategoriesWithUrl(array $categoryIds = []): Collection
+    public function getProductCategoriesWithUrl(array $categoryIds = [], array $condition = [], int $limit = null): Collection
     {
         $query = ProductCategory::query()
             ->toBase()
@@ -175,25 +175,28 @@ class ProductCategoryHelper
                 $join
                     ->on('slugs.reference_id', 'ec_product_categories.id')
                     ->where('slugs.reference_type', ProductCategory::class);
-            });
-
-        if ($this->isEnabledMultiLanguages()) {
-            $query = $query
-                ->leftJoin('slugs_translations as st', function (JoinClause $join) {
-                    $join
-                        ->on('st.slugs_id', 'slugs.id')
-                        ->where('st.lang_code', Language::getCurrentLocaleCode());
-                })
-                ->addSelect(DB::raw('IF(st.key IS NOT NULL, CONCAT(st.prefix, "/", st.key), CONCAT(slugs.prefix, "/", slugs.key)) as url'));
-        }
-
-        $query = $query
+            })
+            ->when($this->isEnabledMultiLanguages(), function (Builder $query) {
+                $query
+                    ->leftJoin('slugs_translations as st', function (JoinClause $join) {
+                        $join
+                            ->on('st.slugs_id', 'slugs.id')
+                            ->where('st.lang_code', Language::getCurrentLocaleCode());
+                    })
+                    ->addSelect(
+                        DB::raw(
+                            'IF(st.key IS NOT NULL, CONCAT(st.prefix, "/", st.key), CONCAT(slugs.prefix, "/", slugs.key)) as url'
+                        )
+                    );
+            })
             ->orderBy('ec_product_categories.order')
             ->orderByDesc('ec_product_categories.created_at')
             ->when(
                 ! empty($categoryIds),
                 fn (Builder $query) => $query->whereIn('ec_product_categories.id', $categoryIds)
-            );
+            )
+            ->when($limit > 0, fn ($query) => $query->limit($limit))
+            ->when($condition, fn ($query) => $query->where($condition));
 
         $query = $this->applyQuery($query);
 

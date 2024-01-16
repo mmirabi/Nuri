@@ -50,7 +50,7 @@
                                                 {{ $orderProduct->product_name }}
                                             </a>
 
-                                            @if ($sku = Arr::get($orderProduct->options, 'sku'))
+                                            @if ($sku = Arr::get($orderProduct->options, 'sku') ?: ($product && $product->sku ? $product->sku : null))
                                                 <p class="mb-0">({{ trans('plugins/ecommerce::order.sku') }}: <strong>{{ $sku }}</strong>)</p>
                                             @endif
                                         </div>
@@ -486,13 +486,13 @@
                                                         <x-core::table.body.cell>
                                                             {{ trans('plugins/ecommerce::order.refund') }}</x-core::table.body.cell>
                                                     </x-core::table.body.row>
-                                                    @if ($history->user->name)
+                                                    @if (trim($history->user->name))
                                                         <x-core::table.body.row>
                                                             <x-core::table.body.cell>
                                                                 {{ trans('plugins/ecommerce::order.staff') }}
                                                             </x-core::table.body.cell>
                                                             <x-core::table.body.cell>
-                                                                {{ $history->user->name ?: trans('plugins/ecommerce::order.n_a') }}
+                                                                {{ $history->user->name}}
                                                             </x-core::table.body.cell>
                                                         </x-core::table.body.row>
                                                     @endif
@@ -569,13 +569,13 @@
                                                         {{ trans('plugins/ecommerce::order.confirm') }}
                                                     </x-core::table.body.cell>
                                                 </x-core::table.body.row>
-                                                @if ($history->user->name)
+                                                @if (trim($history->user->name))
                                                     <x-core::table.body.row>
                                                         <x-core::table.body.cell>
                                                             {{ trans('plugins/ecommerce::order.staff') }}
                                                         </x-core::table.body.cell>
                                                         <x-core::table.body.cell>
-                                                            {{ $history->user->name ?: trans('plugins/ecommerce::order.n_a') }}
+                                                            {{ $history->user->name }}
                                                         </x-core::table.body.cell>
                                                     </x-core::table.body.row>
                                                 @endif

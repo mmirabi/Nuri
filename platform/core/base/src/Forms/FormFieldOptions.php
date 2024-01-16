@@ -4,6 +4,7 @@ namespace Botble\Base\Forms;
 
 use Botble\Base\Supports\Builders\HasAttributes;
 use Botble\Base\Supports\Builders\HasLabel;
+use Botble\Base\Traits\Forms\CanSpanColumns;
 use Closure;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Traits\Conditionable;
@@ -15,10 +16,9 @@ class FormFieldOptions implements Arrayable
     use HasAttributes;
     use HasLabel;
     use Tappable;
+    use CanSpanColumns;
 
     protected bool $required = false;
-
-    protected int $colspan = 0;
 
     protected array $helperText = [];
 
@@ -47,18 +47,6 @@ class FormFieldOptions implements Arrayable
     public function isRequired(): bool
     {
         return $this->required;
-    }
-
-    public function colspan(int $colspan): static
-    {
-        $this->colspan = $colspan;
-
-        return $this;
-    }
-
-    public function getColspan(): int
-    {
-        return $this->colspan;
     }
 
     public function labelAttributes(array $attributes): static

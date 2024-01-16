@@ -208,10 +208,9 @@ export class ActionsService {
 
                 MessageService.showMessage('success', data.message, Helpers.trans('message.success_header'))
 
-                if (callback) {
-                    callback(data)
-                }
+                callback && callback(data)
             })
+            .catch(({ response }) => callback && callback(response.data))
             .finally(() => Helpers.hideAjaxLoading())
     }
 

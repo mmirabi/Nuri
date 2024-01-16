@@ -9,7 +9,7 @@
             data-url="{{ route('public.coupon.remove') }}"
             type="button"
         >
-            <span class="d-none d-md-inline-block">{{ __('Remove') }}</span>
+            <span>{{ __('Remove') }}</span>
         </button>
     </div>
 </div>

@@ -94,7 +94,7 @@ $(() => {
         })
     })
 
-    $(document).on('submit', '.review-container form', (e) => {
+    $(document).on('submit', '.product-review-container form', (e) => {
         e.preventDefault()
         e.stopPropagation()
 
@@ -139,7 +139,7 @@ $(() => {
         })
     })
 
-    $(document).on('change', '.review-container form input[type=file]', function (event) {
+    $(document).on('change', '.product-review-container form input[type=file]', function (event) {
         event.preventDefault()
 
         const input = this
@@ -167,13 +167,13 @@ $(() => {
         setImagesFormReview(input)
     })
 
-    $(document).on('click', '.review-container form .image-viewer__icon-remove', function (event) {
+    $(document).on('click', '.product-review-container form .image-viewer__icon-remove', function (event) {
         event.preventDefault()
         const $this = $(event.currentTarget)
         let id = $this.closest('.image-viewer__item').data('id')
         imagesReviewBuffer.splice(id, 1)
 
-        let input = $('.review-container form input[type=file]')[0]
+        let input = $('.product-review-container form input[type=file]')[0]
         setImagesFormReview(input)
     })
 

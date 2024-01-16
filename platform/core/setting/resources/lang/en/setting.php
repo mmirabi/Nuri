@@ -236,6 +236,7 @@ return [
         'height' => 'Height',
         'default_size_value' => 'Default: :size',
         'all' => 'All',
+        'all_helper_text' => 'If you uncheck all folders, it will apply for all folders.',
         'media_folders_can_add_watermark' => 'Add watermark for images in folders:',
         'max_upload_filesize' => 'Max upload filesize (MB)',
         'max_upload_filesize_placeholder' => 'Default: :size, must less than :size.',

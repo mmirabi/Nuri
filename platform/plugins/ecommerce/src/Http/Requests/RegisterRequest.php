@@ -14,7 +14,14 @@ class RegisterRequest extends Request
     {
         $rules = [
             'name' => 'required|max:120|min:2',
-            'email' => 'required|max:120|min:6|email|unique:ec_customers',
+            'email' => [
+                'nullable',
+                Rule::requiredIf(! EcommerceHelper::isLoginUsingPhone()),
+                'max:120',
+                'min:6',
+                'email',
+                Rule::unique('ec_customers'),
+            ],
             'phone' => [
                 'nullable',
                 Rule::requiredIf(EcommerceHelper::isLoginUsingPhone()),

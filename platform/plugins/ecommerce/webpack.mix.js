@@ -52,6 +52,7 @@ const scripts = [
     'address.js',
     'tax.js',
     'invoice.js',
+    'front-ecommerce.js',
 ];
 
 scripts.forEach(item => {
@@ -70,15 +71,16 @@ const styles = [
     'currencies.scss',
     'review.scss',
     'customer.scss',
-    'front-theme.scss',
-    'front-theme-rtl.scss',
     'report.scss',
     'order-return.scss',
     'customer-admin.scss',
     'widget.scss',
-    'front-review.scss',
-    'front-faq.scss',
     'front-auth.scss',
+    'front-ecommerce.scss',
+    'front-faq.scss',
+    'front-review.scss',
+    'front-theme.scss',
+    'front-theme-rtl.scss',
 ];
 
 styles.forEach(item => {

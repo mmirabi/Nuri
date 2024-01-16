@@ -8,7 +8,6 @@ return [
     'print' => 'Print Invoice',
     'download' => 'Download Invoice',
     'heading' => 'Invoice',
-    'invoice_for_job' => '',
     'table' => [
         'code' => 'Code',
         'amount' => 'Amount',

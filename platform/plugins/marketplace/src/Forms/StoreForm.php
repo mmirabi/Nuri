@@ -4,6 +4,7 @@ namespace Botble\Marketplace\Forms;
 
 use Botble\Base\Enums\BaseStatusEnum;
 use Botble\Base\Facades\Assets;
+use Botble\Base\Forms\FieldOptions\MediaImageFieldOption;
 use Botble\Base\Forms\FieldOptions\NameFieldOption;
 use Botble\Base\Forms\Fields\MediaImageField;
 use Botble\Base\Forms\Fields\TextField;
@@ -152,11 +153,15 @@ class StoreForm extends FormAbstract
                 'label' => trans('plugins/marketplace::store.forms.logo'),
                 'colspan' => 3,
             ])
-            ->add('cover_image', MediaImageField::class, [
-                'label' => __('Cover Image'),
-                'colspan' => 6,
-                'metadata' => true,
-            ])
+            ->add(
+                'cover_image',
+                MediaImageField::class,
+                MediaImageFieldOption::make()
+                    ->label(__('Cover Image'))
+                    ->colspan(6)
+                    ->value($this->getModel()->id ? $this->getModel()->getMetaData('cover_image', true) : null)
+                    ->toArray()
+            )
             ->add('status', 'customSelect', [
                 'label' => trans('core/base::tables.status'),
                 'required' => true,

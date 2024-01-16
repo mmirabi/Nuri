@@ -9,15 +9,13 @@ use Botble\Ecommerce\Enums\CustomerStatusEnum;
 use Botble\Ecommerce\Facades\EcommerceHelper;
 use Botble\Ecommerce\Forms\Fronts\Auth\LoginForm;
 use Botble\Ecommerce\Http\Requests\LoginRequest;
-use Botble\Ecommerce\Models\Customer;
 use Botble\JsValidation\Facades\JsValidator;
 use Botble\SeoHelper\Facades\SeoHelper;
 use Botble\Theme\Facades\Theme;
-use Cryptommer\Smsir\Objects\Parameters;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
-use Cryptommer\Smsir\Smsir;
+
 class LoginController extends BaseController
 {
     use AuthenticatesUsers, LogoutGuardTrait {
@@ -26,64 +24,6 @@ class LoginController extends BaseController
 
     public string $redirectTo = '/';
 
-    public function Verify()
-    {
-
-        return Theme::scope(
-            'ecommerce.customers.verify-sms'
-        )->render();
-    }
-    public function showVerifyForm(Request $request)
-    {
-        $this->validateLoginPhone($request);
-
-        // ...
-
-        if ($this->attemptLogin($request)) {
-            return $this->sendLoginResponse($request);
-        }
-
-        // ...
-
-        $mobile = $request->phone;
-
-        // چک کردن وجود کاربر با شماره تماس
-        $customer = Customer::where('phone', $mobile)->first();
-
-        if ($customer) {
-            // ارسال کد تایید
-            $name = "Code";
-            $value = rand(100000, 999999);
-            $parameter = new Parameters($name, $value);
-            $parameters = array($parameter);
-            $send = smsir::Send();
-            $templateId = 100000;
-            $send->Verify($mobile, $templateId, $parameters);
-        } else {
-            // ایجاد کاربر جدید
-            $customer = new Customer();
-            $customer->phone = $mobile;
-
-
-            $customer->name = $mobile;
-            $customer->password = $mobile;
-            $customer->email = "default@example.com";
-            $customer->save();
-            // ارسال کد تایید
-            $name = "Code";
-            $value = rand(100000, 999999);
-            $parameter = new Parameters($name, $value);
-            $parameters = array($parameter);
-            $send = smsir::Send();
-            $templateId = 100000;
-            $send->Verify($mobile, $templateId, $parameters);
-
-        }
-
-        return Theme::scope(
-            'ecommerce.customers.verify-sms'
-        )->render();
-    }
     public function __construct()
     {
         $this->middleware('customer.guest', ['except' => 'logout']);
@@ -96,7 +36,7 @@ class LoginController extends BaseController
         Theme::breadcrumb()->add(__('Login'), route('customer.login'));
 
         if (! session()->has('url.intended') &&
-            ! in_array(url()->previous(), [route('customer.login')])
+            ! in_array(url()->previous(), [route('customer.login'), route('customer.register')])
         ) {
             session(['url.intended' => url()->previous()]);
         }
@@ -193,8 +133,8 @@ class LoginController extends BaseController
         return false;
     }
 
-    public function phone(): string
+    public function username(): string
     {
-        return EcommerceHelper::isLoginUsingPhone() ? 'username' : 'phone';
+        return EcommerceHelper::isLoginUsingPhone() ? 'phone' : 'email';
     }
 }

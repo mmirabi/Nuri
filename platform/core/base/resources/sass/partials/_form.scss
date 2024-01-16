@@ -71,6 +71,10 @@ form {
             }
         }
     }
+
+    .form-check + .form-hint {
+        margin-top: 0.5rem;
+    }
 }
 
 .repeater-group {

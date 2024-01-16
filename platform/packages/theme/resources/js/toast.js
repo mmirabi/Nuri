@@ -75,7 +75,7 @@ Theme.handleValidationError = (errors) => {
 
     Object.values(errors).forEach((item) => {
         if (message !== '') {
-            message += '<br />'
+            message += '\n'
         }
         message += item
     })

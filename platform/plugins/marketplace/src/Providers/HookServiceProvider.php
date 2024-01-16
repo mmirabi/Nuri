@@ -7,6 +7,7 @@ use Botble\Base\Enums\BaseStatusEnum;
 use Botble\Base\Facades\Assets;
 use Botble\Base\Facades\BaseHelper;
 use Botble\Base\Facades\Html;
+use Botble\Base\Forms\FieldOptions\HtmlFieldOption;
 use Botble\Base\Forms\FieldOptions\RadioFieldOption;
 use Botble\Base\Forms\FieldOptions\SelectFieldOption;
 use Botble\Base\Forms\FieldOptions\TextFieldOption;
@@ -52,6 +53,7 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Throwable;
 
@@ -262,7 +264,7 @@ class HookServiceProvider extends ServiceProvider
                     ->addAfter(
                         'open_shop_slug_wrapper',
                         'shop_url',
-                        'url',
+                        'text',
                         TextFieldOption::make()
                             ->label(__('Shop URL'))
                             ->placeholder(__('Store URL'))
@@ -274,18 +276,18 @@ class HookServiceProvider extends ServiceProvider
                         'shop_url',
                         'shop_slug',
                         HtmlField::class,
-                        ['html' => Blade::render(<<<BLADE
-                            <div class="form-text mb-3" data-base-url="{{ route('public.store', '') }}" data-slug-value>
-                                {{ route('public.store', Str::limit((string) old('shop_url'))) }}
+                        ['html' => sprintf('
+                            <div class="form-text mb-3" data-base-url="%s" data-slug-value>
+                                %s
                             </div>
                             <span class="position-absolute top-0 end-0 shop-url-status text-danger"></span>
-                        BLADE)]
+                        ', route('public.store', ''), route('public.store', Str::limit((string) old('shop_url'))))]
                     )
                     ->addAfter(
                         'shop_slug',
                         'close_shop_slug_wrapper',
                         HtmlField::class,
-                        ['html' => '</div>']
+                        HtmlFieldOption::make()->content('</div>')->toArray()
                     )
                     ->addAfter(
                         'shop_slug',

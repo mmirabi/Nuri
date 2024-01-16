@@ -1,7 +1,8 @@
 @if (EcommerceHelper::isReviewEnabled())
     @php
         Theme::asset()->add('lightgallery-css', 'vendor/core/plugins/ecommerce/libraries/lightgallery/css/lightgallery.min.css');
-        Theme::asset()->add('review-css', 'vendor/core/plugins/ecommerce/css/front-review.css');
+        Theme::asset()->add('front-ecommerce-css', 'vendor/core/plugins/ecommerce/css/front-ecommerce.css');
+        Theme::asset()->add('front-review-css', 'vendor/core/plugins/ecommerce/css/front-review.css');
         Theme::asset()->container('footer')->add('lightgallery-js', 'vendor/core/plugins/ecommerce/libraries/lightgallery/js/lightgallery.min.js', ['jquery']);
         Theme::asset()->container('footer')->add('lg-thumbnail-js', 'vendor/core/plugins/ecommerce/libraries/lightgallery/plugins/lg-thumbnail.min.js', ['lightgallery-js']);
         Theme::asset()->container('footer')->add('review-js', 'vendor/core/plugins/ecommerce/js/front-review.js', ['lightgallery-js', 'lg-thumbnail-js']);
@@ -9,33 +10,44 @@
         $showAvgRating ??= $product->reviews->isNotEmpty();
     @endphp
 
-    <div class="d-flex flex-column gap-5 review-container">
+    <div class="d-flex flex-column gap-5 product-review-container">
         <div class="row">
             @if ($showAvgRating)
                 <div class="col-12 col-md-4">
-                    <div class="border py-4 px-4">
-                        <h3 class="fs-1 text-danger">
-                            {{ number_format($product->reviews_avg ?: 0, 2) }}
-                        </h3>
+                    <div class="product-review-number">
+                        <h3 class="product-review-number-title">{{ __('Customer reviews') }}</h3>
 
-                        <div class="d-flex align-items-center gap-1 border-bottom mb-3 pb-3">
-                            <div class="rating-stars">
-                                <span style="width: {{ $product->reviews_avg * 20 }}%"></span>
+                        <div class="product-review-summary">
+                            <div class="product-review-summary-value">
+                                <span>
+                                    {{ number_format($product->reviews_avg ?: 0, 2) }}
+                                </span>
                             </div>
-                            <span class="text-muted">({{ number_format($product->reviews_count) }})</span>
+                            <div class="product-review-summary-rating">
+                                <div class="bb-product-rating">
+                                    <span style="width: {{ $product->reviews_avg * 20 }}%"></span>
+                                </div>
+                                <p>
+                                    @if ($product->reviews_count === 1)
+                                        ({{ __('1 Review') }})
+                                    @else
+                                        ({{ __(':count Reviews', ['count' => number_format($product->reviews_count)]) }})
+                                    @endif
+                                </p>
+                            </div>
                         </div>
 
-                        <div class="d-flex flex-column gap-2">
+                        <div class="product-review-progress">
                             @foreach (EcommerceHelper::getReviewsGroupedByProductId($product->id, $product->reviews_count) as $item)
-                                <div @class(['d-flex align-items-center justify-content-between w-100 gap-2', 'disabled' => ! $item['count']])>
-                                    <span class="flex-shrink-0">
+                                <div @class(['product-review-progress-bar', 'disabled' => ! $item['count']])>
+                                    <span class="product-review-progress-bar-title">
                                         @if($item['star'] == 1)
                                             {{ __(':number Star', ['number' => $item['star']]) }}
                                         @else
                                             {{ __(':number Stars', ['number' => $item['star']]) }}
                                         @endif
                                     </span>
-                                    <div class="progress w-100">
+                                    <div class="progress product-review-progress-bar-value">
                                         <div
                                             class="progress-bar"
                                             role="progressbar"
@@ -45,7 +57,9 @@
                                             style="width: {{ $item['percent'] }}%"
                                         ></div>
                                     </div>
-                                    <span class="flex-shrink-0">{{ $item['percent'] }}%</span>
+                                    <span class="product-review-progress-bar-percent">
+                                        {{ $item['percent'] }}%
+                                    </span>
                                 </div>
                             @endforeach
                         </div>

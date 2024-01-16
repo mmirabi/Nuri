@@ -3,11 +3,14 @@
 use Botble\Ads\Models\Ads;
 use Botble\Base\Facades\Assets;
 use Botble\Base\Facades\MetaBox;
+use Botble\Base\Forms\Fields\HtmlField;
 use Botble\Blog\Models\Post;
 use Botble\Ecommerce\Models\FlashSale;
 use Botble\Ecommerce\Models\Product;
 use Botble\Ecommerce\Models\ProductCategory;
 use Botble\LanguageAdvanced\Supports\LanguageAdvancedManager;
+use Botble\Marketplace\Forms\StoreForm;
+use Botble\Marketplace\Forms\VendorStoreForm;
 use Botble\Marketplace\Models\Store;
 use Botble\Media\Facades\RvMedia;
 use Botble\Menu\Facades\Menu;
@@ -402,23 +405,27 @@ add_action([BASE_ACTION_AFTER_CREATE_CONTENT, BASE_ACTION_AFTER_UPDATE_CONTENT],
     }
 }, 75, 3);
 
-add_filter(['marketplace_vendor_settings_register_content_tabs', BASE_FILTER_REGISTER_CONTENT_TABS], function ($tabs, $model) {
-    if (get_class($model) == Store::class) {
-        $tabs .= Theme::partial('marketplace.store.settings.extra-tab', compact('model'));
-    }
+if (is_plugin_active('marketplace')) {
+    VendorStoreForm::extend(function (VendorStoreForm $form) {
+        $model = $form->getModel();
+        $model->loadMissing('metadata');
 
-    return $tabs;
-}, 124, 2);
+        $form
+            ->addBefore('submit', 'extended_info_content', HtmlField::class, [
+                'html' => Theme::partial('marketplace.store.settings.extra-content', compact('model')),
+            ]);
+    });
 
-add_filter(['marketplace_vendor_settings_register_content_tab_inside', BASE_FILTER_REGISTER_CONTENT_TAB_INSIDE], function ($tabs, $model) {
-    if (get_class($model) == Store::class) {
-        $model->loadMissing(['metadata']);
+    StoreForm::extend(function (StoreForm $form) {
+        $model = $form->getModel();
+        $model->loadMissing('metadata');
 
-        $tabs .= Theme::partial('marketplace.store.settings.extra-content', compact('model'));
-    }
-
-    return $tabs;
-}, 124, 2);
+        $form
+            ->addBefore('status', 'extended_info_content', HtmlField::class, [
+                'html' => Theme::partial('marketplace.store.settings.extra-content', compact('model')),
+            ]);
+    });
+}
 
 if (! function_exists('get_store_social_links')) {
     function get_store_social_links(): array

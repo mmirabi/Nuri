@@ -49,8 +49,7 @@ class ThemeController extends BaseController
     {
         $this->pageTitle(trans('packages/theme::theme.theme_options'));
 
-        Assets::addScripts(['are-you-sure', 'coloris', 'jquery-ui'])
-            ->addStyles(['coloris'])
+        Assets::addScripts(['are-you-sure', 'jquery-ui'])
             ->addStylesDirectly([
                 'vendor/core/packages/theme/css/theme-options.css',
             ])

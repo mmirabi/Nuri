@@ -3,6 +3,8 @@ class PermalinkField {
         let $slugBox = $(document).find('.slug-field-wrapper')
 
         $(document).on('blur', `.js-base-form input[name=${$slugBox.data('field-name')}]`, (e) => {
+            $slugBox = $(document).find('.slug-field-wrapper')
+
             if ($slugBox.find('input[name="slug"]').is('[readonly]')) {
                 return
             }
@@ -67,6 +69,7 @@ class PermalinkField {
          */
         const createSlug = (value, id) => {
             $slugBox = $(document).find('.slug-field-wrapper')
+
             const form = $slugBox.closest('form')
             const $slugId = $slugBox.find('.slug-data')
 

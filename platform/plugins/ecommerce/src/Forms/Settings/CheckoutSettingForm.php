@@ -21,6 +21,9 @@ class CheckoutSettingForm extends SettingForm
         Assets::addScriptsDirectly('vendor/core/core/setting/js/setting.js')
             ->addScriptsDirectly('vendor/core/plugins/ecommerce/js/setting.js');
 
+        $countries = Helper::countries();
+        $selectedCountries = array_keys(EcommerceHelper::getAvailableCountries());
+
         $this
             ->setSectionTitle(trans('plugins/ecommerce::setting.checkout.name'))
             ->setSectionDescription(trans('plugins/ecommerce::setting.checkout.description'))
@@ -112,11 +115,15 @@ class CheckoutSettingForm extends SettingForm
                     'class' => 'check-all',
                     'data-set' => '.available-countries',
                 ],
+                'help_block' => [
+                    'text' => trans('plugins/ecommerce::setting.checkout.form.all_helper_text'),
+                ],
+                'value' => (count($selectedCountries) - 1) == count($countries) ? '1' : '',
             ])
             ->add('available_countries[]', MultiCheckListField::class, [
                 'label' => false,
-                'choices' => Helper::countries(),
-                'value' => array_keys(EcommerceHelper::getAvailableCountries()),
+                'choices' => $countries,
+                'value' => $selectedCountries,
                 'attr' => [
                     'class' => 'available-countries',
                 ],

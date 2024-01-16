@@ -7,6 +7,7 @@ use Botble\Base\Facades\Form;
 use Botble\Base\Facades\Html;
 use Botble\Base\Forms\FormAbstract;
 use Botble\Base\Forms\FormHelper;
+use Botble\Media\Facades\RvMedia;
 use Botble\Setting\Facades\Setting;
 use Botble\Theme\Contracts\Theme as ThemeContract;
 use Botble\Theme\Events\RenderingThemeOptionSettings;
@@ -32,6 +33,8 @@ class Theme implements ThemeContract
     protected array $themeConfig = [];
 
     protected string|null $theme = null;
+
+    protected string|null $inheritTheme = null;
 
     protected string $layout;
 
@@ -91,6 +94,13 @@ class Theme implements ThemeContract
             throw new UnknownThemeException('Theme [' . $theme . '] not found.');
         }
 
+        $this->inheritTheme = $this->getConfig('inherit');
+
+        // If inherit theme is set and not exists, so throw exception.
+        if ($this->hasInheritTheme() && ! $this->exists($this->getInheritTheme())) {
+            throw new UnknownThemeException('Parent theme [' . $this->getInheritTheme() . '] not found.');
+        }
+
         // Add location to look up view.
         $this->addPathLocation($this->path());
 
@@ -100,17 +110,32 @@ class Theme implements ThemeContract
         // Before from a public theme config.
         $this->fire('appendBefore', $this);
 
-        $assetPath = $this->getThemeAssetsPath();
-
         // Add asset path to asset container.
-        $this->asset->addPath($assetPath . '/' . $this->getConfig('containerDir.asset'));
+        $this->registerAssetsPath();
 
         return $this;
     }
 
+    protected function registerAssetsPath(): void
+    {
+        $assetsPath = $this->getThemeAssetsPath();
+
+        $this->asset->addPath($assetsPath . '/' . $this->getConfig('containerDir.asset'));
+    }
+
+    public function hasInheritTheme(): bool
+    {
+        return $this->inheritTheme !== null;
+    }
+
+    public function getInheritTheme(): string|null
+    {
+        return $this->inheritTheme;
+    }
+
     protected function getThemeAssetsPath(): string
     {
-        $publicThemeName = $this->getPublicThemeName();
+        $publicThemeName =  $this->getPublicThemeName();
 
         $currentTheme = $this->getThemeName();
 
@@ -147,28 +172,48 @@ class Theme implements ThemeContract
      */
     public function getConfig(string|null $key = null): mixed
     {
-        // Main package config.
         if (! $this->themeConfig) {
             $this->themeConfig = $this->config->get('packages.theme.general', []);
         }
 
-        // Config inside a public theme.
-        // This config having buffer by array object.
-        if ($this->theme && ! isset($this->themeConfig['themes'][$this->theme])) {
-            $this->themeConfig['themes'][$this->theme] = [];
+        $this->loadConfigFromTheme($this->theme);
 
-            // Require public theme config.
-            $minorConfigPath = theme_path($this->theme . '/config.php');
-
-            if ($this->files->exists($minorConfigPath)) {
-                $this->themeConfig['themes'][$this->theme] = $this->files->getRequire($minorConfigPath);
-            }
-        }
-
-        // Evaluate theme config.
         $this->themeConfig = $this->evaluateConfig($this->themeConfig);
 
         return empty($key) ? $this->themeConfig : Arr::get($this->themeConfig, $key);
+    }
+
+    public function getInheritConfig(string|null $key = null): mixed
+    {
+        if (! $this->hasInheritTheme()) {
+            return null;
+        }
+
+        $this->loadConfigFromTheme($theme = $this->getInheritTheme());
+
+        if (! isset($this->themeConfig['themes'][$theme])) {
+            return null;
+        }
+
+        $config = $this->themeConfig['themes'][$theme];
+
+        return empty($key) ? $config : Arr::get($config, $key);
+    }
+
+    protected function loadConfigFromTheme(string $theme): void
+    {
+        // Config inside a public theme.
+        // This config having buffer by array object.
+        if ($theme && ! isset($this->themeConfig['themes'][$theme])) {
+            $this->themeConfig['themes'][$theme] = [];
+
+            // Require public theme config.
+            $minorConfigPath = theme_path($theme . '/config.php');
+
+            if ($this->files->exists($minorConfigPath)) {
+                $this->themeConfig['themes'][$theme] = $this->files->getRequire($minorConfigPath);
+            }
+        }
     }
 
     /**
@@ -210,12 +255,8 @@ class Theme implements ThemeContract
         $hints[] = platform_path($location);
 
         // This is nice feature to use inherit from another.
-        if ($this->getConfig('inherit')) {
-            // Inherit from theme name.
-            $inherit = $this->getConfig('inherit');
-
-            // Inherit theme path.
-            $inheritPath = platform_path($this->path($inherit));
+        if ($this->hasInheritTheme()) {
+            $inheritPath = platform_path($this->path($this->getInheritTheme()));
 
             if ($this->files->isDirectory($inheritPath)) {
                 $hints[] = $inheritPath;
@@ -278,6 +319,18 @@ class Theme implements ThemeContract
      */
     public function fire(string $event, string|array|callable|null|object $args): void
     {
+        if ($this->hasInheritTheme()) {
+            $this->asset->isInheritTheme();
+
+            $onEvent = $this->getInheritConfig('events.' . $event);
+
+            if ($onEvent instanceof Closure) {
+                $onEvent($args);
+            }
+
+            $this->asset->isInheritTheme(false);
+        }
+
         $onEvent = $this->getConfig('events.' . $event);
 
         if ($onEvent instanceof Closure) {
@@ -833,7 +886,15 @@ class Theme implements ThemeContract
         $screenshot = public_path($this->getConfig('themeDir') . '/' . $themeName . '/screenshot.png');
 
         if (! File::exists($screenshot)) {
-            $screenshot = theme_path($theme . '/screenshot.png');
+            $screenshot = $this->path($theme) . '/screenshot.png';
+        }
+
+        if (! File::exists($screenshot) && $this->hasInheritTheme()) {
+            $screenshot = $this->path($this->getInheritTheme()) . '/screenshot.png';
+        }
+
+        if (! File::exists($screenshot)) {
+            return RvMedia::getDefaultImage();
         }
 
         return 'data:image/png;base64,' . base64_encode(File::get($screenshot));

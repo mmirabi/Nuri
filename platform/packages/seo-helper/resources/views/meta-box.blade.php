@@ -28,7 +28,7 @@
         </h4>
 
         <div class="page-url-seo">
-            <p>{{ !empty($object->id) && $object->url ? $object->url : '-' }}</p>
+            <p>{{ !empty($object->id) && $object->url ? (url(apply_filters(FILTER_SLUG_PREFIX, SlugHelper::getPrefix($object::class), $object)) . '/' . $object->slug) : '-' }}</p>
         </div>
 
         <div>
@@ -36,9 +36,9 @@
                 - </span>
             <span class="page-description-seo">
                 @if (!empty($meta['seo_description']))
-                    {{ strip_tags($meta['seo_description']) }}
-                @elseif ($metaDescription = (!empty($object->id) ? ($object->description ?: ($object->content ? Str::limit($object->content, 250) : old('seo_meta.seo_description'))) : old('seo_meta.seo_description')))
-                    {{ strip_tags($metaDescription) }}
+                    {{ Str::limit(strip_tags($meta['seo_description']), 250) }}
+                @elseif ($metaDescription = (!empty($object->id) ? ($object->description ?: ($object->content ?: old('seo_meta.seo_description'))) : old('seo_meta.seo_description')))
+                    {{ Str::limit(strip_tags($metaDescription), 250) }}
                 @endif
             </span>
         </div>

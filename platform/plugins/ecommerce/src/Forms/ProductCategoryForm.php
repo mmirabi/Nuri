@@ -2,9 +2,11 @@
 
 namespace Botble\Ecommerce\Forms;
 
+use Botble\Base\Forms\FieldOptions\ContentFieldOption;
 use Botble\Base\Forms\FieldOptions\NameFieldOption;
 use Botble\Base\Forms\FieldOptions\OnOffFieldOption;
 use Botble\Base\Forms\FieldOptions\StatusFieldOption;
+use Botble\Base\Forms\Fields\EditorField;
 use Botble\Base\Forms\Fields\OnOffField;
 use Botble\Base\Forms\Fields\SelectField;
 use Botble\Base\Forms\Fields\TextField;
@@ -20,14 +22,11 @@ class ProductCategoryForm extends FormAbstract
             ->setupModel(new ProductCategory())
             ->setValidatorClass(ProductCategoryRequest::class)
             ->add('name', TextField::class, NameFieldOption::make()->toArray())
-            ->add('description', 'editor', [
-                'label' => trans('core/base::forms.description'),
-                'attr' => [
-                    'rows' => 4,
-                    'placeholder' => trans('core/base::forms.description_placeholder'),
-                    'data-counter' => 500,
-                ],
-            ])
+            ->add(
+                'description',
+                EditorField::class,
+                ContentFieldOption::make()->label(trans('core/base::forms.description'))->toArray()
+            )
             ->add('status', SelectField::class, StatusFieldOption::make()->toArray())
             ->add('image', 'mediaImage')
             ->add(

@@ -672,10 +672,9 @@ class RvMedia
 
     public function getRealPath(string|null $url): string
     {
-        $path = match (config('filesystems.default')) {
-            'local', 'public' => Storage::path($url),
-            default => Storage::url($url),
-        };
+        $path = $this->isUsingCloud()
+            ? Storage::url($url)
+            : Storage::path($url);
 
         return Arr::first(explode('?v=', $path));
     }
@@ -687,7 +686,9 @@ class RvMedia
 
     public function isUsingCloud(): bool
     {
-        return ! in_array(config('filesystems.default'), ['local', 'public']);
+        $defaultDisk = config('filesystems.default');
+
+        return config('filesystems.disks.' . $defaultDisk . '.driver', 'local') !== 'local';
     }
 
     public function uploadFromUrl(
@@ -789,6 +790,10 @@ class RvMedia
 
     public function getUploadPath(): string
     {
+        if ($customFolder = $this->getConfig('default_upload_folder')) {
+            return public_path($customFolder);
+        }
+
         return is_link(public_path('storage')) ? storage_path('app/public') : public_path('storage');
     }
 

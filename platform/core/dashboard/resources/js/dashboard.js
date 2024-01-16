@@ -43,9 +43,9 @@ class BDashboard {
                 BDashboard.initSortable()
             })
             .catch(({ response, message }) => {
-                let content = response?.data?.data ? response.data.data : message
+                let content = response?.data?.data
 
-                if (!content) {
+                if (! content && message) {
                     content = `<div class="empty"><p class="empty-subtitle text-muted">${message}</p></div>`
                 }
 

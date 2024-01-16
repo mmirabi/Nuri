@@ -31,7 +31,7 @@ class ResetPasswordForm extends AuthForm
                 TextField::class,
                 EmailFieldOption::make()
                     ->label(__('Email address'))
-                    ->value($this->request->email)
+                    ->value($this->request->input('email'))
                     ->icon('ti ti-mail')
                     ->toArray()
             )

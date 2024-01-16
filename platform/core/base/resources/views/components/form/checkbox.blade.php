@@ -29,7 +29,7 @@
 <label {!! Html::attributes($labelAttr) !!}>
     <input
         {{ $attributes->merge(['type' => 'checkbox', 'id' => $id, 'name' => $name, 'class' => 'form-check-input', 'value' => $value]) }}
-        @checked(old($name, $checked))
+        @checked($name ? old($name, $checked) : $checked)
     >
 
     @if($label || $slot->isNotEmpty())

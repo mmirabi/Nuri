@@ -8,64 +8,27 @@
     })
 
     let showError = message => {
-        window.showAlert('alert-danger', message)
+        Theme.showError(message)
     }
 
     let showSuccess = message => {
-        window.showAlert('alert-success', message)
+        Theme.showSuccess(message)
     }
 
     let handleError = data => {
-        if (typeof (data.errors) !== 'undefined' && data.errors.length) {
-            handleValidationError(data.errors)
-        } else if (typeof (data.responseJSON) !== 'undefined') {
-            if (typeof (data.responseJSON.errors) !== 'undefined') {
-                if (data.status === 422) {
-                    handleValidationError(data.responseJSON.errors)
-                }
-            } else if (typeof (data.responseJSON.message) !== 'undefined') {
-                showError(data.responseJSON.message)
-            } else {
-                $.each(data.responseJSON, (index, el) => {
-                    $.each(el, (key, item) => {
-                        showError(item)
-                    })
-                })
-            }
-        } else {
-            showError(data.statusText)
-        }
-    }
-
-    let handleValidationError = errors => {
-        let message = ''
-
-        $.each(errors, (index, item) => {
-            if (message !== '') {
-                message += '<br />'
-            }
-            message += item
-        })
-
-        showError(message)
+        Theme.handleError(data)
     }
 
     window.showAlert = (messageType, message) => {
-        if (messageType && message !== '') {
-            let alertId = Math.floor(Math.random() * 1000)
-
-            let html = `<div class='alert ${messageType} alert-dismissible' id='${alertId}'>
-                <span class='btn-close' data-bs-dismiss='alert' aria-label='close'></span>
-                <i class='fi-rs-` + (messageType === 'alert-success' ? 'check' : 'cross') + ` message-icon'></i>
-                ${message}
-            </div>`
-
-            $('#alert-container').append(html).ready(() => {
-                window.setTimeout(() => {
-                    $(`#alert-container #${alertId}`).remove()
-                }, 6000)
-            })
+        if (messageType === 'alert-danger') {
+            message = 'error';
         }
+
+        if (messageType === 'alert-success') {
+            message = 'success';
+        }
+
+        Theme.showNotice(messageType, message)
     }
 
     function parseParamsSearch(query, includeArray = false) {
@@ -321,11 +284,11 @@
                 method: 'POST',
                 success: (response) => {
                     if (response.error) {
-                        window.showAlert('alert-danger', response.message)
+                        Theme.showError(response.message)
                         return false
                     }
 
-                    window.showAlert('alert-success', response.message)
+                    Theme.showSuccess(response.message)
                     $('.wishlist-count').text(response.data.count)
                     _self.toggleClass('wis_added')
                     _self.removeClass('button-loading')
@@ -333,7 +296,7 @@
                         .addClass('js-remove-from-wishlist-button')
                 },
                 error: (response) => {
-                    window.showAlert('alert-danger', response.message)
+                    Theme.showError(response.message)
                 },
                 complete: function() {
                     _self.removeClass('button-loading')
@@ -352,18 +315,18 @@
                 method: 'DELETE',
                 success: (response) => {
                     if (response.error) {
-                        window.showAlert('alert-danger', response.message)
+                        Theme.showError(response.message)
                         return false
                     }
 
-                    window.showAlert('alert-success', response.message)
+                    Theme.showSuccess(response.message)
                     $('.wishlist-count').text(response.data.count)
                     _self.closest('tr').remove()
                     _self.removeClass('js-remove-from-wishlist-button')
                         .addClass('js-add-to-wishlist-button')
                 },
                 error: (response) => {
-                    window.showAlert('alert-danger', response.message)
+                    Theme.showError(response.message)
                 },
                 complete: function() {
                     _self.removeClass('button-loading')
@@ -382,15 +345,15 @@
                 method: 'POST',
                 success: (response) => {
                     if (response.error) {
-                        window.showAlert('alert-danger', response.message)
+                        Theme.showError(response.message)
                         return false
                     }
 
                     $('.compare-count').text(response.data.count)
-                    window.showAlert('alert-success', response.message)
+                    Theme.showSuccess(response.message)
                 },
                 error: (response) => {
-                    window.showAlert('alert-danger', response.message)
+                    Theme.showError(response.message)
                 },
                 complete: function() {
                     _self.removeClass('button-loading')
@@ -412,21 +375,21 @@
 
                     if (response.error) {
                         _self.text(buttonHtml)
-                        window.showAlert('alert-danger', response.message)
+                        Theme.showError(response.message)
                         return false
                     }
 
                     $('.compare-count').text(response.data.count)
 
                     $('.table__compare').load(window.location.href + ' .table__compare > *', function() {
-                        window.showAlert('alert-success', response.message)
+                        Theme.showSuccess(response.message)
 
                         _self.html(buttonHtml)
                     })
                 },
                 error: (response) => {
                     _self.removeClass('button-loading')
-                    window.showAlert('alert-danger', response.message)
+                    Theme.showError(response.message)
                 },
             })
         })
@@ -448,7 +411,7 @@
                     _self.prop('disabled', false).removeClass('button-loading').addClass('active')
 
                     if (response.error) {
-                        window.showAlert('alert-danger', response.message)
+                        Theme.showError(response.message)
 
                         if (response.data.next_url !== undefined) {
                             window.location.href = response.data.next_url
@@ -457,7 +420,7 @@
                         return false
                     }
 
-                    window.showAlert('alert-success', response.message)
+                    Theme.showSuccess(response.message)
 
                     if (response.data.next_url !== undefined) {
                         window.location.href = response.data.next_url
@@ -471,7 +434,7 @@
                 },
                 error: (response) => {
                     _self.prop('disabled', false).removeClass('button-loading')
-                    window.showAlert('alert-danger', response.message)
+                    Theme.showError(response.message)
                 },
             })
         })
@@ -502,7 +465,7 @@
 
                     if (response.error) {
                         _self.removeClass('button-loading')
-                        window.showAlert('alert-danger', response.message)
+                        Theme.showError(response.message)
 
                         if (response.data.next_url !== undefined) {
                             window.location.href = response.data.next_url
@@ -511,7 +474,7 @@
                         return false
                     }
 
-                    window.showAlert('alert-success', response.message)
+                    Theme.showSuccess(response.message)
 
                     if (response.data.next_url !== undefined) {
                         window.location.href = response.data.next_url
@@ -546,7 +509,7 @@
                     _self.closest('li').removeClass('content-loading')
 
                     if (response.error) {
-                        window.showAlert('alert-danger', response.message)
+                        Theme.showError(response.message)
                         return false
                     }
 
@@ -561,7 +524,7 @@
                 },
                 error: (response) => {
                     _self.closest('li').removeClass('content-loading')
-                    window.showAlert('alert-danger', response.message)
+                    Theme.showError(response.message)
                 },
             })
         })
@@ -581,7 +544,7 @@
                 success: (response) => {
 
                     if (response.error) {
-                        window.showAlert('alert-danger', response.message)
+                        Theme.showError(response.message)
                         _self.closest('.table--cart').removeClass('content-loading')
                         return false
                     }
@@ -597,7 +560,7 @@
                 },
                 error: (response) => {
                     _self.closest('.table--cart').removeClass('content-loading')
-                    window.showAlert('alert-danger', response.message)
+                    Theme.showError(response.message)
                 },
             })
         })
@@ -666,7 +629,7 @@
                     let message = $input.data('max-size-message')
                         .replace('__attribute__', input.files[i].name)
                         .replace('__max__', maxSize)
-                    window.showAlert('alert-danger', message)
+                    Theme.showError(message)
                 } else {
                     imagesReviewBuffer.push(input.files[i])
                 }
@@ -795,7 +758,7 @@
                 processData: false,
                 success: (response) => {
                     if (response.error) {
-                        window.showAlert('alert-danger', response.message)
+                        Theme.showError(response.message)
                         _self.closest('.detail-qty').find('.qty-val').text(response.data.count)
                         return false
                     }
@@ -809,13 +772,13 @@
                         }
                     }
 
-                    window.showAlert('alert-success', response.message)
+                    Theme.showSuccess(response.message)
                 },
                 complete: function() {
                     _self.closest('.table--cart').removeClass('content-loading')
                 },
                 error: (response) => {
-                    window.showAlert('alert-danger', response.message)
+                    Theme.showError(response.message)
                 },
             })
         }
@@ -838,10 +801,10 @@
                     if (!response.error) {
                         $('.section--shopping-cart').load(window.location.href + '?applied_coupon=1 .section--shopping-cart > *', function() {
                             _self.prop('disabled', false).removeClass('btn-disabled').removeClass('button-loading')
-                            window.showAlert('alert-success', response.message)
+                            Theme.showSuccess(response.message)
                         })
                     } else {
-                        window.showAlert('alert-danger', response.message)
+                        Theme.showError(response.message)
                         _self.prop('disabled', false).removeClass('btn-disabled').removeClass('button-loading')
                     }
                 },
@@ -850,14 +813,14 @@
                         if (data.responseJSON.errors !== 'undefined') {
                             $.each(data.responseJSON.errors, (index, el) => {
                                 $.each(el, (key, item) => {
-                                    window.showAlert('alert-danger', item)
+                                    Theme.showError(item)
                                 })
                             })
                         } else if (typeof (data.responseJSON.message) !== 'undefined') {
-                            window.showAlert('alert-danger', data.responseJSON.message)
+                            Theme.showError(data.responseJSON.message)
                         }
                     } else {
-                        window.showAlert('alert-danger', data.status.text)
+                        Theme.showError(data.status.text)
                     }
                     _self.prop('disabled', false).removeClass('btn-disabled').removeClass('button-loading')
                 },
@@ -882,7 +845,7 @@
                             _self.text(buttonText)
                         })
                     } else {
-                        window.showAlert('alert-danger', response.message)
+                        Theme.showError(response.message)
                         _self.text(buttonText)
                     }
                 },
@@ -891,14 +854,14 @@
                         if (data.responseJSON.errors !== 'undefined') {
                             $.each(data.responseJSON.errors, (index, el) => {
                                 $.each(el, (key, item) => {
-                                    window.showAlert('alert-danger', item)
+                                    Theme.showError(item)
                                 })
                             })
                         } else if (typeof (data.responseJSON.message) !== 'undefined') {
-                            window.showAlert('alert-danger', data.responseJSON.message)
+                            Theme.showError(data.responseJSON.message)
                         }
                     } else {
-                        window.showAlert('alert-danger', data.status.text)
+                        Theme.showError(data.status.text)
                     }
                     _self.text(buttonText)
                 },
@@ -918,11 +881,11 @@
 
                     if (response.error) {
                         _self.removeClass('button-loading')
-                        window.showAlert('alert-danger', response.message)
+                        Theme.showError(response.message)
                         return false
                     }
 
-                    window.showAlert('alert-success', response.message)
+                    Theme.showSuccess(response.message)
 
                     $('.wishlist-count').text(response.data.count)
                     _self.removeClass('button-loading')
@@ -931,7 +894,7 @@
                 },
                 error: (response) => {
                     _self.removeClass('button-loading')
-                    window.showAlert('alert-danger', response.message)
+                    Theme.showError(response.message)
                 },
             })
         })
@@ -1020,7 +983,7 @@
                             })
                         })
                     } else {
-                        window.showAlert('alert-danger', response.message)
+                        Theme.showError(response.message)
                         $modal.modal('hide')
                     }
                 },
@@ -1601,7 +1564,7 @@
                     success: (response) => {
 
                         if (response.error) {
-                            window.showAlert('alert-danger', response.message)
+                            Theme.showError(response.message)
                             return false
                         }
 
@@ -1610,7 +1573,7 @@
                         $loading.addClass('d-none')
                     },
                     error: (response) => {
-                        window.showAlert('alert-danger', response.message)
+                        Theme.showError(response.message)
                     },
                 })
             })

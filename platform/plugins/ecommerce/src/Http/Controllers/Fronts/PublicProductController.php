@@ -5,6 +5,7 @@ namespace Botble\Ecommerce\Http\Controllers\Fronts;
 use Botble\Base\Enums\BaseStatusEnum;
 use Botble\Base\Facades\BaseHelper;
 use Botble\Base\Http\Controllers\BaseController;
+use Botble\Base\Models\BaseQueryBuilder;
 use Botble\Ecommerce\Facades\EcommerceHelper;
 use Botble\Ecommerce\Forms\Fronts\OrderTrackingForm;
 use Botble\Ecommerce\Http\Requests\Fronts\OrderTrackingRequest;
@@ -331,7 +332,21 @@ class PublicProductController extends BaseController
                         });
                 })
                 ->with(['address', 'products'])
-                ->select('ec_orders.*');
+                ->select('ec_orders.*')
+                ->when(request()->input('phone'), function (BaseQueryBuilder $query, string $phone) {
+                    $query->orWhere(function (BaseQueryBuilder $query) use ($phone) {
+                        $query
+                            ->where(function (BaseQueryBuilder $query) {
+                                $code = request()->input('order_id');
+
+                                $query
+                                    ->where('ec_orders.code', $code)
+                                    ->orWhere('ec_orders.code', '#' . $code);
+                            })
+                            ->whereHas('address', fn ($subQuery) => $subQuery->where('phone', $phone))
+                            ->orWhereHas('user', fn ($subQuery) => $subQuery->where('phone', $phone));
+                    });
+                });
 
             $order = apply_filters('ecommerce_order_tracking_query', $query)->first();
 
@@ -347,8 +362,7 @@ class PublicProductController extends BaseController
         Theme::breadcrumb()
             ->add($title, route('public.orders.tracking'));
 
-        $form = OrderTrackingForm::createFromArray($request->validated())
-            ->renderForm();
+        $form = OrderTrackingForm::createFromArray($request->validated());
 
         return Theme::scope('ecommerce.order-tracking', compact('order', 'form'), 'plugins/ecommerce::themes.order-tracking')
             ->render();

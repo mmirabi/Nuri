@@ -110,7 +110,7 @@ abstract class TableAbstract extends DataTable implements ExtensibleContract
      */
     protected Closure $modifyQueryUsingCallback;
 
-    protected string $dom = "f<'d-none d-md-block'B>rt<'card-footer d-flex flex-column flex-sm-row justify-content-between align-items-center gap-2'<'d-flex justify-content-between align-items-center gap-3'l<'m-0 text-muted'i>><'d-flex justify-content-center'p>>";
+    protected string $dom = "fBrt<'card-footer d-flex flex-column flex-sm-row justify-content-between align-items-center gap-2'<'d-flex justify-content-between align-items-center gap-3'l<'m-0 text-muted'i>><'d-flex justify-content-center'p>>";
 
     public function __construct(protected DataTables $table, UrlGenerator $urlGenerator)
     {
@@ -212,7 +212,6 @@ abstract class TableAbstract extends DataTable implements ExtensibleContract
             'info' => true,
             'searchDelay' => 350,
             'bStateSave' => $this->bStateSave,
-            'stateSaveParams' => 'function (settings, data) { data.search.search = "";}',
             'lengthMenu' => [
                 array_values(
                     array_unique(array_merge(Arr::sortRecursive([10, 30, 50, 100, 500, $this->pageLength]), [-1]))
@@ -390,6 +389,30 @@ abstract class TableAbstract extends DataTable implements ExtensibleContract
     {
         foreach ($columns as $column) {
             $this->addColumn($column);
+        }
+
+        return $this;
+    }
+
+    public function removeColumn(string $name): static
+    {
+        foreach ($this->columns as $index => $column) {
+            if ($column->get('data') === $name || $column->get('name') === $name) {
+                unset($this->columns[$index]);
+
+                break;
+            }
+        }
+
+        $this->columns = array_values($this->columns);
+
+        return $this;
+    }
+
+    public function removeColumns(array $columns): static
+    {
+        foreach ($columns as $column) {
+            $this->removeColumn($column);
         }
 
         return $this;

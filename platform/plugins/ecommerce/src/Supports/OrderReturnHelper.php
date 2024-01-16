@@ -21,7 +21,7 @@ class OrderReturnHelper
     public function returnOrder(Order $order, array $data): array
     {
         $orderReturnData = [
-            'order_id' => $order->id,
+            'order_id' => $order->getKey(),
             'store_id' => $order->store_id,
             'user_id' => $order->user_id,
             'order_status' => $order->status,
@@ -29,7 +29,7 @@ class OrderReturnHelper
         ];
 
         if (! empty($data['reason'])) {
-            $orderReturnData = $data['reason'];
+            $orderReturnData['reason'] = $data['reason'];
         }
 
         try {

@@ -39,6 +39,7 @@ use Botble\Media\Facades\RvMedia;
 use Botble\Menu\Events\RenderingMenuOptions;
 use Botble\Menu\Facades\Menu;
 use Botble\Payment\Enums\PaymentMethodEnum;
+use Botble\Payment\Enums\PaymentStatusEnum;
 use Botble\Payment\Services\Gateways\BankTransferPaymentService;
 use Botble\Payment\Services\Gateways\CodPaymentService;
 use Botble\Payment\Supports\PaymentHelper;
@@ -681,7 +682,7 @@ class HookServiceProvider extends ServiceProvider
                 $productItemView = Theme::getThemeNamespace('views.ecommerce.includes.product-item');
 
                 if (! view()->exists($productItemView)) {
-                    $productItemView = 'plugins/ecommerce::themes.includes.default-product';
+                    $productItemView = 'plugins/ecommerce::themes.includes.product-item';
                 }
 
                 $view = Theme::getThemeNamespace('views.ecommerce.shortcodes.recently-viewed-products');
@@ -726,6 +727,25 @@ class HookServiceProvider extends ServiceProvider
         });
 
         add_filter(BASE_FILTER_PUBLIC_SINGLE_DATA, [$this, 'handleSingleView'], 30);
+
+        if (defined('ACTION_AFTER_UPDATE_PAYMENT')) {
+            add_action(ACTION_AFTER_UPDATE_PAYMENT, function ($request, $payment) {
+                if (
+                    in_array($payment->payment_channel, [PaymentMethodEnum::COD, PaymentMethodEnum::BANK_TRANSFER])
+                    && $request->input('status') == PaymentStatusEnum::COMPLETED
+                    && EcommerceHelper::isEnabledSupportDigitalProducts()
+                ) {
+                    $order = Order::query()->where('id', $payment->order_id)->with('products')->first();
+
+                    if (
+                        $order
+                        && EcommerceHelper::countDigitalProducts($order->products) === $order->products->count()
+                    ) {
+                        OrderHelper::setOrderCompleted($order->getKey(), request(), Auth::id() ?? 0);
+                    }
+                }
+            }, 123, 2);
+        }
     }
 
     public function addCustomerSettingRules(array $rules): array

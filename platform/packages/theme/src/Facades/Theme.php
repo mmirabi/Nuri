@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Facade;
  * @method static \Botble\Theme\Theme layout(string $layout)
  * @method static \Botble\Theme\Theme uses(string|null $theme = null)
  * @method static \Botble\Theme\Theme theme(string|null $theme = null)
+ * @method static bool hasInheritTheme()
+ * @method static string|null getInheritTheme()
  * @method static bool exists(string|null $theme)
  * @method static string path(string|null $forceThemeName = null)
  * @method static mixed|null getConfig(string|null $key = null)

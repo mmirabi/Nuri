@@ -77,7 +77,6 @@ class LanguageSettingForm extends FormAbstract
                             ->label(trans('plugins/language::language.hide_languages'))
                             ->choices($choices)
                             ->selected(json_decode(setting('language_hide_languages', '[]'), true))
-                            ->emptyValue('')
                             ->toArray()
                     );
             }

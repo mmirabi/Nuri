@@ -215,7 +215,7 @@ class PublicController extends BaseController
         OrderHistory::query()->create([
             'action' => 'cancel_order',
             'description' => __('Order was cancelled by custom :customer', ['customer' => $order->address->name]),
-            'order_id' => $order->id,
+            'order_id' => $order->getKey(),
         ]);
 
         return $this

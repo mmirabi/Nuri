@@ -44,7 +44,7 @@ class AdminAppearance
 
     public function getCurrentLayout(): string
     {
-        return $this->getUserSetting('layout', array_key_first($this->getLayouts()));
+        return $this->getSetting('layout', array_key_first($this->getLayouts()));
     }
 
     public function isVerticalLayout(): bool
@@ -59,7 +59,7 @@ class AdminAppearance
 
     public function showMenuItemIcon(): bool
     {
-        return $this->getUserSetting('show_menu_item_icon', true);
+        return $this->getSetting('show_menu_item_icon', true);
     }
 
     public function getLayouts(): array
@@ -72,7 +72,7 @@ class AdminAppearance
 
     public function getContainerWidth(): string
     {
-        return $this->getUserSetting('container_width', array_key_first($this->getContainerWidths()));
+        return $this->getSetting('container_width', array_key_first($this->getContainerWidths()));
     }
 
     public function getContainerWidths(): array

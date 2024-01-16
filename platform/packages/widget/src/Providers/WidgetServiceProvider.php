@@ -82,6 +82,10 @@ class WidgetServiceProvider extends ServiceProvider
                     return $html;
                 }
 
+                if ($widget->getConfig('ignore_guideline')) {
+                    return $html;
+                }
+
                 $editLink = route('widgets.index') . '?widget=' . $widget->getId();
                 $link = view('packages/theme::guideline-link', [
                     'html' => $html,

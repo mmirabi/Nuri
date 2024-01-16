@@ -102,12 +102,10 @@ class CustomerTable extends TableAbstract
             }
         }
 
-        $columns += [
+        return array_merge($columns, [
             CreatedAtColumn::make(),
             StatusColumn::make(),
-        ];
-
-        return $columns;
+        ]);
     }
 
     public function buttons(): array

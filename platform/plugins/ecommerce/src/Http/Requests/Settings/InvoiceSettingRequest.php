@@ -34,7 +34,7 @@ class InvoiceSettingRequest extends Request
             'enable_invoice_stamp' => $onOffRule,
             'invoice_code_prefix' => ['nullable', 'string', 'max:120'],
             'disable_order_invoice_until_order_confirmed' => $onOffRule,
-            'invoice_font_family' => ['sometimes', Rule::in($googleFonts)],
+            'invoice_font_family' => ['nullable', Rule::in($googleFonts)],
         ];
     }
 }

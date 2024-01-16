@@ -21,6 +21,7 @@
     @endif
 
     {!! Html::style('vendor/core/core/base/libraries/font-awesome/css/fontawesome.min.css') !!}
+    {!! Html::style('vendor/core/core/base/libraries/ckeditor/content-styles.css?v=3.2.0') !!}
     {!! Html::style('vendor/core/plugins/ecommerce/css/front-theme.css?v=3.2.0') !!}
 
     @if (BaseHelper::isRtlEnabled())

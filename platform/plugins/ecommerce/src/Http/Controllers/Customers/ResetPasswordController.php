@@ -32,7 +32,11 @@ class ResetPasswordController extends BaseController
 
         return Theme::scope(
             'ecommerce.customers.passwords.reset',
-            ['form' => ResetPasswordForm::create()],
+            [
+                'token' => $token,
+                'email' => $request->input('email'),
+                'form' => ResetPasswordForm::create(),
+            ],
             'plugins/ecommerce::themes.customers.passwords.reset'
         )->render();
     }

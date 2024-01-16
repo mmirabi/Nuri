@@ -25,7 +25,10 @@ class CurrencySettingController extends SettingController
             'deleted_currencies',
         ]));
 
-        $currencies = json_decode($request->validated('currencies'), true) ?: [];
+        $currencies = $request->validated('currencies') ?: [];
+        if ($currencies) {
+            $currencies = json_decode($currencies, true);
+        }
 
         $response = $this->httpResponse();
 
@@ -36,7 +39,10 @@ class CurrencySettingController extends SettingController
                 ->setMessage(trans('plugins/ecommerce::currency.require_at_least_one_currency'));
         }
 
-        $deletedCurrencies = json_decode($request->validated('deleted_currencies', []), true) ?: [];
+        $deletedCurrencies = $request->validated('deleted_currencies') ?: [];
+        if ($deletedCurrencies) {
+            $deletedCurrencies = json_decode($deletedCurrencies, true);
+        }
 
         $response->setNextUrl(route('ecommerce.settings.currencies'));
 

@@ -47,6 +47,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -380,7 +381,7 @@ class OrderHelper
         $variables = [
             'order_id' => Html::link(
                 route('orders.edit', $history->order->id),
-                $history->order->code . ' <i class="fa fa-external-link-alt"></i>',
+                $history->order->code . ' ' . Blade::render('<x-core::icon name="external-link"/>'),
                 ['target' => '_blank'],
                 null,
                 false

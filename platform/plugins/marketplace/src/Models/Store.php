@@ -64,6 +64,14 @@ class Store extends BaseModel
                 File::deleteDirectory($folder);
             }
         });
+
+        static::updating(function (Store $store) {
+            if ($store->getOriginal('status') != $store->status) {
+                $status = $store->status;
+
+                $store->products()->update(['status' => $status]);
+            }
+        });
     }
 
     public function customer(): BelongsTo

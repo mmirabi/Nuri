@@ -13,6 +13,7 @@ use Botble\Base\Forms\FormAbstract;
 use Botble\Captcha\Facades\Captcha;
 use Botble\Captcha\Forms\Fields\MathCaptchaField;
 use Botble\Captcha\Forms\Fields\ReCaptchaField;
+use Botble\Ecommerce\Facades\EcommerceHelper;
 use Botble\Ecommerce\Forms\Fronts\Auth\FieldOptions\EmailFieldOption;
 use Botble\Ecommerce\Forms\Fronts\Auth\FieldOptions\TextFieldOption;
 use Botble\Ecommerce\Http\Requests\RegisterRequest;
@@ -48,7 +49,11 @@ class RegisterForm extends AuthForm
                 'email',
                 TextField::class,
                 EmailFieldOption::make()
-                    ->label(__('Email'))
+                    ->when(EcommerceHelper::isLoginUsingPhone(), function (EmailFieldOption $fieldOption) {
+                        $fieldOption->label(__('Email (optional)'));
+                    }, function (EmailFieldOption $fieldOption) {
+                        $fieldOption->label(__('Email'));
+                    })
                     ->placeholder(__('Your email'))
                     ->icon('ti ti-mail')
                     ->toArray()
@@ -57,7 +62,11 @@ class RegisterForm extends AuthForm
                 'phone',
                 PhoneNumberField::class,
                 TextFieldOption::make()
-                    ->label(__('Phone'))
+                    ->when(EcommerceHelper::isLoginUsingPhone(), function (TextFieldOption $fieldOption) {
+                        $fieldOption->label(__('Phone'));
+                    }, function (TextFieldOption $fieldOption) {
+                        $fieldOption->label(__('Phone (optional)'));
+                    })
                     ->placeholder(__('Phone number'))
                     ->icon('ti ti-phone')
                     ->toArray()

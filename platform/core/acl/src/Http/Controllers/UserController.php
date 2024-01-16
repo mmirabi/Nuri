@@ -58,8 +58,10 @@ class UserController extends BaseSystemController
         $form = UserForm::create();
         $user = null;
 
-        $form->saving(function () use ($service, $request, &$user) {
+        $form->saving(function (UserForm $form) use ($service, $request, &$user) {
             $user = $service->execute($request);
+
+            $form->setupModel($user);
         });
 
         return $this
@@ -177,7 +179,10 @@ class UserController extends BaseSystemController
         $request->merge(['id' => $user->getKey()]);
 
         try {
-            PasswordForm::createFromModel($user)->saving(fn () => $service->execute($request));
+            PasswordForm::createFromModel($user)
+                ->saving(function (PasswordForm $form) use ($service, $request) {
+                    return tap($service->execute($request), fn ($user) => $form->setupModel($user));
+                });
         } catch (Throwable $exception) {
             return $this
                 ->httpResponse()
@@ -192,11 +197,13 @@ class UserController extends BaseSystemController
 
     public function updatePreferences(User $user, PreferenceRequest $request)
     {
-        PreferenceForm::createFromModel($user)->saving(function () use ($request, $user) {
-            $user->setMeta('locale', $request->input('locale'));
-            $user->setMeta('locale_direction', $request->input('locale_direction'));
-            $user->setMeta('theme_mode', $request->input('theme_mode'));
-        });
+        PreferenceForm::createFromModel($user)
+            ->saving(function (PreferenceForm $form) use ($request) {
+                $model = $form->getModel();
+                $model->setMeta('locale', $request->input('locale'));
+                $model->setMeta('locale_direction', $request->input('locale_direction'));
+                $model->setMeta('theme_mode', $request->input('theme_mode'));
+            });
 
         return $this
             ->httpResponse()

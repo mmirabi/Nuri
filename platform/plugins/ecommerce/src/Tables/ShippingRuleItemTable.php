@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Blade;
 
 class ShippingRuleItemTable extends TableAbstract
 {
@@ -116,7 +117,12 @@ class ShippingRuleItemTable extends TableAbstract
         if ($this->hasPermission('ecommerce.shipping-rule-items.bulk-import')) {
             $buttons['import'] = [
                 'link' => route('ecommerce.shipping-rule-items.bulk-import.index'),
-                'text' => '<i class="fas fa-file-import"></i> ' . trans('plugins/ecommerce::bulk-import.tables.import'),
+                'text' => Blade::render(
+                    sprintf(
+                        '<x-core::icon name="ti ti-file-import" /> %s',
+                        trans('plugins/ecommerce::bulk-import.tables.import')
+                    )
+                ),
             ];
         }
 

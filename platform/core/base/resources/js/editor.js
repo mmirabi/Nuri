@@ -61,7 +61,7 @@ class EditorManagement {
         const editor = document.querySelector('#' + element)
         let config = {
             fontSize: {
-                options: [9, 11, 13, 'default', 17, 16, 18, 19, 21, 22, 23, 24],
+                options: [9, 10, 11, 12, 13, 'default', 15, 16, 17, 18, 19, 20, 21, 22, 23, 24],
             },
 
             alignment: {
@@ -112,6 +112,7 @@ class EditorManagement {
                     'removeFormat',
                     'sourceEditing',
                     'codeBlock',
+                    'fullScreen',
                 ],
                 shouldNotGroupWhenFull: true,
             },

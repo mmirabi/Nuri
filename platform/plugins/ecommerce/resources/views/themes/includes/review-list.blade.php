@@ -22,7 +22,7 @@
             </div>
 
             <div class="mb-2 review-item__rating">
-                <div class="rating-stars">
+                <div class="bb-product-rating">
                     <span style="width: {{ $review->star * 20 }}%"></span>
                 </div>
             </div>

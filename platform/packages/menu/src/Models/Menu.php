@@ -33,7 +33,7 @@ class Menu extends BaseModel
         });
 
         self::saving(function (self $model) {
-            $model->slug = self::createSlug($model->slug, $model->getKey());
+            $model->slug = self::createSlug($model->name, $model->getKey());
         });
     }
 

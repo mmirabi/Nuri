@@ -92,28 +92,6 @@
 
     {!! Theme::footer() !!}
 
-    @if (session()->has('success_msg') || session()->has('error_msg') || (isset($errors) && $errors->count() > 0) || isset($error_msg))
-        <script type="text/javascript">
-            window.onload = function () {
-                @if (session()->has('success_msg'))
-                    window.showAlert('alert-success', '{{ session('success_msg') }}');
-                @endif
-
-                @if (session()->has('error_msg'))
-                    window.showAlert('alert-danger', '{{ session('error_msg') }}');
-                @endif
-
-                @if (isset($error_msg))
-                    window.showAlert('alert-danger', '{{ $error_msg }}');
-                @endif
-
-                @if (isset($errors))
-                    @foreach ($errors->all() as $error)
-                        window.showAlert('alert-danger', '{!! BaseHelper::clean($error) !!}');
-                    @endforeach
-                @endif
-            };
-        </script>
-    @endif
+    @include('packages/theme::toast-notification')
     </body>
 </html>

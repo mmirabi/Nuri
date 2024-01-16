@@ -2,7 +2,7 @@
 
 return [
     'name' => 'Invoice Template',
-    'setting' => 'Invoice Settings',
+    'setting' => 'Invoice Template Settings',
     'setting_description' => 'Settings for Invoice template',
     'setting_content' => 'Content',
     'preview' => 'Preview',

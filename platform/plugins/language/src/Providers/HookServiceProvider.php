@@ -67,7 +67,7 @@ class HookServiceProvider extends ServiceProvider
                 ->remove('locale_direction')
                 ->modify('locale', HtmlField::class, [
                     'html' => Blade::render(sprintf(
-                        '<x-core::form.helper-text>%s</x-core::form.helper-text>',
+                        '<x-core::form.helper-text class="mt-2">%s</x-core::form.helper-text>',
                         trans(
                             'plugins/language::language.setup_site_language',
                             [

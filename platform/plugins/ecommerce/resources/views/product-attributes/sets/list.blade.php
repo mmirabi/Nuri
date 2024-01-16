@@ -15,7 +15,7 @@
             </x-core::table.body.cell>
 
             <x-core::table.body.cell>
-                <input type="text" name="swatch-value" class="input-color-picker" style="display: none" value="__color__">
+                <input type="text" name="swatch-value" data-bb-color-picker style="display: none" value="__color__">
             </x-core::table.body.cell>
 
             <x-core::table.body.cell width="5%">
@@ -94,7 +94,7 @@
 
                 @if (!$isNotDefaultLanguage)
                     <x-core::table.body.cell>
-                        <input class="input-color-picker" style="display: none" name="swatch-value" type="text" value="{{ $attribute->color }}" />
+                        <input data-bb-color-picker style="display: none" name="swatch-value" type="text" value="{{ $attribute->color }}" />
                     </x-core::table.body.cell>
 
                     <x-core::table.body.cell>
