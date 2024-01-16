@@ -86,15 +86,15 @@ class LoginForm extends AuthForm
             ->add('closeRow', HtmlField::class, [
                 'html' => '</div>',
             ])
-            ->submitButton(Blade::render(sprintf('%s <x-core::icon name="ti ti-arrow-narrow-right" class="ms-1" />', __('Login'))))
-            ->add('register', HtmlField::class, [
-                'html' => sprintf(
-                    '<div class="mt-3 text-center">%s <a href="%s" class="text-decoration-underline">%s</a></div>',
-                    __("Don't have an account?"),
-                    route('customer.register'),
-                    __('Register now')
-                ),
-            ])
+//            ->submitButton(Blade::render(sprintf('%s <x-core::icon name="ti ti-arrow-narrow-right" class="ms-1" />', __('Login'))))
+//            ->add('register', HtmlField::class, [
+//                'html' => sprintf(
+//                    '<div class="mt-3 text-center">%s <a href="%s" class="text-decoration-underline">%s</a></div>',
+//                    __("Don't have an account?"),
+//                    route('customer.register'),
+//                    __('Register now')
+//                ),
+//            ])
             ->add('filters', HtmlField::class, [
                 'html' => apply_filters(BASE_FILTER_AFTER_LOGIN_OR_REGISTER_FORM, null, Customer::class),
             ]);

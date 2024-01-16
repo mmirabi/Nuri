@@ -915,7 +915,7 @@
     "version :version required": "version :version required",
     "when shipping fee less than or equal :amount": "when shipping fee less than or equal :amount",
     "✅ Purchased :time": "✅ Purchased :time",
-    "Login With Email": "ورود با ایمیل",
+    "Login With Email": "با ایمیل",
     "Login with social account": "ورود با شبکه های اجتماعی",
     "Register With Phone": "ثبت نام با موبایل",
     "Register With Email": "ثبت نام با ایمیل",
@@ -926,5 +926,5 @@
     "Last News": "جدیدترین مطالب",
     "Left Time": "زمان باقی مانده",
     "Send again": "ارسال مجدد",
-    "Login With Phone": "ورود با شماره موبایل"
+    "Login With Phone": " با شماره موبایل"
 }

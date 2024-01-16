@@ -80,8 +80,8 @@ if (defined('THEME_MODULE_SCREEN_NAME')) {
             Route::get('login', 'LoginController@showLoginForm')->name('login');
             Route::post('login', 'LoginController@login')->name('login.post');
 
-            Route::get('register', 'RegisterController@showRegistrationForm')->name('register');
-            Route::post('register', 'RegisterController@register')->name('register.post');
+//            Route::get('register', 'RegisterController@showRegistrationForm')->name('register');
+//            Route::post('register', 'RegisterController@register')->name('register.post');
 
             Route::get('verify-sms', 'LoginController@Verify')->name('verify');
             Route::post('verify-sms', 'LoginController@showVerifyForm')->name('verify.code');

@@ -16,8 +16,8 @@
                         <div class="login_wrap widget-taber-content background-white">
                             <div class="padding_eight_all verify-page">
                                 <div class="heading_s1">
-                                    <h1 class="mb-5">{{ __('Login') }}</h1>
-                                    <p class="mb-30">{{ __("Don't have an account?") }} <a href="{{ route('customer.register') }}">{{ __('Create one') }}</a></p>
+                                    <h3 class="mb-50 mt-20">{{ __('Login') }} | {{ __('Register') }}</h3>
+{{--                                    <p class="mb-30">{{ __("Don't have an account?") }} <a href="{{ route('customer.register') }}">{{ __('Create one') }}</a></p>--}}
                                 </div>
                                 <ul class="nav nav-tabs" id="EmailPhone" role="tablist">
                                     <li class="nav-item login-register" role="presentation">

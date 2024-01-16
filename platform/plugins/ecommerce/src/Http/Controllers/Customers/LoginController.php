@@ -63,8 +63,8 @@ class LoginController extends BaseController
             // ایجاد کاربر جدید
             $customer = new Customer();
             $customer->phone = $mobile;
-            $customer->code = "123456";
-            $customer->user_id = $user->id;
+
+
             $customer->name = $mobile;
             $customer->password = $mobile;
             $customer->email = "default@example.com";
@@ -96,7 +96,7 @@ class LoginController extends BaseController
         Theme::breadcrumb()->add(__('Login'), route('customer.login'));
 
         if (! session()->has('url.intended') &&
-            ! in_array(url()->previous(), [route('customer.login'), route('customer.register')])
+            ! in_array(url()->previous(), [route('customer.login')])
         ) {
             session(['url.intended' => url()->previous()]);
         }
